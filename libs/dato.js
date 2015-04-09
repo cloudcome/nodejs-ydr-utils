@@ -7,17 +7,11 @@
 
 'use strict';
 
-var qs = require('querystring');
-var path = require('path');
 var typeis = require('./typeis.js');
-var encryption = require('./encryption.js');
-//var request = require('./request.js');
 var udf;
 var canListTypeArr = 'array object nodelist htmlcollection'.split(' ');
-var REG_STRING_FIX = /[.*+?^=!:${}()|[\]/\\]/g;
-var REG_PATH = path.sep === '/' ? /\\/ : /\//g;
-var REG_URL = /\\/g;
 var REG_NOT_UTF16_SINGLE = /[^\x00-\xff]{2}/g;
+var REG_STRING_FIX = /[.*+?^=!:${}()|[\]/\\]/g;
 var REG_BEGIN_0 = /^0+/;
 
 
@@ -147,6 +141,32 @@ exports.extend = function (isExtendDeep, source, target) {
 
 
 /**
+ * 萃取
+ * @param data {Object} 传递的数据
+ * @param keys {Array} 摘取的键数组
+ * @param [filter] {Function} 过滤方法，默认取不为 undefined 键值
+ * @returns {Object}
+ */
+exports.pick = function (data, keys, filter) {
+    var data2 = {};
+
+    data = data || {};
+
+    filter = filter || function (val) {
+        return val !== udf;
+    };
+
+    keys.forEach(function (key) {
+        if (filter(data[key])) {
+            data2[key] = data[key];
+        }
+    });
+
+    return data2;
+};
+
+
+/**
  * 转换对象为一个纯数组，只要对象有length属性即可
  * @param {Object} [obj] 对象
  * @param {Boolean} [isConvertWhole] 是否转换整个对象为数组中的第0个元素，当该对象无length属性时，默认false
@@ -181,20 +201,52 @@ exports.toArray = function (obj, isConvertWhole) {
     return ret;
 };
 
-///**
-// * 判断一个对象是否有属于自身的方法、属性，而不是原型链方法、属性以及其他继承来的方法、属性
-// * @param obj {Object} 判断对象
-// * @param prop {String} 方法、属性名称
-// * @returns {Boolean}
-// *
-// * @example
-// * var o = {a: 1};
-// * data.hasOwnProperty(o, 'a');
-// * // => true
-// */
-//exports.hasOwnProperty = function (obj, prop) {
-//    return Object.prototype.hasOwnProperty.call(obj, prop);
-//};
+
+/**
+ * 计算字节长度
+ * @param string {String} 原始字符串
+ * @param [doubleLength=2] {Number} 双字节长度，默认为2
+ * @returns {number}
+ *
+ * @example
+ * data.bytes('我123');
+ * // => 5
+ */
+exports.bytes = function (string, doubleLength) {
+    string += '';
+    doubleLength = exports.parseInt(doubleLength, 2);
+
+    var i = 0,
+        j = string.length,
+        k = 0,
+        c;
+
+    for (; i < j; i++) {
+        c = string.charCodeAt(i);
+        k += (c >= 0x0001 && c <= 0x007e) || (0xff60 <= c && c <= 0xff9f) ? 1 : doubleLength;
+    }
+
+    return k;
+};
+
+
+/**
+ * 计算字符串长度
+ * 双字节的字符使用 length 属性计算不准确
+ * @ref http://es6.ruanyifeng.com/#docs/string
+ * @param string {String} 原始字符串
+ *
+ * @example
+ * var s = "𠮷";
+ * s.length = 2;
+ * dato.length(s);
+ * // => 3
+ */
+exports.length = function (string) {
+    string += '';
+
+    return string.replace(REG_NOT_UTF16_SINGLE, '*').length;
+};
 
 
 /**
@@ -258,6 +310,122 @@ exports.compare = function (obj1, obj2) {
 
 
 /**
+ * 人类数字，千位分割
+ * @param number {String|Number} 数字（字符串）
+ * @param [separator=","] {String} 分隔符
+ * @param [length=3] {Number} 分隔长度
+ * @returns {string} 分割后的字符串
+ */
+exports.humanize = function (number, separator, length) {
+    separator = separator || ',';
+    length = length || 3;
+
+    var reg = new RegExp('(\\d)(?=(\\d{' + length + '})+$)', 'g');
+    var arr = String(number).split('.');
+    var p1 = arr[0].replace(reg, '$1' + separator);
+
+    return p1 + (arr[1] ? '.' + arr[1] : '');
+};
+
+
+/**
+ * 比较两个长整型数值
+ * @param long1 {String} 长整型数值字符串1
+ * @param long2 {String} 长整型数值字符串2
+ * @param [operator=">"] {String} 比较操作符，默认比较 long1 > long2
+ * @returns {*}
+ */
+exports.than = function (long1, long2, operator) {
+    operator = operator || '>';
+    long1 = String(long1).replace(REG_BEGIN_0, '');
+    long2 = String(long2).replace(REG_BEGIN_0, '');
+
+    // 1. 比较长度
+    if (long1.length > long2.length) {
+        return operator === '>';
+    } else if (long1.length < long2.length) {
+        return operator === '<';
+    }
+
+    var long1List = exports.humanize(long1, ',', 15).split(',');
+    var long2List = exports.humanize(long2, ',', 15).split(',');
+
+    //[
+    // '123456',
+    // '789012345678901',
+    // '234567890123456',
+    // '789012345678901',
+    // '234567890123457'
+    // ]
+
+    // 2. 比较数组长度
+    if (long1List.length > long2List.length) {
+        return operator === '>';
+    } else if (long1List.length < long2List.length) {
+        return operator === '<';
+    }
+
+    // 3. 遍历比较
+    var ret = false;
+
+    exports.each(long1List, function (index, number1) {
+        var number2 = long2List[index];
+
+        if (number1 > number2) {
+            ret = operator === '>';
+            return false;
+        } else if (number1 < number2) {
+            ret = operator === '<';
+            return false;
+        }
+    });
+
+    return ret;
+};
+
+
+/**
+ * 按长度填满指定字符
+ * @param {Number|String} orginalString 原始字符串
+ * @param {Number} length 长度
+ * @param {String} [fixString="0"] 补充的字符
+ * @param {Boolean} [isSuffix=false] 是否添加为后缀，默认前缀
+ * @returns {String}
+ *
+ * @example
+ * dato.fillString('2', 4);
+ * // => "0002"
+ */
+exports.fillString = function (orginalString, length, fixString, isSuffix) {
+    var len = length;
+    var fixedString = '';
+    var args = arguments;
+    var argL = args.length;
+
+    // dato.fillString(originalString, length, isSuffix);
+    // dato.fillString(originalString, length, fixString, isSuffix);
+    if (typeis.boolean(args[argL - 1])) {
+        fixString = argL === 4 ? args[2] : '0';
+        isSuffix = args[argL - 1];
+    }
+    // dato.fillString(originalString, length);
+    // dato.fillString(originalString, length, fixString);
+    else {
+        fixString = argL === 3 ? args[2] : '0';
+        isSuffix = false;
+    }
+
+    while (len--) {
+        fixedString += fixString;
+    }
+
+    return isSuffix ?
+        (orginalString + fixedString).slice(0, length) :
+        (fixedString + orginalString).slice(-length);
+};
+
+
+/**
  * 修正正则字符串
  * @param regExpString
  * @returns {String}
@@ -271,72 +439,43 @@ exports.fixRegExp = function (regExpString) {
 };
 
 
+/////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////[ ONLY NODEJS ]////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////
+var path = require('path');
+var qs = require('querystring');
+var encryption = require('./encryption.js');
+var REG_PATH = path.sep === '/' ? /\\/ : /\//g;
+var REG_URL = /\\/g;
+
+
 /**
- * 计算字节长度
- * @param string {String} 原始字符串
- * @param [doubleLength=2] {Number} 双字节长度，默认为2
- * @returns {number}
- *
- * @example
- * data.bytes('我123');
- * // => 5
+ * ascii to base64
+ * @param ascii {String} ascii 字符串
+ * @returns {String} base64 字符串
  */
-exports.bytes = function (string, doubleLength) {
-    string += '';
-    doubleLength = exports.parseInt(doubleLength, 2);
-
-    var i = 0,
-        j = string.length,
-        k = 0,
-        c;
-
-    for (; i < j; i++) {
-        c = string.charCodeAt(i);
-        k += (c >= 0x0001 && c <= 0x007e) || (0xff60 <= c && c <= 0xff9f) ? 1 : doubleLength;
+exports.atob = function (ascii) {
+    try {
+        return new Buffer(encodeURIComponent(ascii), 'utf8').toString('base64');
+    } catch (err) {
+        return '';
     }
-
-    return k;
 };
 
 
 /**
- * 计算字符串长度
- * 双字节的字符使用 length 属性计算不准确
- * @ref http://es6.ruanyifeng.com/#docs/string
- * @param string {String} 原始字符串
- *
- * @example
- * var s = "𠮷";
- * s.length = 2;
- * dato.length(s);
- * // => 3
+ * base64 to ascii
+ * @param base64 {String} base64 字符串
+ * @returns {String} ascii 字符串
  */
-exports.length = function (string) {
-    string += '';
-
-    return string.replace(REG_NOT_UTF16_SINGLE, '*').length;
-};
-
-
-/**
- * 按长度补0填充数字
- * @param  {Number|String} number 数字
- * @param  {Number} length 长度
- * @return {String} 修复后的数字
- *
- * @example
- * fixedNumber(2, 4);
- * // => "0002"
- */
-exports.fillNumber = function (number, length) {
-    var len = length;
-    var start = '';
-
-    while (len--) {
-        start += '0';
+exports.btoa = function (base64) {
+    try {
+        return decodeURIComponent(new Buffer(base64, 'base64').toString());
+    } catch (err) {
+        return '';
     }
-
-    return (start + number).slice(-length);
 };
 
 
@@ -418,106 +557,6 @@ exports.removeComments = function (str) {
 
 
 /**
- * base64 to ascii
- * @param ascii
- */
-exports.atob = function (ascii) {
-    try {
-        return new Buffer(encodeURIComponent(ascii), 'utf8').toString('base64');
-    } catch (err) {
-        return '';
-    }
-};
-
-/**
- * base64 to ascii
- * @param base64
- */
-exports.btoa = function (base64) {
-    try {
-        return decodeURIComponent(new Buffer(base64, 'base64').toString());
-    } catch (err) {
-        return '';
-    }
-};
-
-
-/**
- * 人类数字，千位分割
- * @param number {String|Number} 数字（字符串）
- * @param [separator=","] {String} 分隔符
- * @param [length=3] {Number} 分隔长度
- * @returns {string} 分割后的字符串
- */
-exports.humanize = function (number, separator, length) {
-    separator = separator || ',';
-    length = length || 3;
-
-    var reg = new RegExp('(\\d)(?=(\\d{' + length + '})+$)', 'g');
-    var arr = String(number).split('.');
-    var p1 = arr[0].replace(reg, '$1' + separator);
-
-    return p1 + (arr[1] ? '.' + arr[1] : '');
-};
-
-
-/**
- * 比较两个长整型数值
- * @param long1 {String} 长整型数值字符串1
- * @param long2 {String} 长整型数值字符串2
- * @param [operator=">"] {String} 比较操作符，默认比较 long1 > long2
- * @returns {*}
- */
-exports.than = function (long1, long2, operator) {
-    operator = operator || '>';
-    long1 = String(long1).replace(REG_BEGIN_0, '');
-    long2 = String(long2).replace(REG_BEGIN_0, '');
-
-    // 1. 比较长度
-    if (long1.length > long2.length) {
-        return operator === '>';
-    } else if (long1.length < long2.length) {
-        return operator === '<';
-    }
-
-    var long1List = exports.humanNumber(long1, ',', 15).split(',');
-    var long2List = exports.humanNumber(long2, ',', 15).split(',');
-
-    //[
-    // '123456',
-    // '789012345678901',
-    // '234567890123456',
-    // '789012345678901',
-    // '234567890123457'
-    // ]
-
-    // 2. 比较数组长度
-    if (long1List.length > long2List.length) {
-        return operator === '>';
-    } else if (long1List.length < long2List.length) {
-        return operator === '<';
-    }
-
-    // 3. 遍历比较
-    var ret = false;
-
-    exports.each(long1List, function (index, number1) {
-        var number2 = long2List[index];
-
-        if (number1 > number2) {
-            ret = operator === '>';
-            return false;
-        } else if (number1 < number2) {
-            ret = operator === '<';
-            return false;
-        }
-    });
-
-    return ret;
-};
-
-
-/**
  * 获取 gravatar
  * @param email {String} 邮箱
  * @param [options] {Object} 配置
@@ -557,31 +596,21 @@ exports.gravatar = function (email, options) {
         s: options.size
     };
 
-    if(options.default){
+    if (options.default) {
         query.d = options.default;
     }
 
-    if(options.forcedefault){
+    if (options.forcedefault) {
         query.f = options.forcedefault;
     }
 
-    if(options.rating){
+    if (options.rating) {
         query.r = options.rating;
     }
 
     return options.host + qs.stringify(query);
 };
 
-//var ascii = '云淡然2014';
-//var base64;
-//console.log(base64 = exports.atob(ascii));
-//console.log(exports.btoa(base64));
-//console.log(exports.humanize('31231231231210.003112'));
 
-//var long1 = '12345678901234567890';
-//var long2 = '5';
-//
-//var ret = exports.than(long1, long2);
-//console.log(ret);
 
-//console.log(exports.gravatar('1@1.com'));
+
