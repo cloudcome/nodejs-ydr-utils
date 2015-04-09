@@ -7,6 +7,8 @@
 'use strict';
 
 module.exports = {
+    // 调用
+    allocation: require('./libs/allocation.js'),
     // 阿里云 OSS 上传
     aliOSS: require('./libs/ali-oss.js'),
     // 类

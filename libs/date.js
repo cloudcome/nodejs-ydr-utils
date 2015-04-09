@@ -5,13 +5,9 @@
  */
 
 
-/**
- * @module util/date
- * @requires util/dato
- * @requires util/typeis
- */
 'use strict';
 
+var allocation = require('./allocation.js');
 var dato = require('./dato.js');
 var typeis = require('./typeis.js');
 var weeks = '日一二三四五六';
@@ -88,8 +84,10 @@ exports.format = function (format, date, config) {
         throw new Error('date format must be a string');
     }
 
+    var args = allocation.args(arguments);
+
     if (typeis(arguments[1]) === 'object') {
-        config = arguments[1];
+        config = args[1];
         date = new Date();
     }
 
@@ -120,7 +118,7 @@ exports.format = function (format, date, config) {
         },
         {
             key: 'MM',
-            val: dato.fillNumber(M, 2),
+            val: dato.fillString(M, 2),
             is: 'M'
         },
         {
@@ -130,7 +128,7 @@ exports.format = function (format, date, config) {
         },
         {
             key: 'DD',
-            val: dato.fillNumber(D, 2),
+            val: dato.fillString(D, 2),
             is: 'D'
         },
         {
@@ -140,7 +138,7 @@ exports.format = function (format, date, config) {
         },
         {
             key: 'HH',
-            val: dato.fillNumber(H, 2),
+            val: dato.fillString(H, 2),
             is: 'H'
         },
         {
@@ -150,7 +148,7 @@ exports.format = function (format, date, config) {
         },
         {
             key: 'hh',
-            val: dato.fillNumber(h, 2),
+            val: dato.fillString(h, 2),
             is: 'h'
         },
         {
@@ -160,7 +158,7 @@ exports.format = function (format, date, config) {
         },
         {
             key: 'mm',
-            val: dato.fillNumber(m, 2),
+            val: dato.fillString(m, 2),
             is: 'm'
         },
         {
@@ -170,7 +168,7 @@ exports.format = function (format, date, config) {
         },
         {
             key: 'ss',
-            val: dato.fillNumber(s, 2),
+            val: dato.fillString(s, 2),
             is: 's'
         },
         {
@@ -180,12 +178,12 @@ exports.format = function (format, date, config) {
         },
         {
             key: 'SSS',
-            val: dato.fillNumber(S, 3),
+            val: dato.fillString(S, 3),
             is: 'S'
         },
         {
             key: 'SS',
-            val: dato.fillNumber(S, 2),
+            val: dato.fillString(S, 2),
             is: 'S'
         },
         {
@@ -378,7 +376,7 @@ exports.getWeeksInMonth = function (year, month, date, isNatualMonth) {
 /**
  * 人性化比较时间时间
  * @param {String|Number|Date} date 比较时间
- * @param {String|Number|Date} [date] 被比较时间，默认为当前时间
+ * @param {String|Number|Date} [compareDate] 被比较时间，默认为当前时间
  * @returns {string}
  *
  * @example
