@@ -7,7 +7,7 @@
 'use strict';
 
 var dato = require('./dato.js');
-var date = require('./dato.js');
+var date = require('./date.js');
 var typeis = require('./typeis.js');
 var fs = require('fs-extra');
 var path = require('path');

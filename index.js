@@ -10,7 +10,7 @@ module.exports = {
     // 调用
     allocation: require('./libs/allocation.js'),
     // 阿里云 OSS 上传
-    aliOSS: require('./libs/ali-oss.js'),
+    AliOSS: require('./libs/ali-oss.js'),
     // 类
     class: require('./libs/class.js'),
     // 日期
