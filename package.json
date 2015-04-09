@@ -1,0 +1,54 @@
+{
+  "name": "ydr-utils",
+  "version": "1.0.0",
+  "private": false,
+  "description": "util for ydr.me",
+  "scripts": {},
+  "preferGlobal": false,
+  "bin": {},
+  "main": "index.js",
+  "keywords": [
+    "cloudcome",
+    "ydr.me",
+    "util",
+    "utils",
+    "class",
+    "crypto",
+    "date",
+    "dato",
+    "httpStatus",
+    "log",
+    "mime",
+    "random",
+    "request",
+    "template",
+    "express",
+    "koa",
+    "translate",
+    "typeis",
+    "validate",
+    "validator",
+    "validation",
+    "xss"
+  ],
+  "author": {
+    "name": "cloudcome",
+    "email": "cloudcome@163.com",
+    "url": "http://ydr.me"
+  },
+  "homepage": "https://github.com/cloudcome/nodejs-ydr-utils",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cloudcome/nodejs-ydr-utils"
+  },
+  "bugs": {
+    "url": "https://github.com/cloudcome/nodejs-ydr-utils/issues"
+  },
+  "dependencies": {
+    "fs-extra": "^0.18.0",
+    "howdo": "^1.1.4",
+    "marked": "^0.3.3"
+  },
+  "devDependencies": {},
+  "licenses": "MIT"
+}
