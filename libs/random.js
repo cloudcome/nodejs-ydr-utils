@@ -47,7 +47,7 @@ exports.number = function (min, max) {
 /**
  * 随机字符串
  * @param [length=6] {Number} 随机字符串长度
- * @param [dictionary='a'] {String} 字典
+ * @param [dictionary='aA0'] {String} 字典
  *
  * @example
  * // 字典对应关系
@@ -92,7 +92,6 @@ exports.string = function (length, dictionary) {
 
 
 
-
 /**
  * 根据当前时间戳生成指定长度不重复的26位纯数字字符串
  * 数字之间有大小之分，因此可以用来排序
@@ -106,21 +105,21 @@ exports.guid = function () {
     var a = [];
     var d = new Date();
     // 4
-    var Y = dato.fillNumber(d.getFullYear(), 4);
+    var Y = dato.fillString(d.getFullYear(), 4);
     // 2
-    var M = dato.fillNumber(d.getMonth() + 1, 2);
+    var M = dato.fillString(d.getMonth() + 1, 2);
     // 2
-    var D = dato.fillNumber(d.getDate(), 2);
+    var D = dato.fillString(d.getDate(), 2);
     // 2
-    var H = dato.fillNumber(d.getHours(), 2);
+    var H = dato.fillString(d.getHours(), 2);
     // 2
-    var I = dato.fillNumber(d.getMinutes(), 2);
+    var I = dato.fillString(d.getMinutes(), 2);
     // 2
-    var S = dato.fillNumber(d.getSeconds(), 2);
+    var S = dato.fillString(d.getSeconds(), 2);
     // 3
-    var C = dato.fillNumber(d.getMilliseconds(), 3);
+    var C = dato.fillString(d.getMilliseconds(), 3);
     // 9
-    var N = dato.fillNumber(process.hrtime()[1], 9);
+    var N = dato.fillString(process.hrtime()[1], 9);
 
     a.push(Y);
     a.push(M);
