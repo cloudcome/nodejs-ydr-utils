@@ -15,6 +15,8 @@ module.exports = {
     date: require('./libs/date.js'),
     // 数据出口
     dato: require('./libs/dato.js'),
+    // 加密
+    encryption: require('./libs/encryption.js'),
     // HTTP status
     httpStatus: require('./libs/http-status.js'),
     // log
@@ -25,8 +27,6 @@ module.exports = {
     random: require('./libs/random.js'),
     // 数据类型
     request: require('./libs/request.js'),
-    // 加密
-    secret: require('./libs/secret.js'),
     // 模板引擎
     Template: require('./libs/template.js'),
     // 翻译

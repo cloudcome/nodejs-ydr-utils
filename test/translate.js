@@ -5,7 +5,7 @@
  */
 
 
-var translate = require('../libs/translate.js');
+var translate = require('../').translate;
 
 translate('你好', function (err, word) {
     console.log(err);

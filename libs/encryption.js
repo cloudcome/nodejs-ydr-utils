@@ -11,7 +11,6 @@ var fs = require('fs');
 var crypto = require('crypto');
 var random = require('./random.js');
 var typeis = require('./typeis.js');
-var crypto2 = require('./crypto.js');
 
 
 /**
@@ -85,7 +84,7 @@ exports.etag = function (file, callback) {
             data = '';
         }
 
-        return crypto2.md5(data);
+        return exports.md5(data);
     }
 };
 
@@ -154,7 +153,7 @@ exports.decode = function (data, secret) {
 exports.password = function (originalPassword, signPassword) {
     var key = '';
     var cnt = '';
-    var crypto = function (key, cnt) {
+    var entryption = function (key, cnt) {
         // 轮次 sha1
         key = exports.sha1(key, cnt);
         cnt = exports.sha1(cnt, key);
@@ -167,13 +166,13 @@ exports.password = function (originalPassword, signPassword) {
         key = signPassword.slice(0, 8);
         cnt = signPassword.slice(8);
 
-        return crypto(key, originalPassword) === cnt;
+        return entryption(key, originalPassword) === cnt;
     }
     // 密码签名
     else {
         key = random.string(8, '~@#$%^&*()_+{}[]=-<>?/,.|:;');
 
-        return key + crypto(key, originalPassword);
+        return key + entryption(key, originalPassword);
     }
 };
 

@@ -10,7 +10,7 @@
 var qs = require('querystring');
 var path = require('path');
 var typeis = require('./typeis.js');
-var crypto = require('./crypto.js');
+var encryption = require('./encryption.js');
 //var request = require('./request.js');
 var udf;
 var canListTypeArr = 'array object nodelist htmlcollection'.split(' ');
@@ -536,7 +536,7 @@ exports.gravatar = function (email, options) {
         options.host = 'http://gravatar.duoshuo.com/avatar/';
     }
 
-    options.host += crypto.md5(email) + '?';
+    options.host += encryption.md5(email) + '?';
 
     if (!options.size) {
         options.size = 100;

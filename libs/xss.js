@@ -9,7 +9,7 @@
 var marked = require('marked');
 var typeis = require('./typeis.js');
 var dato = require('./dato.js');
-var crypto = require('./crypto.js');
+var encryption = require('./encryption.js');
 var url = require('url');
 var REG_DOUBLE = /^\/\//;
 var REG_POINT = /\./g;
@@ -101,7 +101,7 @@ exports.mdSafe = function (source, moreDangerTagNameList) {
     //
     //    var depth = new Array((token.depth - 1) * 4 + 1).join(' ');
     //
-    //    toc += depth + '- [' + token.text + '](#heading-' + crypto.md5(token.text) + ')\n';
+    //    toc += depth + '- [' + token.text + '](#heading-' + encryption.md5(token.text) + ')\n';
     //});
     //
     //return toc + '\n\n<!--toc end-->' + ret;
@@ -125,7 +125,7 @@ exports.mdTOC = function (source) {
 
         var depth = new Array((token.depth - 1) * 4 + 1).join(' ');
 
-        toc += depth + '- [' + token.text + '](#heading-' + token.depth + '-' + (index++) + '-' + crypto.md5(token.text) + ')\n';
+        toc += depth + '- [' + token.text + '](#heading-' + token.depth + '-' + (index++) + '-' + encryption.md5(token.text) + ')\n';
     });
 
     return toc + '\n\n';
@@ -182,7 +182,7 @@ exports.mdRender = function (source, filterOptions) {
     var index = 0;
 
     markedRender.heading = function (text, level) {
-        var href = crypto.md5(text);
+        var href = encryption.md5(text);
 
         var html = '<h' + level + ' id="heading-' + level + '-' + index + '-' + href + '"><a class="heading-link" ' +
             'href="#toc-' + level + '-' + index + '-' + href + '">' +
