@@ -1,6 +1,6 @@
 {
   "name": "ydr-utils",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": false,
   "description": "util for ydr.me",
   "scripts": {},
@@ -12,6 +12,8 @@
     "ydr.me",
     "util",
     "utils",
+    "aliyun",
+    "oss",
     "class",
     "crypto",
     "date",
@@ -24,6 +26,7 @@
     "template",
     "express",
     "koa",
+    "secret",
     "translate",
     "typeis",
     "validate",
@@ -45,9 +48,12 @@
     "url": "https://github.com/cloudcome/nodejs-ydr-utils/issues"
   },
   "dependencies": {
+    "busboy": "^0.2.9",
     "fs-extra": "^0.18.0",
     "howdo": "^1.1.4",
-    "marked": "^0.3.3"
+    "imagesize": "^1.0.0",
+    "marked": "^0.3.3",
+    "xml2js": "^0.4.6"
   },
   "devDependencies": {},
   "licenses": "MIT"
