@@ -196,7 +196,7 @@ exports.mdRender = function (source, filterOptions) {
 
 
     // ![](1.png =200x100)
-    module.exports = function (src, title, text) {
+    markedRender.image = function (src, title, text) {
         src = src || '';
 
         var matches = src.match(REG_SIZE);
