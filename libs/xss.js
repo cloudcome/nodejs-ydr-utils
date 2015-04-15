@@ -16,8 +16,8 @@ var REG_POINT = /\./g;
 var REG_LT = /</g;
 var REG_GT = />/g;
 var REG_SHAP = /^#/;
-var REG_NOT_WORD = /[^\w]/g;
-var RGE_FIRST = /^-/;
+//var REG_NOT_WORD = /[^\w]/g;
+//var RGE_FIRST = /^-/;
 var REG_TOC = /^#heading(-\d-\d+-.*)$/;
 // 空白
 //var REG_SPACE = /[\x00-\x20\x7F-\xA0\u1680\u180E\u2000-\u200B\u2028\u2029\u202F\u205F\u3000\uFEFF\t\v]{1,}/g;
@@ -26,6 +26,7 @@ var REG_LONG_BREAK_LINE = /[\n\r]{3,}/g;
 var REG_CLOSE_TAGNAME = /(?!```)<([a-z\d]+)\b[\s\S]*?>([\s\S]*?)<\/\1>(?!```)/ig;
 var REG_PRE = /```[\s\S]*?```/g;
 var REG_PATH = /^(\/|\.{0,2})(\/[^/]+)+$/;
+var REG_SIZE = /(?:\s+?=\s*?(\d+)(?:[x*×](\d+))?)?$/i;
 // 影响页面的危险标签
 var dangerTagNameList = 'script iframe frameset body head html link'.split(' ');
 var filterDefaults = {
@@ -191,6 +192,30 @@ exports.mdRender = function (source, filterOptions) {
         index++;
 
         return html;
+    };
+
+
+    // ![](1.png =200x100)
+    module.exports = function (src, title, text) {
+        src = src || '';
+
+        var matches = src.match(REG_SIZE);
+        var width = null;
+        var height = null;
+
+        if (matches) {
+            width = matches[1];
+            height = matches[2];
+            src = src.replace(REG_SIZE, '');
+        }
+
+        return '<img' +
+            (typeis.null(title) ? '' : ' title="' + title + '"') +
+            (typeis.null(text) ? '' : ' alt="' + text + '"') +
+            (typeis.null(src) ? '' : ' src="' + src + '"' ) +
+            (typeis.null(width) ? '' : ' width="' + width + '"') +
+            (typeis.null(height) ? '' : ' height="' + height + '"' ) +
+            '>';
     };
 
 
