@@ -210,14 +210,13 @@ exports.mdRender = function (source, filterOptions) {
         }
 
         return '<img' +
-            (typeis.null(title) ? '' : ' title="' + title + '"') +
-            (typeis.null(text) ? '' : ' alt="' + text + '"') +
-            (typeis.null(src) ? '' : ' src="' + src + '"' ) +
-            (typeis.null(width) ? '' : ' width="' + width + '"') +
-            (typeis.null(height) ? '' : ' height="' + height + '"' ) +
+            (typeis.null(title) || typeis.undefined(title) ? '' : ' title="' + title + '"') +
+            (typeis.null(text) || typeis.undefined(text) ? '' : ' alt="' + text + '"') +
+            (typeis.null(src) || typeis.undefined(src) ? '' : ' src="' + src + '"' ) +
+            (typeis.null(width) || typeis.undefined(width) ? '' : ' width="' + width + '"') +
+            (typeis.null(height) || typeis.undefined(height) ? '' : ' height="' + height + '"' ) +
             '>';
     };
-
 
     marked.setOptions({renderer: markedRender});
 
