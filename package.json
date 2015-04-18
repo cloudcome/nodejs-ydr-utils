@@ -1,6 +1,6 @@
 {
   "name": "ydr-utils",
-  "version": "16.9.0",
+  "version": "16.10.0",
   "private": false,
   "description": "utils for ydr.me",
   "scripts": {},
@@ -53,6 +53,7 @@
     "howdo": "^1.1.4",
     "imagesize": "^1.0.0",
     "marked": "^0.3.3",
+    "sanitize-html": "^1.6.1",
     "xml2js": "^0.4.6"
   },
   "devDependencies": {},

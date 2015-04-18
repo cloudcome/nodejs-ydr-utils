@@ -7,6 +7,7 @@
 'use strict';
 
 var marked = require('marked');
+var random = require('./random.js');
 var typeis = require('./typeis.js');
 var dato = require('./dato.js');
 var encryption = require('./encryption.js');
@@ -49,64 +50,43 @@ var filterDefaults = {
         }
     }
 };
+var sanitizeHtml = require('sanitize-html');
+var sanitizeOptions = {
+    allowedTags: ['b', 'i', 'em', 'strong', 'a', 'img'],
+    allowedAttributes: {
+        a: ['href'],
+        img: ['src']
+    }
+};
 
 
 /**
  * markdown 语法安全过滤，虽然 markdown 支持兼容 HTML 标签，但为了安全考虑，
  * 这里必须去掉相当一部分的标签
  * @param source {String} 原始内容
- * @param [moreDangerTagNameList] {Array} 更多危险标签，危险标签是会被直接删除的
  * @returns {string} 过滤后的内容
  */
-exports.mdSafe = function (source, moreDangerTagNameList) {
-    var list = source.split(REG_PRE);
-    var pres = source.match(REG_PRE) || [''];
-    var ret = '';
-    var i = 0;
+exports.mdSafe = function (source) {
+    var preMap = {};
 
-    if (typeis(moreDangerTagNameList) !== 'array') {
-        moreDangerTagNameList = [];
-    }
+    source = source.replace(REG_PRE, function ($0) {
+        var key = _generatorKey();
 
-    // 过滤不安全 HTML 标签
-    list = list.map(function (item) {
-        return item
-            .replace(REG_CLOSE_TAGNAME, function ($0, $1) {
-                $1 = $1.toLowerCase();
+        preMap[key] = $0;
 
-                if (dangerTagNameList.indexOf($1) > -1 || moreDangerTagNameList.indexOf($1) > -1) {
-                    return '';
-                } else {
-                    return $0.replace(REG_LT, '&lt;').replace(REG_GT, '&gt;');
-                }
-            })
-            .replace(REG_LONG_BREAK_LINE, '\n\n\n');
+        return key;
     });
 
-    list.forEach(function (item, j) {
-        if (j > 0) {
-            ret += pres[i++];
-        }
+    source = sanitizeHtml(source, sanitizeOptions);
 
-        ret += item;
+
+    dato.each(preMap, function (key, val) {
+        source = source.replace(key, val);
     });
 
-    return ret;
+    source = source.replace(REG_LONG_BREAK_LINE, '\n\n\n');
 
-    //var tokens = marked.lexer(source);
-    //var toc = '<!--toc start-->';
-    //
-    //tokens.forEach(function (token) {
-    //    if (token.type !== 'heading') {
-    //        return;
-    //    }
-    //
-    //    var depth = new Array((token.depth - 1) * 4 + 1).join(' ');
-    //
-    //    toc += depth + '- [' + token.text + '](#heading-' + encryption.md5(token.text) + ')\n';
-    //});
-    //
-    //return toc + '\n\n<!--toc end-->' + ret;
+    return source;
 };
 
 
@@ -282,6 +262,16 @@ function _regExp(regstr) {
     });
 
     return new RegExp('^' + ret + '$', 'i');
+}
+
+
+/**
+ * 生成唯一随机字符串
+ * @returns {string}
+ * @private
+ */
+function _generatorKey() {
+    return 'œ' + random.string(10, 'aA0') + random.guid() + Date.now() + 'œ';
 }
 
 
