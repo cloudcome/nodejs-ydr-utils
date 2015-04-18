@@ -29,6 +29,7 @@ var REG_PATH = /^(\/|\.{0,2})(\/[^/]+)+$/;
 var REG_SIZE = /(?:\s+?=\s*?(\d+)(?:[x*×](\d+))?)?$/i;
 // 影响页面的危险标签
 var dangerTagNameList = 'script iframe frameset body head html link'.split(' ');
+var tableClassName = 'table table-radius table-bordered table-hover';
 var filterDefaults = {
     /**
      * link 配置
@@ -182,6 +183,8 @@ exports.mdRender = function (source, filterOptions) {
 
     var index = 0;
 
+
+    // heading
     markedRender.heading = function (text, level) {
         var href = encryption.md5(text);
 
@@ -217,6 +220,13 @@ exports.mdRender = function (source, filterOptions) {
             (typeis.null(height) || typeis.undefined(height) ? '' : ' height="' + height + '"' ) +
             '>';
     };
+
+
+    // 表格
+    markedRender.table = function (thead, tbody) {
+        return '<table class="' + tableClassName + '"><thead>' + thead + '</thead><tbody>' + tbody + '</tbody></table>';
+    };
+
 
     marked.setOptions({renderer: markedRender});
 

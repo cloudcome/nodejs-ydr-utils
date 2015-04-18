@@ -2,7 +2,7 @@
   "name": "ydr-utils",
   "version": "16.8.0",
   "private": false,
-  "description": "util for ydr.me",
+  "description": "utils for ydr.me",
   "scripts": {},
   "preferGlobal": false,
   "bin": {},
