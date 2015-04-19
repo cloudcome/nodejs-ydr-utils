@@ -453,7 +453,7 @@ Validator.fn._validateOne = function (rule, data, callback) {
             dato.each(rule.onafters, function (index, onafter) {
                 var ret = onafter.call(rule, val, data);
 
-                if (ret && ret.constructor === Error) {
+                if (typeis.error(ret)) {
                     // callback
                     if (typeis.function(callback)) {
                         callback.call(the, ret, data);
