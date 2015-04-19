@@ -22,7 +22,8 @@ var REG_SHAP = /^#/;
 var REG_TOC = /^#heading(-\d-\d+-.*)$/;
 // 空白
 //var REG_SPACE = /[\x00-\x20\x7F-\xA0\u1680\u180E\u2000-\u200B\u2028\u2029\u202F\u205F\u3000\uFEFF\t\v]{1,}/g;
-var REG_LONG_BREAK_LINE = /[\n\r]{3,}/g;
+var REG_BREAK_LINE = /\r/g;
+var REG_LONG_BREAK_LINE = /\n{3,}/g;
 // 自动关闭标签是安全的，如 br、hr、img 等
 //var REG_CLOSE_TAGNAME = /(?!```)<([a-z\d]+)\b[\s\S]*?>([\s\S]*?)<\/\1>(?!```)/ig;
 //var REG_PRE = /```[\s\S]*?```/g;
@@ -87,9 +88,9 @@ var sanitizeOptions = {
  * @returns {string} 过滤后的内容
  */
 exports.mdSafe = function (source) {
-    source = source.replace(REG_LONG_BREAK_LINE, '\n\n\n');
-
-    return source;
+    return source
+        .replace(REG_BREAK_LINE, '\n')
+        .replace(REG_LONG_BREAK_LINE, '\n\n\n');
 };
 
 
