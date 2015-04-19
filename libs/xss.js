@@ -26,6 +26,10 @@ var REG_LONG_BREAK_LINE = /[\n\r]{3,}/g;
 // 自动关闭标签是安全的，如 br、hr、img 等
 var REG_CLOSE_TAGNAME = /(?!```)<([a-z\d]+)\b[\s\S]*?>([\s\S]*?)<\/\1>(?!```)/ig;
 var REG_PRE = /```[\s\S]*?```/g;
+var REG_PRE2 = /^( {4}[^\n]+\n*)+/g;
+var REG_CODE = /(`+)\s*([\s\S]*?[^`])\s*\1(?!`)/g;
+var REG_BLOKQUOTE = /^( *>[^\n]+(\n(?!def)[^\n]+)*\n*)+/g;
+var REG_LINK = /<https?:\/\/>/gi;
 var REG_PATH = /^(\/|\.{0,2})(\/[^/]+)+$/;
 var REG_SIZE = /(?:\s+?=\s*?(\d+)(?:[x*×](\d+))?)?$/i;
 // 影响页面的危险标签
@@ -52,10 +56,26 @@ var filterDefaults = {
 };
 var sanitizeHtml = require('sanitize-html');
 var sanitizeOptions = {
-    allowedTags: ['b', 'i', 'em', 'strong', 'a', 'img'],
+    allowedTags: [
+        // inline
+        'b', 'i', 'em', 'strong', 'a', 'img', 'code', 'del',
+        // block
+        'p', 'blockquote', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'br', 'hr',
+        // list
+        'ol', 'ul', 'li',
+        // table
+        'table', 'thead', 'tbody', 'tr', 'th', 'td', 'caption'
+    ],
     allowedAttributes: {
-        a: ['href'],
-        img: ['src']
+        a: ['href', 'target', 'class', 'id'],
+        img: ['src', 'title', 'alt'],
+        h1: ['id', 'class'],
+        h2: ['id', 'class'],
+        h3: ['id', 'class'],
+        h4: ['id', 'class'],
+        h5: ['id', 'class'],
+        h6: ['id', 'class'],
+        table: ['class']
     }
 };
 
@@ -67,22 +87,41 @@ var sanitizeOptions = {
  * @returns {string} 过滤后的内容
  */
 exports.mdSafe = function (source) {
-    var preMap = {};
-
-    source = source.replace(REG_PRE, function ($0) {
-        var key = _generatorKey();
-
-        preMap[key] = $0;
-
-        return key;
-    });
-
-    source = sanitizeHtml(source, sanitizeOptions);
-
-
-    dato.each(preMap, function (key, val) {
-        source = source.replace(key, val);
-    });
+    //var preMap = {};
+    //
+    //// ```
+    //source = source.replace(REG_PRE, function ($0) {
+    //    var key = _generatorKey();
+    //
+    //    preMap[key] = $0;
+    //
+    //    return key;
+    //});
+    //
+    //// `
+    //source = source.replace(REG_CODE, function ($0) {
+    //    var key = _generatorKey();
+    //
+    //    preMap[key] = $0;
+    //
+    //    return key;
+    //});
+    //
+    //// >
+    //source = source.replace(REG_BLOKQUOTE, function ($0) {
+    //    var key = _generatorKey();
+    //
+    //    preMap[key] = $0;
+    //
+    //    return key;
+    //});
+    //
+    //source = sanitizeHtml(source, sanitizeOptions);
+    //
+    //
+    //dato.each(preMap, function (key, val) {
+    //    source = source.replace(key, val);
+    //});
 
     source = source.replace(REG_LONG_BREAK_LINE, '\n\n\n');
 
@@ -209,8 +248,10 @@ exports.mdRender = function (source, filterOptions) {
 
 
     marked.setOptions({renderer: markedRender});
+    source = marked(source);
+    source = sanitizeHtml(source, sanitizeOptions);
 
-    return marked(source);
+    return source;
 };
 
 
