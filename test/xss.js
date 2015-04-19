@@ -7,7 +7,7 @@
 'use strict';
 
 
-var dangerHTML = '```\nabc\n```</div> 1<2>3 abc';
+var dangerHTML = '```\nabc\n```\n\n</div> 1<2>3 abc';
 var xss  = require('../libs/xss.js');
 
 console.log(xss.mdSafe(dangerHTML));
