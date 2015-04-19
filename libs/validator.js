@@ -446,11 +446,29 @@ Validator.fn._validateOne = function (rule, data, callback) {
             .follow(next);
     };
     var onover = function (err) {
+        var hasBreak = false;
+
         // onafter
         if (!err) {
-            rule.onafters.forEach(function (fn) {
-                data[rule.name] = fn.call(rule, val, data);
+            dato.each(rule.onafters, function (index, onafter) {
+                var ret = onafter.call(rule, val, data);
+
+                if (ret && ret.constructor === Error) {
+                    // callback
+                    if (typeis.function(callback)) {
+                        callback.call(the, ret, data);
+                    }
+
+                    hasBreak = true;
+                    return false;
+                }
+
+                data[rule.name] = onafter.call(rule, ret, data);
             });
+        }
+
+        if (hasBreak) {
+            return;
         }
 
         /**

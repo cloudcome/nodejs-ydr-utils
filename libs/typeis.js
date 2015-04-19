@@ -8,7 +8,6 @@
 
 'use strict';
 
-var fs = require('fs');
 var udf = 'undefined';
 var REG_URL = /^https?:\/\/([\w-]+\.)+[a-z]{2,5}(:\d{1,})?(\/|\/[\w#!:.?+=&%@!\-\/]+)?$/i;
 var REG_EMAIL = /^\w+[-+.\w]*@([\w-]+\.)+[a-z]{2,5}$/i;
@@ -214,7 +213,7 @@ typeis.email = function (string) {
 
 /**
  * 判断能否转换为合法Date
- * @param  {*}
+ * @param  anything
  * @return {Boolean}
  * @version 1.0
  * 2014年5月2日21:07:33
@@ -225,8 +224,29 @@ typeis.validDate = function (anything) {
 
 
 /**
+ * 判断对象是否为 Error 实例
+ * @param anything
+ * @returns {boolean}
+ *
+ * @example
+ * typeis.error(new TypeError());
+ * // => true
+ */
+typeis.error = function (anything) {
+    return anything && (anything instanceof Error);
+};
+
+
+/////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////[ ONLY NODEJS ]////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////
+
+
+/**
  * 判断是否为合法的mongodbID
- * @param  {*}
+ * @param  anything
  * @return {Boolean}
  * @version 1.0
  * 2014年5月3日23:11:37
@@ -247,7 +267,6 @@ typeis.mongoId = function (anything) {
 typeis.emptyData = function (any) {
     return any === undefined || any === null || any === '';
 };
-
 
 
 /**
