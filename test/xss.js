@@ -11,3 +11,4 @@ var dangerHTML = '```\nabc\n```</div> 1<2>3 abc';
 var xss  = require('../libs/xss.js');
 
 console.log(xss.mdSafe(dangerHTML));
+console.log(xss.mdRender(dangerHTML));

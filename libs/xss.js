@@ -33,7 +33,7 @@ var REG_LINK = /<https?:\/\/>/gi;
 var REG_PATH = /^(\/|\.{0,2})(\/[^/]+)+$/;
 var REG_SIZE = /(?:\s+?=\s*?(\d+)(?:[x*×](\d+))?)?$/i;
 // 影响页面的危险标签
-var dangerTagNameList = 'script iframe frameset body head html link'.split(' ');
+var dangerTagNameList = 'script iframe frameset body head html link base style'.split(' ');
 var tableClassName = 'table table-radius table-bordered table-hover';
 var filterDefaults = {
     /**
@@ -87,42 +87,6 @@ var sanitizeOptions = {
  * @returns {string} 过滤后的内容
  */
 exports.mdSafe = function (source) {
-    //var preMap = {};
-    //
-    //// ```
-    //source = source.replace(REG_PRE, function ($0) {
-    //    var key = _generatorKey();
-    //
-    //    preMap[key] = $0;
-    //
-    //    return key;
-    //});
-    //
-    //// `
-    //source = source.replace(REG_CODE, function ($0) {
-    //    var key = _generatorKey();
-    //
-    //    preMap[key] = $0;
-    //
-    //    return key;
-    //});
-    //
-    //// >
-    //source = source.replace(REG_BLOKQUOTE, function ($0) {
-    //    var key = _generatorKey();
-    //
-    //    preMap[key] = $0;
-    //
-    //    return key;
-    //});
-    //
-    //source = sanitizeHtml(source, sanitizeOptions);
-    //
-    //
-    //dato.each(preMap, function (key, val) {
-    //    source = source.replace(key, val);
-    //});
-
     source = source.replace(REG_LONG_BREAK_LINE, '\n\n\n');
 
     return source;
