@@ -8,7 +8,7 @@ var configs = {
 Favicon.config(configs);
 Favicon.buildDefaultConfigs();
 
-var favicon = new Favicon('http://www.baidu.com/');
+var favicon = new Favicon('http://www.bad.com/');
 
 favicon.get(function () {
     console.log('file:', this.faviconFile);

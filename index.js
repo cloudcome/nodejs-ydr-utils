@@ -21,6 +21,8 @@ module.exports = {
     dato: require('./libs/dato.js'),
     // 加密
     encryption: require('./libs/encryption.js'),
+    // favicon
+    favicon: require('./libs/favicon.js'),
     // HTTP status
     httpStatus: require('./libs/http-status.js'),
     // log

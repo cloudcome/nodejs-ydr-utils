@@ -20,6 +20,7 @@ var REG_REL = /\brel\s*?=\s*?['"]([^'"]*?)['"]/i;
 var REG_TYPE = /\btype\s*?=\s*?['"]([^'"]*?)['"]/i;
 var REG_HREF = /\bhref\s*?=\s*?['"]([^'"]*?)['"]/i;
 var REG_ICON = /icon/i;
+var REG_HTTP = /^https?:///;
 var noop = function () {
     //
 };
@@ -38,8 +39,8 @@ var configs = {
 var Favicon = klass.create(function (url) {
     var the = this;
 
+    the._oURL = url;
     the.url = url;
-    the._url = urlParser.parse(url);
     the.faviconURL = null;
     the.faviconFile = null;
 }, Emitter);
@@ -89,6 +90,17 @@ Favicon.implement({
 
         callback = typeis.function(callback) ? callback : noop;
 
+        the._safeURL();
+
+        if (!the.url) {
+            setTimeout(function () {
+                the.faviconFile = configs.defaultFaviconFilePath;
+                the.emit('error', new Error(the._oURL + ' is error'));
+                callback.call(the);
+            });
+            return the;
+        }
+
         howdo
             .task(the._getFaviconFromDefaults.bind(the))
             .task(the._getFaviconFromLocal.bind(the))
@@ -96,11 +108,32 @@ Favicon.implement({
             .task(the._getFaviconFromPage.bind(the))
             .task(the._saveFaviconFromURL.bind(the))
             .task(the._updateCache.bind(the))
-            .follow(function (err) {
-                callback.call(the, err);
+            .follow(function () {
+                callback.call(the);
             });
 
         return the;
+    },
+
+
+    /**
+     * 安全 URL
+     * @private
+     */
+    _safeURL: function () {
+        var the = this;
+
+        the.url = (REG_HTTP.test(the.url) ? '' : 'http://') + the.url;
+
+        if (the.url.length < 256 && typeis.url(this.url)) {
+            the._url = urlParser.parse(the.url);
+
+            if (the._url.hostname.indexOf('.') === -1) {
+                the.url = null;
+            }
+        } else {
+            the.url = null;
+        }
     },
 
 
@@ -194,11 +227,11 @@ Favicon.implement({
     _saveFaviconFromURL: function (next) {
         var the = this;
 
-        if(the.faviconFile){
+        if (the.faviconFile) {
             return next();
         }
 
-        if(!the.faviconURL){
+        if (!the.faviconURL) {
             return next();
         }
 
@@ -209,7 +242,7 @@ Favicon.implement({
 
             request.down(url, function (err, binary, res) {
                 if (err) {
-                    the.emit('download error: ' + this.options.href);
+                    the.emit('error', 'download error: ' + this.options.href);
                     return next();
                 }
 
