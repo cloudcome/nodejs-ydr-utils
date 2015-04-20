@@ -36,11 +36,12 @@ var configs = {
     // 更新时间点
     updateHours: [0, 1, 2, 3, 4, 5, 6, 7]
 };
-var Favicon = klass.create(function (url) {
+var Favicon = klass.create(function (url, isUpdate) {
     var the = this;
 
     the._oURL = url;
     the.url = url;
+    the._isUpdate = Boolean(isUpdate);
     the.faviconURL = null;
     the.faviconFile = null;
 }, Emitter);
@@ -146,6 +147,12 @@ Favicon.implement({
     _getFaviconFromDefaults: function (next) {
         var the = this;
 
+        if (the._isUpdate) {
+            delete(defaultConfigs[the._url.hostname]);
+            Favicon.updateDefaultConfigs();
+            return next();
+        }
+
         if (defaultConfigs[the._url.hostname]) {
             the.faviconFile = configs.defaultFaviconFilePath;
 
@@ -163,10 +170,19 @@ Favicon.implement({
      */
     _getFaviconFromLocal: function (next) {
         var the = this;
-        var file = path.join(configs.saveDirection, the._url.hostname + configs.extname);
+        var filePath = path.join(configs.saveDirection, the._url.hostname + configs.extname);
 
-        if (typeis.file(file)) {
-            the.faviconFile = file;
+        if (typeis.file(filePath)) {
+            if (the._isUpdate) {
+                try {
+                    fse.unlink(filePath);
+                } catch (err) {
+                    // ignore
+                }
+            } else {
+                the.faviconFile = filePath;
+            }
+
             return next();
         }
 
