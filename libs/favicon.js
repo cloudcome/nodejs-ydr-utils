@@ -20,7 +20,7 @@ var REG_REL = /\brel\s*?=\s*?['"]([^'"]*?)['"]/i;
 var REG_TYPE = /\btype\s*?=\s*?['"]([^'"]*?)['"]/i;
 var REG_HREF = /\bhref\s*?=\s*?['"]([^'"]*?)['"]/i;
 var REG_ICON = /icon/i;
-var REG_HTTP = /^https?:///;
+var REG_HTTP = /^https?:\/\//i;
 var noop = function () {
     //
 };
@@ -123,6 +123,7 @@ Favicon.implement({
     _safeURL: function () {
         var the = this;
 
+        the.url = the.url.toLowerCase();
         the.url = (REG_HTTP.test(the.url) ? '' : 'http://') + the.url;
 
         if (the.url.length < 256 && typeis.url(this.url)) {
