@@ -21,6 +21,11 @@ var defaults = {
 };
 var methods = 'head get post put delete'.split(' ');
 var Stream = require('stream');
+var noop = function () {
+    //
+};
+var REG_HTTP = /^https?:\/\//i;
+
 
 /**
  * HEAD/GET/POST/PUT/DELETE 请求
@@ -48,7 +53,7 @@ methods.forEach(function (method) {
         }
 
         options.method = method;
-        _request(options, callback);
+        _remote(options, callback);
     };
 });
 
@@ -56,6 +61,8 @@ methods.forEach(function (method) {
 /**
  * 下载资源
  * @param options {String|Object}
+ * @param [options.method="get"] {String}
+ * @param [options.encoding="binary"] {String}
  * @param callback {Function}
  */
 exports.down = function (options, callback) {
@@ -67,8 +74,61 @@ exports.down = function (options, callback) {
 
     options.method = 'get';
     options.encoding = 'binary';
-    _request(options, callback);
+    _remote(options, callback);
 };
+
+
+/**
+ * 远程请求
+ * @param options
+ * @param options.url {String} 请求地址
+ * @param [options.max30x=10] {Number} 30x 最大跳转次数
+ * @param [options.method="GET"] {String} 请求方法
+ * @param [options.headers=null] {Object} 请求头
+ * @param [options.agent=null] {String} 请求代理信息
+ * @param [options.encoding="utf8"] {String} 响应处理编码，可选 utf8/binary
+ * @param [options.body=""] {String|Stream} POST/PUT 写入数据
+ * @param [options.file=""] {String} POST/PUT 写入的文件地址
+ * @param callback
+ * @private
+ */
+function _remote(options, callback) {
+    var int30x = 0;
+
+    options.max30x = dato.parseInt(options.max30x, 10);
+    callback = typeis.function(callback) ? callback : noop;
+
+    var request = function () {
+        _request(options, function (err, bodyORheaders, res) {
+            if (options.method === 'head' || err) {
+                return callback(err, bodyORheaders, res, 1);
+            }
+
+            var is30x = res.statusCode === 301 || res.statusCode === 302;
+
+            if (is30x) {
+                int30x++;
+            }
+
+            if (is30x && int30x > options.max30x) {
+                return callback(new Error('redirect count over ' + options.max30x));
+            }
+
+            if (is30x) {
+                var domain = this.options.protocol + '//' + this.options.hostname;
+                var urlto = res.headers.location;
+
+                urlto = (REG_HTTP.test(urlto) ? '' : domain) + urlto;
+                options.url = urlto;
+                request();
+            } else {
+                callback(err, bodyORheaders, res, 2);
+            }
+        });
+    };
+
+    request();
+}
 
 
 /**
@@ -130,6 +190,9 @@ function _request(options, callback) {
     }
 
     requestOptions.headers = options.headers;
+    var context = {
+        options: requestOptions
+    };
 
     var req = _http.request(requestOptions, function (res) {
         var bufferList = [];
@@ -138,7 +201,7 @@ function _request(options, callback) {
 
         if (requestOptions.method === 'HEAD') {
             req.abort();
-            return callback(null, res.headers, res);
+            return callback.call(context, null, res.headers, res);
         }
 
         res.setEncoding(options.encoding);
@@ -158,11 +221,11 @@ function _request(options, callback) {
                 data = binarys;
             }
 
-            callback(null, data, res);
-        }).on('error', callback);
+            callback.call(context, null, data, res);
+        }).on('error', callback.bind(context));
     });
 
-    req.on('error', callback);
+    req.on('error', callback.bind(context));
 
     if (canSend) {
         //steam
@@ -177,13 +240,8 @@ function _request(options, callback) {
 }
 
 
-//////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////
-
-
 /**
- * 小写话 headers
+ * 小写化 headers
  * @param headers
  * @returns {{}}
  * @private
@@ -197,33 +255,3 @@ function _lowerCaseHeaders(headers) {
 
     return headers2;
 }
-
-
-//exports.head('http://ydr.me/favicon.ico', function (err, headers, res) {
-//    console.log(headers);
-//});
-
-//exports.get('http://ydr.me', function (err, body, res) {
-//    console.log(body);
-//});
-
-//var fs = require('fs');
-//var path = require('path');
-//exports.get('http://ydr.me/favicon.ico', {
-//    encoding: 'binary'
-//}, function (e, binary, res) {
-//    var file = path.join(__dirname, '../test/ydr.me.ico');
-//    fs.writeFileSync(file, binary, 'binary');
-//});
-
-//var path = require('path');
-//var file = path.join(__dirname, '../test/test.ico');
-//exports.down('http://ydr.me/favicon.ico', function (err, binary, res) {
-//    if (err) {
-//        return console.error(err);
-//    }
-//
-//    fs.writeFile(file, binary, 'binary', function () {
-//        console.log(arguments);
-//    });
-//});

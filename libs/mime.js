@@ -6,7 +6,7 @@
 
 'use strict';
 
-var mimeMap = require('./mime.json');
+var mimeMap = require('./../data/mime.json');
 
 /**
  * 获取 MIME 的相应类型

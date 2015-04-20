@@ -7,7 +7,7 @@
 'use strict';
 
 
-var httpStatusMap = require('./http-status.json');
+var httpStatusMap = require('./../data/http-status.json');
 
 
 /**
