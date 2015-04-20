@@ -15,6 +15,8 @@ var dato = require('./dato.js');
 var defaults = {
     method: 'GET',
     encoding: 'utf8',
+    isRedirectOnHeadWhen30x: true,
+    max30x: 10,
     headers: {},
     body: null,
     file: null
@@ -82,6 +84,7 @@ exports.down = function (options, callback) {
  * 远程请求
  * @param options
  * @param options.url {String} 请求地址
+ * @param [options.isRedirectOnHeadWhen30x=true] {Boolean} head 请求时出现 301 是否跳转
  * @param [options.max30x=10] {Number} 30x 最大跳转次数
  * @param [options.method="GET"] {String} 请求方法
  * @param [options.headers=null] {Object} 请求头
@@ -95,13 +98,16 @@ exports.down = function (options, callback) {
 function _remote(options, callback) {
     var int30x = 0;
 
+    options = dato.extend(true, {}, defaults, options);
     options.max30x = dato.parseInt(options.max30x, 10);
     callback = typeis.function(callback) ? callback : noop;
 
     var request = function () {
         _request(options, function (err, bodyORheaders, res) {
-            if (options.method === 'head' || err) {
-                return callback(err, bodyORheaders, res, 1);
+            var context = this;
+
+            if (!(!options.isRedirectOnHeadWhen30x && options.method === 'head') || err) {
+                return callback.call(context, err, bodyORheaders, res);
             }
 
             var is30x = res.statusCode === 301 || res.statusCode === 302;
@@ -111,7 +117,7 @@ function _remote(options, callback) {
             }
 
             if (is30x && int30x > options.max30x) {
-                return callback(new Error('redirect count over ' + options.max30x));
+                return callback.call(context, new Error('redirect count over ' + options.max30x));
             }
 
             if (is30x) {
@@ -122,7 +128,7 @@ function _remote(options, callback) {
                 options.url = urlto;
                 request();
             } else {
-                callback(err, bodyORheaders, res, 2);
+                callback.call(context, err, bodyORheaders, res);
             }
         });
     };
