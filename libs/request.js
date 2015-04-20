@@ -106,7 +106,7 @@ function _remote(options, callback) {
         _request(options, function (err, bodyORheaders, res) {
             var context = this;
 
-            if (!(!options.isRedirectOnHeadWhen30x && options.method === 'head') || err) {
+            if (!options.isRedirectOnHeadWhen30x && options.method === 'head' || err) {
                 return callback.call(context, err, bodyORheaders, res);
             }
 
