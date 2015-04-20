@@ -34,7 +34,7 @@ exports.get = function (statusCode, defaultStatus) {
 /**
  * 根据 HTTP code 设置对应的 HTTP status
  * @param statusCode {String|Number} HTTP code
- * @param Status HTTP status
+ * @param status {String} HTTP status
  * @returns {Object} HTTP status MAP
  */
 exports.set = function (statusCode, status) {
@@ -44,9 +44,3 @@ exports.set = function (statusCode, status) {
 
     return httpStatusMap;
 };
-
-
-////////////////////////////////////////////////////////////////////
-//console.log(exports.get(200));
-//console.log(exports.set(200, 'hehe'));
-//console.log(exports.get(200));
