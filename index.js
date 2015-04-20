@@ -13,6 +13,8 @@ module.exports = {
     AliOSS: require('./libs/ali-oss.js'),
     // 类
     class: require('./libs/class.js'),
+    // csrf
+    csrf: require('./libs/csrf.js'),
     // 日期
     date: require('./libs/date.js'),
     // 数据出口
