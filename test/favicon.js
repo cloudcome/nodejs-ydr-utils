@@ -1,15 +1,17 @@
-
 var Favicon = require('../libs/favicon.js');
 var path = require('path');
 var configs = {
-    defaultFavicon: path.join(__dirname, '../data/default.png'),
-    defaultConfig: path.join(__dirname, '../data/default.json'),
-    saveDirection: path.join(__dirname, '../data/')
+    defaultFaviconFilePath: path.join(__dirname, '../f/default.png'),
+    configsFilePath: path.join(__dirname, '../f/default.json'),
+    saveDirection: path.join(__dirname, '../f/')
 };
-var favicon = new Favicon('http://www.aliued.cn/', configs);
+Favicon.config(configs);
+Favicon.buildDefaultConfigs();
 
-favicon.get(function (err, url) {
-    console.log('url: ' + url);
+var favicon = new Favicon('http://www.baidu.com/');
+
+favicon.get(function () {
+    console.log('file:', this.faviconFile);
 }).on('error', function (err) {
-    console.log('err: ' + err);
+    console.log('err:', err);
 });

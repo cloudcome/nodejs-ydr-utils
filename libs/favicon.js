@@ -12,6 +12,7 @@ var klass = require('./class.js');
 var typeis = require('./typeis.js');
 var urlParser = require('url');
 var howdo = require('howdo');
+var path = require('path');
 var fse = require('fs-extra');
 var Emitter = require('events').EventEmitter;
 var REG_LINK = /<link[^<>]*?>/ig;
@@ -22,53 +23,64 @@ var REG_ICON = /icon/i;
 var noop = function () {
     //
 };
-var defaults = {
+var configs = {
+    // favicon 文件后缀
+    extname: '.ico',
     // 默认的 favicon ico文件
-    defaultFavicon: '',
+    defaultFaviconFilePath: '',
     // 默认的 favicon 配置文件
-    defaultConfig: '',
+    configsFilePath: '',
     // favicon 文件保存目录
-    saveDirection: ''
+    saveDirection: '',
+    // 更新时间点
+    updateHours: [0, 1, 2, 3, 4, 5, 6, 7]
 };
-var Favicon = klass.create(function (url, options) {
+var Favicon = klass.create(function (url) {
     var the = this;
 
-    the._options = dato.extend({}, defaults, options);
     the.url = url;
     the._url = urlParser.parse(url);
-    the.favicon = null;
+    the.faviconURL = null;
+    the.faviconFile = null;
 }, Emitter);
-var defaultsConfigs = {};
+var defaultConfigs = {};
 
 
-Favicon.extend({
-    config: function (options) {
-        dato.extend(defaults, options);
-    },
-    cache: {},
+Favicon.config = function (options) {
+    dato.extend(configs, options);
+};
 
-    /**
-     * 构造缓存
-     */
-    buildDefaultConfigs: function () {
-        try {
-            defaultsConfigs = fse.readJSONFileSync(defaults.defaultConfig, 'utf8');
-        } catch (err) {
-            // ignore
-        }
-    },
-
-
-    updateDefaultConfigs: function () {
-        try {
-            fse.writeJSONFileSync(defaults.defaultConfig, defaultsConfigs, {
-                encoding: 'utf8'
-            });
-        } catch (err) {
-            // ignore
-        }
+/**
+ * 构造配置
+ */
+Favicon.buildDefaultConfigs = function () {
+    try {
+        defaultConfigs = fse.readJSONFileSync(configs.configsFilePath, 'utf8') || {};
+    } catch (err) {
+        // ignore
     }
-});
+};
+
+
+/**
+ * 更新配置
+ */
+Favicon.updateDefaultConfigs = function () {
+    var date = new Date();
+    var hour = date.getHours();
+
+    if (configs.updateHours.indexOf(hour) === -1) {
+        return;
+    }
+
+    try {
+        fse.writeJSONFileSync(configs.configsFilePath, defaultConfigs, {
+            encoding: 'utf8'
+        });
+    } catch (err) {
+        // ignore
+    }
+};
 
 
 Favicon.implement({
@@ -82,9 +94,10 @@ Favicon.implement({
             .task(the._getFaviconFromLocal.bind(the))
             .task(the._getFaviconFromRootDirection.bind(the))
             .task(the._getFaviconFromPage.bind(the))
-            .task(the._savFaviconFromURL.bind(the))
+            .task(the._saveFaviconFromURL.bind(the))
+            .task(the._updateCache.bind(the))
             .follow(function (err) {
-                callback.call(the, err, the.favicon);
+                callback.call(the, err);
             });
 
         return the;
@@ -99,6 +112,12 @@ Favicon.implement({
     _getFaviconFromDefaults: function (next) {
         var the = this;
 
+        if (defaultConfigs[the._url.hostname]) {
+            the.faviconFile = configs.defaultFaviconFilePath;
+
+            return next();
+        }
+
         next();
     },
 
@@ -110,6 +129,12 @@ Favicon.implement({
      */
     _getFaviconFromLocal: function (next) {
         var the = this;
+        var file = path.join(configs.saveDirection, the._url.hostname + configs.extname);
+
+        if (typeis.file(file)) {
+            the.faviconFile = file;
+            return next();
+        }
 
         next();
     },
@@ -123,36 +148,16 @@ Favicon.implement({
     _getFaviconFromRootDirection: function (next) {
         var the = this;
 
-        if(the.favicon){
+        if (the.faviconFile) {
             return next();
         }
 
         var rootDirection = the._url.protocol + '//' + the._url.host;
         var url = rootDirection + '/favicon.ico';
 
-        request.head(url, function (err, headers, res) {
-            if (err) {
-                the.emit('error', err);
-                return next();
-            }
-
-            var href = this.options.href;
-            var contentLength = dato.parseInt(headers['content-length'], 0);
-
-            if (res.statusCode === 200 && contentLength >= 20) {
-                the.favicon = href;
-                return next();
-            }
-
-            if (res.statusCode !== 200) {
-                the.emit('error', new Error(href + ' status code is ' + res.statusCode));
-            }
-
-            if (contentLength < 20) {
-                the.emit('error', new Error(href + ' content-length is ' + contentLength));
-            }
-
-            return next();
+        the._parseFaviconURLByHead(url, function (url) {
+            the.faviconURL = url;
+            next();
         });
     },
 
@@ -165,7 +170,7 @@ Favicon.implement({
     _getFaviconFromPage: function (next) {
         var the = this;
 
-        if (the.favicon) {
+        if (the.faviconFile || the.faviconURL) {
             return next();
         }
 
@@ -174,19 +179,110 @@ Favicon.implement({
                 return next();
             }
 
-            the.favicon = the._parseFaviconURLFromBody(body);
+            the.faviconURL = the._parseFaviconURLFromBody(body);
             next();
         });
     },
 
 
     /**
-     * 保存 favicon url
+     * 保存 url
+     * @param next
+     * @returns {*}
+     * @private
+     */
+    _saveFaviconFromURL: function (next) {
+        var the = this;
+
+        if(the.faviconFile){
+            return next();
+        }
+
+        if(!the.faviconURL){
+            return next();
+        }
+
+        the._parseFaviconURLByHead(the.faviconURL, function (url) {
+            if (!url) {
+                return next();
+            }
+
+            request.down(url, function (err, binary, res) {
+                if (err) {
+                    the.emit('download error: ' + this.options.href);
+                    return next();
+                }
+
+                var filePath = path.join(configs.saveDirection, the._url.hostname + configs.extname);
+
+                try {
+                    fse.writeFileSync(filePath, binary, 'binary');
+                    the.faviconURL = this.options.href;
+                    the.faviconFile = filePath;
+                } catch (err) {
+                    the.emit('erorr', err);
+                    // ignore
+                }
+
+                next();
+            });
+        });
+    },
+
+
+    /**
+     * 更新缓存
      * @param next
      * @private
      */
-    _savFaviconFromURL: function (next) {
+    _updateCache: function (next) {
+        var the = this;
 
+        if (the.faviconFile) {
+            return next();
+        }
+
+        defaultConfigs[the._url.hostname] = 1;
+        the.faviconFile = configs.defaultFaviconFilePath;
+        Favicon.updateDefaultConfigs();
+        next();
+    },
+
+
+    /**
+     * 通过 head 请求判断资源
+     * @param url
+     * @param callback
+     * @private
+     */
+    _parseFaviconURLByHead: function (url, callback) {
+        var the = this;
+
+        request.head(url, function (err, headers, res) {
+            var href = this.options.href;
+
+            if (err) {
+                the.emit('error', err);
+                return callback(null);
+            }
+
+            var contentLength = dato.parseInt(headers['content-length'], 0);
+
+            if (res.statusCode === 200 && contentLength >= 20) {
+                the.faviconURL = href;
+                return callback(href);
+            }
+
+            if (res.statusCode !== 200) {
+                the.emit('error', new Error(href + ' status code is ' + res.statusCode));
+            }
+
+            if (contentLength < 20) {
+                the.emit('error', new Error(href + ' content-length is ' + contentLength));
+            }
+
+            return callback(null);
+        });
     },
 
 
