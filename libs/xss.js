@@ -237,12 +237,12 @@ exports.mdRender = function (source, isNoFavicon) {
 function _buildLink(href, title, text, isBlank, isNoFavicon) {
     text = text.trim();
 
-    return (isNoFavicon ? '' : '<img src="http://f.ydr.me/' + href + '" class="favicon" width="16" height="16" alt="f">') +
-        '<a href="' + href + '"' +
+    return '<a href="' + href + '"' +
         (REG_TOC.test(href) ? ' id="toc' + href.replace(REG_TOC, '$1') + '"' : '') +
         (isBlank ? ' target="_blank"' : '') +
         (title ? ' ' + title : '') +
         '>' +
+        (isNoFavicon ? '' : '<img src="http://f.ydr.me/' + href + '" class="favicon" width="16" height="16" alt="f">') +
         (text || href) + '</a>';
 }
 
