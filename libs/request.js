@@ -27,6 +27,7 @@ var noop = function () {
     //
 };
 var REG_HTTP = /^https?:\/\//i;
+var USER_AGENT = 'node; ydr-utils.request';
 
 
 /**
@@ -196,6 +197,11 @@ function _request(options, callback) {
     }
 
     requestOptions.headers = options.headers;
+
+    requestOptions.headers['user-agent'] = typeis.undefined(requestOptions.headers['user-agent']) ?
+        USER_AGENT :
+        requestOptions.headers['user-agent'];
+
     var context = {
         options: requestOptions
     };
@@ -235,7 +241,7 @@ function _request(options, callback) {
 
     if (canSend) {
         //steam
-        if (body && typeis(body.pipe) === 'function') {
+        if (body && typeis.function(body.pipe)) {
             body.pipe(req);
         } else {
             req.end(body);

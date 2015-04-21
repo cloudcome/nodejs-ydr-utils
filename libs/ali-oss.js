@@ -49,16 +49,17 @@ var OSS = klass.create(function (options) {
 });
 
 
+
+
 OSS.implement({
     /**
-     * 重新设置配置
-     * @param key
-     * @param val
+     * 设置配置
+     * @param options
      */
-    config: function (key, val) {
+    setOptions: function (options) {
         var the = this;
 
-        the._options[key] = val;
+        the._options = dato.extend(the._options, options);
     },
 
 
@@ -132,6 +133,7 @@ OSS.implement({
 
             var headers = {
                 date: date.toUTCString(),
+                'content-length': req.headers['content-length'],
                 'content-type': options.contentType,
                 'content-md5': '',
                 'cache-control': options.cacheControl
