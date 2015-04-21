@@ -32,9 +32,7 @@ var configs = {
     // 默认的 favicon 配置文件
     configsFilePath: '',
     // favicon 文件保存目录
-    saveDirection: '',
-    // 更新时间点
-    updateHours: [0, 1, 2, 3, 4, 5, 6, 7]
+    saveDirection: ''
 };
 var Favicon = klass.create(function (url, isUpdate) {
     var the = this;
@@ -68,13 +66,6 @@ Favicon.buildDefaultConfigs = function () {
  * 更新配置
  */
 Favicon.updateDefaultConfigs = function () {
-    var date = new Date();
-    var hour = date.getHours();
-
-    if (configs.updateHours.indexOf(hour) === -1) {
-        return;
-    }
-
     try {
         fse.writeJSONFileSync(configs.configsFilePath, defaultConfigs, {
             encoding: 'utf8'
