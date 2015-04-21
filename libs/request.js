@@ -99,7 +99,11 @@ exports.down = function (options, callback) {
 function _remote(options, callback) {
     var int30x = 0;
 
-    options = dato.extend(true, {}, defaults, options);
+    /**
+     * ！！！这里千万不要深度复制！！！
+     * @type {*}
+     */
+    options = dato.extend({}, defaults, options);
     options.max30x = dato.parseInt(options.max30x, 10);
     callback = typeis.function(callback) ? callback : noop;
 
@@ -160,9 +164,6 @@ function _request(options, callback) {
     var _http = requestOptions.protocol === 'https:' ? https : http;
     var body = options.body || '';
     var file = options.file || '';
-
-    options = dato.extend(true, {}, defaults, options);
-
     var headers = options.headers = _lowerCaseHeaders(options.headers);
     var bodyLength = headers['content-length'];
 
