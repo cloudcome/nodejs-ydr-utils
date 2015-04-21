@@ -19,8 +19,29 @@ var REG_LINK = /<link[^<>]*?>/ig;
 var REG_REL = /\brel\s*?=\s*?['"]([^'"]*?)['"]/i;
 var REG_TYPE = /\btype\s*?=\s*?['"]([^'"]*?)['"]/i;
 var REG_HREF = /\bhref\s*?=\s*?['"]([^'"]*?)['"]/i;
-var REG_ICON = /icon/i;
+var REG_REL_ICON = /\s\bicon\b/i;
+var REG_TYPE_ICON = /\s-icon\b/i;
 var REG_HTTP = /^https?:\/\//i;
+var REG_URL_SUFFIX = /\/[^/]*$/;
+/**
+ * 判断是否为绝对路径
+ * @type {RegExp}
+ */
+var REG_PATH_ABSOLUTE = /^\//;
+
+
+/**
+ * 判断是否相对路径
+ * @type {RegExp}
+ */
+var REG_PATH_RELATIVE = /^(\.{1,2})\//;
+
+
+/**
+ * 路径结尾
+ * @type {RegExp}
+ */
+var REG_PATH_END = /\/[^/]+?\/$/;
 var noop = function () {
     //
 };
@@ -45,6 +66,8 @@ var Favicon = klass.create(function (url, isUpdate) {
 }, Emitter);
 var defaultConfigs = {};
 
+
+Favicon.REG_MAP = {};
 
 Favicon.config = function (options) {
     dato.extend(configs, options);
@@ -198,7 +221,12 @@ Favicon.implement({
                 return next();
             }
 
+            var href = this.options.href;
+
             the.faviconURL = the._parseFaviconURLFromBody(body);
+            the.faviconURL = REG_HTTP.test(the.faviconURL) ? the.faviconURL : the._joinURL(href, the.faviconURL);
+
+            console.log(the.faviconURL);
             next();
         });
     },
@@ -343,13 +371,18 @@ Favicon.implement({
 
         var find = null;
 
-        dato.each(links, function () {
-            var rel = the._getRel(body);
-            var type = the._getType(body);
-            var href = the._getHref(body);
+        // 倒序查找
+        dato.each(links.reverse(), function (index, link) {
+            var rel = the._getAttr(link, 'rel');
+            var type = the._getAttr(link, 'type');
+            var href = the._getAttr(link, 'href');
+            //var size = the._getAttr(link, 'size');
+            //var sizes = the._getAttr(link, 'sizes');
 
-            if (REG_ICON.test(rel) || REG_ICON.test(type)) {
+            // <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
+            if (REG_REL_ICON.test(rel) || rel === 'icon' || REG_TYPE_ICON.test(type)) {
                 find = href;
+                return false;
             }
         });
 
@@ -357,19 +390,52 @@ Favicon.implement({
     },
 
 
-    // 获得 rel 属性
-    _getRel: function (html) {
-        return (html.match(REG_REL) || ['', ''])[1];
+    /**
+     * 获取 attr 属性值
+     * @param html
+     * @param attrName
+     * @returns {*|string}
+     * @private
+     */
+    _getAttr: function (html, attrName) {
+        var reg = Favicon.REG_MAP[attrName] || new RegExp('\\b' + attrName + '\\s*?=\\s*?["\']([^"\']*?)["\']', 'i');
+
+        Favicon.REG_MAP[attrName] = reg;
+
+        return (html.match(reg) || ['', ''])[1].toLowerCase();
     },
 
-    // 获得 type 属性
-    _getType: function (html) {
-        return (html.match(REG_TYPE) || ['', ''])[1];
-    },
 
-    // 获得 href 属性
-    _getHref: function (html) {
-        return (html.match(REG_HREF) || ['', ''])[1];
+    /**
+     * url 合并
+     * @param from
+     * @param to
+     * @returns {*}
+     * @private
+     */
+    _joinURL: function (from, to) {
+        var parse = urlParser.parse(from);
+        var domain = parse.protocol + '//' + parse.hostname;
+
+        from = domain + parse.pathname.replace(REG_URL_SUFFIX, '/');
+
+        if (!to || REG_PATH_ABSOLUTE.test(to)) {
+            return domain + to;
+        }
+
+        var mathes;
+
+        to = './' + to;
+
+        while (mathes = to.match(REG_PATH_RELATIVE)) {
+            to = to.replace(REG_PATH_RELATIVE, '');
+
+            if (mathes[1].length === 2) {
+                from = from.replace(REG_PATH_END, '/');
+            }
+        }
+
+        return from + to;
     }
 });
 

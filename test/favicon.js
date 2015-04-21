@@ -8,7 +8,7 @@ var configs = {
 Favicon.config(configs);
 Favicon.buildDefaultConfigs();
 
-var favicon = new Favicon('https://code.facebook.com/projects/');
+var favicon = new Favicon('https://www.npmjs.com/package/marked');
 
 favicon.get(function () {
     console.log('file:', this.faviconFile);
