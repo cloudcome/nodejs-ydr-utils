@@ -30,6 +30,9 @@ var REG_URL_SUFFIX = /\/[^/]*$/;
 var REG_PATH_ABSOLUTE = /^\//;
 
 
+var REG_THIS_PROTOCOL = /^\/\//;
+
+
 /**
  * 判断是否相对路径
  * @type {RegExp}
@@ -416,6 +419,10 @@ Favicon.implement({
     _joinURL: function (from, to) {
         var parse = urlParser.parse(from);
         var domain = parse.protocol + '//' + parse.hostname;
+
+        if (REG_THIS_PROTOCOL.test(to)) {
+            return parse.protocol + to;
+        }
 
         from = domain + parse.pathname.replace(REG_URL_SUFFIX, '/');
 
