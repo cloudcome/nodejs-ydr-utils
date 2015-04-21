@@ -8,7 +8,10 @@ var configs = {
 Favicon.config(configs);
 Favicon.buildDefaultConfigs();
 
-var favicon = new Favicon('https://www.npmjs.com/package/marked');
+var favicon = new Favicon('http://www.species-in-pieces.com');
+
+//var r = favicon._joinURL('http://www.species-in-pieces.com', 'favicon.ico');
+//console.log(r);
 
 favicon.get(function () {
     console.log('file:', this.faviconFile);
