@@ -69,7 +69,7 @@ var sanitizeOptions = {
     ],
     allowedAttributes: {
         a: ['href', 'target', 'class', 'id'],
-        img: ['src', 'title', 'alt'],
+        img: ['src', 'title', 'alt', 'class'],
         h1: ['id', 'class'],
         h2: ['id', 'class'],
         h3: ['id', 'class'],
@@ -241,7 +241,7 @@ function _buildLink(href, title, text, isBlank) {
         (REG_TOC.test(href) ? ' id="toc' + href.replace(REG_TOC, '$1') + '"' : '') +
         (isBlank ? ' target="_blank"' : '') +
         (title ? ' ' + title : '') +
-        '>' + (text || href) + '</a>';
+        '><img src="http://f.ydr.me/' + href + '" class="favicon" width="16" height="16" alt="f">' + (text || href) + '</a>';
 }
 
 
