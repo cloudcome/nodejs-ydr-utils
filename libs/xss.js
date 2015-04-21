@@ -36,25 +36,26 @@ var REG_SIZE = /(?:\s+?=\s*?(\d+)(?:[x*×](\d+))?)?$/i;
 // 影响页面的危险标签
 //var dangerTagNameList = 'script iframe frameset body head html link base style'.split(' ');
 var tableClassName = 'table table-radius table-bordered table-hover';
-var filterDefaults = {
-    /**
-     * link 配置
-     * 1、无域地址都在当前窗口打开
-     * 2、符合 hosts 内的域名都在当前窗口打开
-     * 3、其他都在新窗口打开
-     * 4、不合法的URL直接返回空
-     */
-    link: {
-        /**
-         * 不需要新窗口打开的域名
-         * @type Array
-         */
-        hosts: [],
-        filter: function (href, title, text) {
-            return _buildLink(href, title, text, true);
-        }
-    }
-};
+var SAFE_HOSTS = ['*.FrontEndDev.org', '*.ydr.me', '*.qianduanblog.com'];
+//var filterDefaults = {
+//    /**
+//     * link 配置
+//     * 1、无域地址都在当前窗口打开
+//     * 2、符合 hosts 内的域名都在当前窗口打开
+//     * 3、其他都在新窗口打开
+//     * 4、不合法的URL直接返回空
+//     */
+//    link: {
+//        /**
+//         * 不需要新窗口打开的域名
+//         * @type Array
+//         */
+//        hosts: ['*.FrontEndDev.org', '*.ydr.me', '*.qianduanblog.com'],
+//        filter: function (href, title, text) {
+//            return _buildLink(href, title, text, true, false);
+//        }
+//    }
+//};
 var sanitizeHtml = require('sanitize-html');
 var sanitizeOptions = {
     allowedTags: [
@@ -121,17 +122,15 @@ exports.mdTOC = function (source) {
 /**
  * markdown 内容渲染成 HTML 内容
  * @param source {String} 原始 markdown 内容
- * @param [filterOptions] {Object} 配置
+ * @param [isNoFavicon=false] {Boolean} 是否添加链接的 favicon
  */
-exports.mdRender = function (source, filterOptions) {
+exports.mdRender = function (source, isNoFavicon) {
     var markedRender = new marked.Renderer();
-
-    filterOptions = dato.extend(true, {}, filterDefaults, filterOptions);
 
     // 定义 A 链接的 target
     markedRender.link = function (href, title, text) {
         if (REG_SHAP.test(href)) {
-            return _buildLink(href, title, text, false);
+            return _buildLink(href, title, text, false, isNoFavicon);
         }
 
         var fixHref = REG_DOUBLE.test(href) ? 'http:' + href : href;
@@ -145,10 +144,10 @@ exports.mdRender = function (source, filterOptions) {
         }
 
         if (!host) {
-            return _buildLink(href, title, text, false);
+            return _buildLink(href, title, text, false, isNoFavicon);
         }
 
-        dato.each(filterOptions.link.hosts, function (index, item) {
+        dato.each(SAFE_HOSTS, function (index, item) {
             if (_regExp(item).test(host)) {
                 inHost = true;
                 return false;
@@ -157,11 +156,11 @@ exports.mdRender = function (source, filterOptions) {
 
         // 指定域内的 NO _blank
         if (inHost) {
-            return _buildLink(href, title, text, false);
+            return _buildLink(href, title, text, false, isNoFavicon);
         }
 
         // 其他的使用传入对象处理
-        return filterOptions.link.filter(href, title, text);
+        return _buildLink(href, title, text, true, isNoFavicon);
     };
 
 
@@ -231,17 +230,20 @@ exports.mdRender = function (source, filterOptions) {
  * @param title
  * @param text
  * @param isBlank
+ * @param isNoFavicon
  * @returns {string}
  * @private
  */
-function _buildLink(href, title, text, isBlank) {
+function _buildLink(href, title, text, isBlank, isNoFavicon) {
     text = text.trim();
 
-    return '<a href="' + href + '"' +
+    return (isNoFavicon ? '' : '<img src="http://f.ydr.me/' + href + '" class="favicon" width="16" height="16" alt="f">') +
+        '<a href="' + href + '"' +
         (REG_TOC.test(href) ? ' id="toc' + href.replace(REG_TOC, '$1') + '"' : '') +
         (isBlank ? ' target="_blank"' : '') +
         (title ? ' ' + title : '') +
-        '><img src="http://f.ydr.me/' + href + '" class="favicon" width="16" height="16" alt="f">' + (text || href) + '</a>';
+        '>' +
+        (text || href) + '</a>';
 }
 
 
@@ -271,14 +273,14 @@ function _regExp(regstr) {
 }
 
 
-/**
- * 生成唯一随机字符串
- * @returns {string}
- * @private
- */
-function _generatorKey() {
-    return 'œ' + random.string(10, 'aA0') + random.guid() + Date.now() + 'œ';
-}
+///**
+// * 生成唯一随机字符串
+// * @returns {string}
+// * @private
+// */
+//function _generatorKey() {
+//    return 'œ' + random.string(10, 'aA0') + random.guid() + Date.now() + 'œ';
+//}
 
 
 //var fs = require('fs');
