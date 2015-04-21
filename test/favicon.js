@@ -8,7 +8,7 @@ var configs = {
 Favicon.config(configs);
 Favicon.buildDefaultConfigs();
 
-var favicon = new Favicon('http://www.yyyweb.com/2379.html', true);
+var favicon = new Favicon('https://code.facebook.com/projects/');
 
 favicon.get(function () {
     console.log('file:', this.faviconFile);

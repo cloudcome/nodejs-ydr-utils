@@ -105,8 +105,8 @@ Favicon.implement({
         howdo
             .task(the._getFaviconFromDefaults.bind(the))
             .task(the._getFaviconFromLocal.bind(the))
-            .task(the._getFaviconFromRootDirection.bind(the))
             .task(the._getFaviconFromPage.bind(the))
+            .task(the._getFaviconFromRootDirection.bind(the))
             .task(the._saveFaviconFromURL.bind(the))
             .task(the._updateCache.bind(the))
             .follow(function () {
@@ -191,28 +191,6 @@ Favicon.implement({
 
 
     /**
-     * 从根目录获取 favicon
-     * @param next
-     * @private
-     */
-    _getFaviconFromRootDirection: function (next) {
-        var the = this;
-
-        if (the.faviconFile) {
-            return next();
-        }
-
-        var rootDirection = the._url.protocol + '//' + the._url.host;
-        var url = rootDirection + '/favicon.ico';
-
-        the._parseFaviconURLByHead(url, function (url) {
-            the.faviconURL = url;
-            next();
-        });
-    },
-
-
-    /**
      * 从页面中获取 favicon
      * @param next
      * @private
@@ -230,6 +208,28 @@ Favicon.implement({
             }
 
             the.faviconURL = the._parseFaviconURLFromBody(body);
+            next();
+        });
+    },
+
+
+    /**
+     * 从根目录获取 favicon
+     * @param next
+     * @private
+     */
+    _getFaviconFromRootDirection: function (next) {
+        var the = this;
+
+        if (the.faviconFile || the.faviconURL) {
+            return next();
+        }
+
+        var rootDirection = the._url.protocol + '//' + the._url.host;
+        var url = rootDirection + '/favicon.ico';
+
+        the._parseFaviconURLByHead(url, function (url) {
+            the.faviconURL = url;
             next();
         });
     },
