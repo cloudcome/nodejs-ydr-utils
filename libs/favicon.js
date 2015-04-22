@@ -24,27 +24,9 @@ var REG_TYPE_ICON = /\s-icon\b/i;
 var REG_HTTP = /^https?:\/\//i;
 var REG_URL_SUFFIX = /\/[^/]*$/;
 var REG_HOSTNAME = /^((xn--)?[a-z\d]+\.)+([a-z]{2,}|xn--[a-z\d]+)$/i;
-/**
- * 判断是否为绝对路径
- * @type {RegExp}
- */
 var REG_PATH_ABSOLUTE = /^\//;
-
-
 var REG_THIS_PROTOCOL = /^\/\//;
-
-
-/**
- * 判断是否相对路径
- * @type {RegExp}
- */
 var REG_PATH_RELATIVE = /^(\.{1,2})\//;
-
-
-/**
- * 路径结尾
- * @type {RegExp}
- */
 var REG_PATH_END = /\/[^/]+?\/$/;
 var noop = function () {
     //
@@ -187,6 +169,11 @@ Favicon.implement({
         var the = this;
 
         the.url = the.url.toLowerCase();
+
+        if (REG_THIS_PROTOCOL.test(the.url)) {
+            the.url = 'http:' + the.url;
+        }
+
         the.url = (REG_HTTP.test(the.url) ? '' : 'http://') + the.url;
 
         if (the.url.length < 256 && typeis.url(this.url)) {

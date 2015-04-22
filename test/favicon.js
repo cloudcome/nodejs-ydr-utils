@@ -8,7 +8,7 @@ var configs = {
 Favicon.config(configs);
 Favicon.buildDefaultConfigs();
 
-var favicon = new Favicon('https://ssss.mmmmmm.dd/');
+var favicon = new Favicon('jt://dqw.com');
 
 //var u = Favicon.joinURL('/3/4/', '/3/4/');
 //console.log(u);
