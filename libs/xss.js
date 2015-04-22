@@ -151,6 +151,8 @@ exports.mdSafe = function (source) {
  * @returns {string}
  */
 exports.mdTOC = function (source) {
+    source = exports.mdSafe(source);
+
     var tokens = marked.lexer(source);
     var toc = '\n\n';
     var index = 0;
