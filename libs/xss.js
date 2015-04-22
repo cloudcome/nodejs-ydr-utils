@@ -26,13 +26,26 @@ var REG_BREAK_LINE = /\r/g;
 var REG_LONG_BREAK_LINE = /\n{3,}/g;
 // 自动关闭标签是安全的，如 br、hr、img 等
 //var REG_CLOSE_TAGNAME = /(?!```)<([a-z\d]+)\b[\s\S]*?>([\s\S]*?)<\/\1>(?!```)/ig;
-//var REG_PRE = /```[\s\S]*?```/g;
-//var REG_PRE2 = /^( {4}[^\n]+\n*)+/g;
-//var REG_CODE = /(`+)\s*([\s\S]*?[^`])\s*\1(?!`)/g;
+// @link marked
+var REG_PRE1 = /^```\s*\n[\s\S]*?^```/mg;
+var REG_PRE2 = /^( {4}[^\n]+\n*)+/mg;
+var REG_CODE = /(`+)\s*([\s\S]*?[^`])\s*\1(?!`)/g;
+var REG_HEADING = /^#{1,6}(.*)$/mg;
+var REG_STRONG = /\b__([\s\S]+?)__(?!_)|\*\*([\s\S]+?)\*\*(?!\*)/mg;
+var REG_EM = /^\b_((?:__|[\s\S])+?)_\b|^\*((?:\*\*|[\s\S])+?)\*(?!\*)/mg;
+var REG_TAG = /<\/?[a-z][a-z\d]*\b[^>]*?>/g;
+var REG_TAG_P = /<\/?p>/ig;
 //var REG_BLOKQUOTE = /^( *>[^\n]+(\n(?!def)[^\n]+)*\n*)+/g;
 //var REG_LINK = /<https?:\/\/>/gi;
 var REG_PATH = /^(\/|\.{0,2})(\/[^/]+)+$/;
 var REG_SIZE = /(?:\s+?=\s*?(\d+)(?:[x*×](\d+))?)?$/i;
+var encodeList = [{
+    f: />/g,
+    t: '&gt;'
+}, {
+    f: /</g,
+    t: 'lgt;'
+}];
 // 影响页面的危险标签
 //var dangerTagNameList = 'script iframe frameset body head html link base style'.split(' ');
 var tableClassName = 'table table-radius table-bordered table-hover';
@@ -89,6 +102,43 @@ var sanitizeOptions = {
  * @returns {string} 过滤后的内容
  */
 exports.mdSafe = function (source) {
+    var preMap = {};
+
+    // ```
+    source = source.replace(REG_PRE1, function ($0) {
+        var key = _generatorKey();
+
+        preMap[key] = $0;
+
+        return key;
+    });
+
+    // \s\s\s\s
+    source = source.replace(REG_PRE2, function ($0) {
+        var key = _generatorKey();
+
+        preMap[key] = $0;
+
+        return key;
+    });
+
+    // ``
+    source = source.replace(REG_CODE, function ($0) {
+        var key = _generatorKey();
+
+        preMap[key] = $0;
+
+        return key;
+    });
+
+    // <.>
+    source = source.replace(REG_TAG, '');
+
+    // back
+    dato.each(preMap, function (key, val) {
+        source = source.replace(key, val);
+    });
+
     return source
         .replace(REG_BREAK_LINE, '\n')
         .replace(REG_LONG_BREAK_LINE, '\n\n\n');
@@ -110,9 +160,11 @@ exports.mdTOC = function (source) {
             return;
         }
 
+        var text = token.text;
         var depth = new Array((token.depth - 1) * 4 + 1).join(' ');
+        var id = encryption.md5( exports.mdRender(text).replace(REG_TAG_P, '').trim());
 
-        toc += depth + '- [' + token.text + '](#heading-' + token.depth + '-' + (index++) + '-' + encryption.md5(token.text) + ')\n';
+        toc += depth + '- [' + text + '](#heading-' + token.depth + '-' + (index++) + '-' + id + ')\n';
     });
 
     return toc + '\n\n';
@@ -169,7 +221,7 @@ exports.mdRender = function (source, isNoFavicon) {
 
     // heading
     markedRender.heading = function (text, level) {
-        var href = encryption.md5(text);
+        var href = encryption.md5(text.trim());
 
         var html = '<h' + level + ' id="heading-' + level + '-' + index + '-' + href + '"><a class="heading-link" ' +
             'href="#toc-' + level + '-' + index + '-' + href + '">' +
@@ -273,14 +325,14 @@ function _regExp(regstr) {
 }
 
 
-///**
-// * 生成唯一随机字符串
-// * @returns {string}
-// * @private
-// */
-//function _generatorKey() {
-//    return 'œ' + random.string(10, 'aA0') + random.guid() + Date.now() + 'œ';
-//}
+/**
+ * 生成唯一随机字符串
+ * @returns {string}
+ * @private
+ */
+function _generatorKey() {
+    return 'œ' + random.string(10, 'aA0') + random.guid() + Date.now() + 'œ';
+}
 
 
 //var fs = require('fs');

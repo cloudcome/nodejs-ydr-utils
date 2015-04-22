@@ -6,9 +6,12 @@
 
 'use strict';
 
-
-var dangerHTML = '```\nabc\n```\n\n</div> 1<2>3 abc';
+var fs = require('fs');
+var path = require('path');
+var dangerMarkdown = fs.readFileSync(path.join(__dirname, './markdown.md'), 'utf8');
 var xss  = require('../libs/xss.js');
 
-console.log(xss.mdSafe(dangerHTML));
-console.log(xss.mdRender(dangerHTML));
+//console.log(xss.mdSafe(dangerMarkdown));
+console.log(xss.mdRender(xss.mdSafe(dangerMarkdown)));
+console.log('\n\n===================\n\n');
+console.log(xss.mdRender(xss.mdTOC(xss.mdSafe(dangerMarkdown))));
