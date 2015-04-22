@@ -10,12 +10,12 @@ Favicon.buildDefaultConfigs();
 
 var favicon = new Favicon('jt://dqw.com');
 
-//var u = Favicon.joinURL('/3/4/', '/3/4/');
-//console.log(u);
+var u = Favicon.joinURL('http://gruntjs.com/getting-started','../img/favicon.ico');
+console.log(u);
 
-
-favicon.get(function () {
-    console.log('file:', this.faviconFile);
-}).on('error', function (err) {
-    console.log('err:', err);
-});
+//
+//favicon.get(function () {
+//    console.log('file:', this.faviconFile);
+//}).on('error', function (err) {
+//    console.log('err:', err);
+//});

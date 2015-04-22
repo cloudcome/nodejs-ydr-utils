@@ -16,18 +16,20 @@ var path = require('path');
 var fse = require('fs-extra');
 var Emitter = require('events').EventEmitter;
 var REG_LINK = /<link[^<>]*?>/ig;
-var REG_REL = /\brel\s*?=\s*?['"]([^'"]*?)['"]/i;
-var REG_TYPE = /\btype\s*?=\s*?['"]([^'"]*?)['"]/i;
-var REG_HREF = /\bhref\s*?=\s*?['"]([^'"]*?)['"]/i;
+//var REG_REL = /\brel\s*?=\s*?['"]([^'"]*?)['"]/i;
+//var REG_TYPE = /\btype\s*?=\s*?['"]([^'"]*?)['"]/i;
+//var REG_HREF = /\bhref\s*?=\s*?['"]([^'"]*?)['"]/i;
 var REG_REL_ICON = /\s\bicon\b/i;
 var REG_TYPE_ICON = /\s-icon\b/i;
 var REG_HTTP = /^https?:\/\//i;
+var REG_HTTP_ROOT = /^https?:\/\/[^/]+\/$/i;
 var REG_URL_SUFFIX = /\/[^/]*$/;
 var REG_HOSTNAME = /^((xn--)?[a-z\d]+\.)+([a-z]{2,}|xn--[a-z\d]+)$/i;
 var REG_PATH_ABSOLUTE = /^\//;
 var REG_THIS_PROTOCOL = /^\/\//;
 var REG_PATH_RELATIVE = /^(\.{1,2})\//;
 var REG_PATH_END = /\/[^/]+?\/$/;
+var REG_FAVICON_TYPE = /^image\/x-icon$/i;
 var noop = function () {
     //
 };
@@ -121,7 +123,7 @@ Favicon.joinURL = function (from, to) {
         to = to.replace(REG_PATH_RELATIVE, '');
 
         if (mathes[1].length === 2) {
-            from = from.replace(REG_PATH_END, '/');
+            from = REG_HTTP_ROOT.test(from) ? from : from.replace(REG_PATH_END, '/');
         }
     }
 
@@ -260,7 +262,7 @@ Favicon.implement({
 
             the.faviconURL = the._parseFaviconURLFromBody(body);
 
-            if(!the.faviconURL){
+            if (!the.faviconURL) {
                 return next();
             }
 
@@ -376,9 +378,14 @@ Favicon.implement({
             }
 
             var contentLength = dato.parseInt(headers['content-length'], 0);
+            var contentType = headers['content-type'];
 
             if (res.statusCode === 200 && contentLength >= 20) {
                 the.faviconURL = href;
+                return callback(href);
+            }
+
+            if (REG_FAVICON_TYPE.test(href)) {
                 return callback(href);
             }
 
