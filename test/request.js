@@ -3,7 +3,8 @@
 var req = require('../libs/request.js');
 
 req.get({
-    url: 'http://qianduanblog.com/post/sublime-text-3-plugin-html-css-js-prettify.html'
+    url: 'http://hidoos.me/',
+    timeout: 3000
 }, function (err, body, res) {
-    console.log(body);
+    console.log(err);
 });

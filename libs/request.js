@@ -19,7 +19,9 @@ var defaults = {
     max30x: 10,
     headers: {},
     body: null,
-    file: null
+    file: null,
+    // 超时时间：15 秒
+    timeout: 15000
 };
 var methods = 'head get post put delete'.split(' ');
 var Stream = require('stream');
@@ -93,11 +95,13 @@ exports.down = function (options, callback) {
  * @param [options.encoding="utf8"] {String} 响应处理编码，可选 utf8/binary
  * @param [options.body=""] {String|Stream} POST/PUT 写入数据
  * @param [options.file=""] {String} POST/PUT 写入的文件地址
+ * @param [options.timeout=15000] {Number} 超时时间
  * @param callback
  * @private
  */
 function _remote(options, callback) {
     var int30x = 0;
+    var req;
 
     /**
      * ！！！这里千万不要深度复制！！！
@@ -108,10 +112,11 @@ function _remote(options, callback) {
     callback = typeis.function(callback) ? callback : noop;
 
     var request = function () {
-        _request(options, function (err, bodyORheaders, res) {
+        req = _request(options, function (err, bodyORheaders, res) {
             var context = this;
 
             if (!options.isRedirectOnHeadWhen30x && options.method === 'head' || err) {
+                clearTimeout(timeid);
                 return callback.call(context, err, bodyORheaders, res);
             }
 
@@ -122,6 +127,7 @@ function _remote(options, callback) {
             }
 
             if (is30x && int30x > options.max30x) {
+                clearTimeout(timeid);
                 return callback.call(context, new Error('redirect count over ' + options.max30x));
             }
 
@@ -133,12 +139,25 @@ function _remote(options, callback) {
                 options.url = urlto;
                 request();
             } else {
+                clearTimeout(timeid);
                 callback.call(context, err, bodyORheaders, res);
             }
         });
     };
 
     request();
+
+    var timeid = setTimeout(function () {
+        if (req) {
+            req.abort();
+        }
+
+        options.href = options.url;
+        callback.call({
+            options: options
+        }, new Error('request timeout'));
+        callback = noop;
+    }, options.timeout);
 }
 
 
@@ -250,6 +269,8 @@ function _request(options, callback) {
     } else {
         req.end();
     }
+
+    return req;
 }
 
 
