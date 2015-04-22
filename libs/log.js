@@ -99,7 +99,7 @@ module.exports = log;
 function _log(err, req, res, next) {
     var time = date.format('YYYY年MM月DD日 HH:mm:ss.SSS 星期e a');
     var request = req ? req.method + ' ' + (err ? '500' : '404') + ' ' + req.url : '';
-    var ip = req ? req.headers['x-forwarded-for'] || req.ip : '0.0.0.0';
+    var ip = req ? req.headers['x-real-ip'] || req.ip : '0.0.0.0';
     var query = req ? JSON.stringify(req.query || {}, null, 4) : '';
     var body = req ? JSON.stringify(req.body || {}, null, 4) : '';
     var name = date.format(logDefaults.name);
