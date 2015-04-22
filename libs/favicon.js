@@ -125,7 +125,7 @@ Favicon.joinURL = function (from, to) {
         return parse.protocol + to;
     }
 
-    from = domain + parse.pathname.replace(REG_URL_SUFFIX, '/');
+    from = domain + (parse.pathname || '/').replace(REG_URL_SUFFIX, '/');
 
     if (!to || REG_PATH_ABSOLUTE.test(to)) {
         return domain + to;
