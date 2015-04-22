@@ -259,6 +259,11 @@ Favicon.implement({
             var href = this.options.href;
 
             the.faviconURL = the._parseFaviconURLFromBody(body);
+
+            if(!the.faviconURL){
+                return next();
+            }
+
             the.faviconURL = REG_HTTP.test(the.faviconURL) ? the.faviconURL : Favicon.joinURL(href, the.faviconURL);
 
             console.log(the.faviconURL);
