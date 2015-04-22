@@ -8,13 +8,14 @@ var configs = {
 Favicon.config(configs);
 Favicon.buildDefaultConfigs();
 
-var favicon = new Favicon('https://cnodejs.org/');
+var favicon = new Favicon('https://ssss.mmmmmm.dd/');
 
-var r = favicon._joinURL('https://cnodejs.org/', '//dn-cnodestatic.qbox.me/public/images/cnode_icon_32.png');
-console.log(r);
+//var u = Favicon.joinURL('/3/4/', '/3/4/');
+//console.log(u);
 
-//favicon.get(function () {
-//    console.log('file:', this.faviconFile);
-//}).on('error', function (err) {
-//    console.log('err:', err);
-//});
+
+favicon.get(function () {
+    console.log('file:', this.faviconFile);
+}).on('error', function (err) {
+    console.log('err:', err);
+});

@@ -23,6 +23,7 @@ var REG_REL_ICON = /\s\bicon\b/i;
 var REG_TYPE_ICON = /\s-icon\b/i;
 var REG_HTTP = /^https?:\/\//i;
 var REG_URL_SUFFIX = /\/[^/]*$/;
+var REG_HOSTNAME = /^((xn--)?[a-z\d]+\.)+([a-z]{2,}|xn--[a-z\d]+)$/i;
 /**
  * 判断是否为绝对路径
  * @type {RegExp}
@@ -76,6 +77,7 @@ Favicon.config = function (options) {
     dato.extend(configs, options);
 };
 
+
 /**
  * 构造配置
  */
@@ -99,6 +101,49 @@ Favicon.updateDefaultConfigs = function () {
     } catch (err) {
         // ignore
     }
+};
+
+
+/**
+ * url 合并
+ * @param from
+ * @param to
+ * @returns {*}
+ * @private
+ */
+Favicon.joinURL = function (from, to) {
+    var parseTo = urlParser.parse(to);
+
+    if (parseTo.protocol && parseTo.hostname) {
+        return to;
+    }
+
+    var parse = urlParser.parse(from);
+    var domain = (parse.protocol || 'http:') + '//' + (parse.hostname || '0');
+
+    if (REG_THIS_PROTOCOL.test(to)) {
+        return parse.protocol + to;
+    }
+
+    from = domain + parse.pathname.replace(REG_URL_SUFFIX, '/');
+
+    if (!to || REG_PATH_ABSOLUTE.test(to)) {
+        return domain + to;
+    }
+
+    var mathes;
+
+    to = './' + to;
+
+    while ((mathes = to.match(REG_PATH_RELATIVE))) {
+        to = to.replace(REG_PATH_RELATIVE, '');
+
+        if (mathes[1].length === 2) {
+            from = from.replace(REG_PATH_END, '/');
+        }
+    }
+
+    return from + to;
 };
 
 
@@ -147,7 +192,7 @@ Favicon.implement({
         if (the.url.length < 256 && typeis.url(this.url)) {
             the._url = urlParser.parse(the.url);
 
-            if (the._url.hostname.indexOf('.') === -1) {
+            if (!REG_HOSTNAME.test(the._url.hostname)) {
                 the.url = null;
             }
         } else {
@@ -227,7 +272,7 @@ Favicon.implement({
             var href = this.options.href;
 
             the.faviconURL = the._parseFaviconURLFromBody(body);
-            the.faviconURL = REG_HTTP.test(the.faviconURL) ? the.faviconURL : the._joinURL(href, the.faviconURL);
+            the.faviconURL = REG_HTTP.test(the.faviconURL) ? the.faviconURL : Favicon.joinURL(href, the.faviconURL);
 
             console.log(the.faviconURL);
             next();
@@ -406,43 +451,6 @@ Favicon.implement({
         Favicon.REG_MAP[attrName] = reg;
 
         return (html.match(reg) || ['', ''])[1].toLowerCase();
-    },
-
-
-    /**
-     * url 合并
-     * @param from
-     * @param to
-     * @returns {*}
-     * @private
-     */
-    _joinURL: function (from, to) {
-        var parse = urlParser.parse(from);
-        var domain = parse.protocol + '//' + parse.hostname;
-
-        if (REG_THIS_PROTOCOL.test(to)) {
-            return parse.protocol + to;
-        }
-
-        from = domain + parse.pathname.replace(REG_URL_SUFFIX, '/');
-
-        if (!to || REG_PATH_ABSOLUTE.test(to)) {
-            return domain + to;
-        }
-
-        var mathes;
-
-        to = './' + to;
-
-        while (mathes = to.match(REG_PATH_RELATIVE)) {
-            to = to.replace(REG_PATH_RELATIVE, '');
-
-            if (mathes[1].length === 2) {
-                from = from.replace(REG_PATH_END, '/');
-            }
-        }
-
-        return from + to;
     }
 });
 
