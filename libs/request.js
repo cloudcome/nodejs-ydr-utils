@@ -24,7 +24,7 @@ var defaults = {
     // 超时时间：15 秒
     timeout: 15000
 };
-var methods = 'head get post put delete'.split(' ');
+var methods = 'head get post put delete options'.split(' ');
 var Stream = require('stream');
 var noop = function () {
     //
@@ -34,7 +34,7 @@ var USER_AGENT = 'node; ydr-utils.request';
 
 
 /**
- * HEAD/GET/POST/PUT/DELETE 请求
+ * HEAD/GET/POST/PUT/DELETE/OPTIONS 请求
  */
 methods.forEach(function (method) {
     /**
@@ -50,6 +50,7 @@ methods.forEach(function (method) {
      * @property post {Function}
      * @property put {Function}
      * @property delete {Function}
+     * @property options {Function}
      */
     exports[method] = function (options, callback) {
         if (typeis(options) === 'string') {
