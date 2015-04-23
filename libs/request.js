@@ -38,12 +38,6 @@ var USER_AGENT = 'node; ydr-utils.request';
  */
 methods.forEach(function (method) {
     /**
-     * 请求
-     * @param options {String|Object}
-     * @param callback {Function}
-     */
-
-    /**
      * @name exports
      * @property head {Function}
      * @property get {Function}
@@ -106,11 +100,8 @@ function _remote(options, callback) {
     var int30x = 0;
     var req;
 
-    /**
-     * ！！！这里千万不要深度复制！！！
-     * @type {*}
-     */
-    options = dato.extend({}, defaults, options);
+    // ！！！这里千万不要深度复制！！！
+    options = dato.extend(false, {}, defaults, options);
     options.max30x = dato.parseInt(options.max30x, 10);
     callback = typeis.function(callback) ? callback : noop;
 
