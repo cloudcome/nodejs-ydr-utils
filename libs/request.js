@@ -10,6 +10,7 @@ var fs = require('fs');
 var url = require('url');
 var http = require('http');
 var https = require('https');
+var qs = require('querystring');
 var typeis = require('./typeis.js');
 var dato = require('./dato.js');
 var defaults = {
@@ -96,6 +97,7 @@ exports.down = function (options, callback) {
  * @param [options.body=""] {String|Stream} POST/PUT 写入数据
  * @param [options.file=""] {String} POST/PUT 写入的文件地址
  * @param [options.timeout=15000] {Number} 超时时间
+ * @param [options.query=null] {Object} querystring
  * @param callback
  * @private
  */
@@ -110,6 +112,19 @@ function _remote(options, callback) {
     options = dato.extend({}, defaults, options);
     options.max30x = dato.parseInt(options.max30x, 10);
     callback = typeis.function(callback) ? callback : noop;
+
+    var querystring = '';
+
+    if (typeis.object(options.query)) {
+        querystring = qs.stringify(options.query);
+    }
+
+    if(querystring){
+        querystring = (options.url.indexOf('?') > -1 ? '&' : '?') + querystring;
+    }
+
+    options.url += querystring;
+    options.query = null;
 
     var request = function () {
         req = _request(options, function (err, bodyORheaders, res) {
@@ -217,7 +232,6 @@ function _request(options, callback) {
     }
 
     requestOptions.headers = options.headers;
-
     requestOptions.headers['user-agent'] = typeis.undefined(requestOptions.headers['user-agent']) ?
         USER_AGENT :
         requestOptions.headers['user-agent'];
@@ -225,6 +239,8 @@ function _request(options, callback) {
     var context = {
         options: requestOptions
     };
+
+    //console.log(requestOptions);
 
     var req = _http.request(requestOptions, function (res) {
         var bufferList = [];
