@@ -27,6 +27,9 @@ code: `<pre>~</pre>`
 
 在1.4之前相信大家非常喜欢使用live(),因为它可以把事件绑定到当前以及以后添加的元素上面，当然在1.4之后delegate()也可以做类似的事情了。live()的原理很简单，它是通过document进行事件委派的，因此我们也可以使用on()通过将事件绑定到document来达到live()一样的效果。
 
+
+<http://link>
+
 # live()写法
 
 <pre> $('#list li').live('click', '#list li', function() {

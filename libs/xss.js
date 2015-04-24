@@ -33,11 +33,10 @@ var REG_CODE = /(`+)\s*([\s\S]*?[^`])\s*\1(?!`)/g;
 var REG_HEADING = /^#{1,6}(.*)$/mg;
 var REG_STRONG = /\b__([\s\S]+?)__(?!_)|\*\*([\s\S]+?)\*\*(?!\*)/mg;
 var REG_EM = /^\b_((?:__|[\s\S])+?)_\b|^\*((?:\*\*|[\s\S])+?)\*(?!\*)/mg;
-var REG_LINK = /<http.*?>/g;
-var REG_TAG = /<\/?[a-z][a-z\d]*\b[^>]*?>/g;
+var REG_LINK = /<http.*?>/ig;
+var REG_TAG = /<\/?[a-z][a-z\d]*(\s\b[^>]*)?>/g;
 var REG_TAG_P = /<\/?p>/ig;
 //var REG_BLOKQUOTE = /^( *>[^\n]+(\n(?!def)[^\n]+)*\n*)+/g;
-//var REG_LINK = /<https?:\/\/>/gi;
 var REG_PATH = /^(\/|\.{0,2})(\/[^/]+)+$/;
 var REG_SIZE = /(?:\s+?=\s*?(\d+)(?:[x*×](\d+))?)?$/i;
 var encodeList = [{
