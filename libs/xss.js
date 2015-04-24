@@ -33,6 +33,7 @@ var REG_CODE = /(`+)\s*([\s\S]*?[^`])\s*\1(?!`)/g;
 var REG_HEADING = /^#{1,6}(.*)$/mg;
 var REG_STRONG = /\b__([\s\S]+?)__(?!_)|\*\*([\s\S]+?)\*\*(?!\*)/mg;
 var REG_EM = /^\b_((?:__|[\s\S])+?)_\b|^\*((?:\*\*|[\s\S])+?)\*(?!\*)/mg;
+var REG_LINK = /<http.*?>/g;
 var REG_TAG = /<\/?[a-z][a-z\d]*\b[^>]*?>/g;
 var REG_TAG_P = /<\/?p>/ig;
 //var REG_BLOKQUOTE = /^( *>[^\n]+(\n(?!def)[^\n]+)*\n*)+/g;
@@ -124,6 +125,15 @@ exports.mdSafe = function (source) {
 
     // ``
     source = source.replace(REG_CODE, function ($0) {
+        var key = _generatorKey();
+
+        preMap[key] = $0;
+
+        return key;
+    });
+
+    // <http...>
+    source = source.replace(REG_LINK, function ($0) {
         var key = _generatorKey();
 
         preMap[key] = $0;
