@@ -27,7 +27,7 @@ var REG_LONG_BREAK_LINE = /\n{3,}/g;
 // 自动关闭标签是安全的，如 br、hr、img 等
 //var REG_CLOSE_TAGNAME = /(?!```)<([a-z\d]+)\b[\s\S]*?>([\s\S]*?)<\/\1>(?!```)/ig;
 // @link marked
-var REG_PRE1 = /^```\s*\n[\s\S]*?^```/mg;
+var REG_PRE1 = /^```\s*\n[\s\S]*?^```{3,}/mg;
 var REG_PRE2 = /^( {4}[^\n]+\n*)+/mg;
 var REG_CODE = /(`+)\s*([\s\S]*?[^`])\s*\1(?!`)/g;
 var REG_HEADING = /^#{1,6}(.*)$/mg;
