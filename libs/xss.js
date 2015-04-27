@@ -27,10 +27,10 @@ var REG_LONG_BREAK_LINE = /\n{3,}/g;
 // 自动关闭标签是安全的，如 br、hr、img 等
 //var REG_CLOSE_TAGNAME = /(?!```)<([a-z\d]+)\b[\s\S]*?>([\s\S]*?)<\/\1>(?!```)/ig;
 // @link marked
-var REG_PRE1 = /^```\s*\n[\s\S]*?^```{3,}/mg;
-var REG_PRE2 = /^( {4}[^\n]+\n*)+/mg;
+var REG_PRE1 = /^`{3,}.*$\n((^.*$\n)*?)^`{3,}.*$/mg;
+var REG_PRE2 = /(^ {4}.*$)+\n/mg;
 var REG_CODE = /(`+)\s*([\s\S]*?[^`])\s*\1(?!`)/g;
-var REG_HEADING = /^#{1,6}(.*)$/mg;
+var REG_HEADING = /^(#{1,6})(.*)$/mg;
 var REG_STRONG = /\b__([\s\S]+?)__(?!_)|\*\*([\s\S]+?)\*\*(?!\*)/mg;
 var REG_EM = /^\b_((?:__|[\s\S])+?)_\b|^\*((?:\*\*|[\s\S])+?)\*(?!\*)/mg;
 var REG_LINK = /<http.*?>/ig;
@@ -39,7 +39,7 @@ var REG_TAG_P = /<\/?p>/ig;
 //var REG_BLOKQUOTE = /^( *>[^\n]+(\n(?!def)[^\n]+)*\n*)+/g;
 var REG_PATH = /^(\/|\.{0,2})(\/[^/]+)+$/;
 var REG_SIZE = /(?:\s+?=\s*?(\d+)(?:[x*×](\d+))?)?$/i;
-var encodeList = [{
+var ENCODE_LIST = [{
     f: />/g,
     t: '&gt;'
 }, {
@@ -103,6 +103,7 @@ var sanitizeOptions = {
  */
 exports.mdSafe = function (source) {
     var preMap = {};
+    var minHeadering = 0;
 
     // ```
     source = source.replace(REG_PRE1, function ($0) {
@@ -140,8 +141,27 @@ exports.mdSafe = function (source) {
         return key;
     });
 
-    // <.>
-    source = source.replace(REG_TAG, '');
+    // <>
+    dato.each(ENCODE_LIST, function (index, en) {
+        source = source.replace(en.f, en.t);
+    });
+
+
+    source = source.replace(REG_HEADING, function ($0, $1, $2) {
+        minHeadering = !minHeadering || minHeadering > $1.length ? $1.length : minHeadering;
+
+        return $0;
+    });
+
+
+    if (minHeadering && minHeadering > 1) {
+        var detaHeading = minHeadering - 1;
+
+        source = source.replace(REG_HEADING, function ($0, $1, $2) {
+            return $1.slice(detaHeading) + $2;
+        });
+    }
+
 
     // back
     dato.each(preMap, function (key, val) {
@@ -173,7 +193,7 @@ exports.mdTOC = function (source) {
 
         var text = token.text;
         var depth = new Array((token.depth - 1) * 4 + 1).join(' ');
-        var id = encryption.md5( exports.mdRender(text).replace(REG_TAG_P, '').trim());
+        var id = encryption.md5(exports.mdRender(text).replace(REG_TAG_P, '').trim());
 
         toc += depth + '- [' + text + '](#heading-' + token.depth + '-' + (index++) + '-' + id + ')\n';
     });
