@@ -14,6 +14,7 @@ var qs = require('querystring');
 var typeis = require('./typeis.js');
 var dato = require('./dato.js');
 var gunzip = require('zlib').createGunzip();
+var FormData = require('form-data');
 var browserHeaders = {
     'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
     'accept-encoding': 'gzip, deflate, sdch',
@@ -31,10 +32,12 @@ var defaults = {
     max30xRedirectTimes: 10,
     // 头信息
     headers: {},
-    // 请求体
-    body: null,
-    // 请求文件
+    // form 表单，优先级1，form-data 模块的实例
+    form: null,
+    // 请求文件，优先级2
     file: null,
+    // 请求体，优先级2
+    body: null,
     // 超时时间：15 秒
     timeout: 15000,
     // 是否自动解压 gzip 压缩
@@ -114,8 +117,9 @@ exports.setBrowserHeaders = function (options) {
  * @param [options.method="GET"] {String} 请求方法
  * @param [options.headers=null] {Object} 请求头
  * @param [options.encoding="utf8"] {String} 响应处理编码，可选 utf8/binary
- * @param [options.body=""] {String|Stream} POST/PUT 写入数据
- * @param [options.file=""] {String} POST/PUT 写入的文件地址
+ * @param [options.form=null] {String|Stream|Object} POST/PUT 写入数据
+ * @param [options.file=null] {String|Stream|Object} POST/PUT 写入数据
+ * @param [options.body=null] {String|Stream|Object} POST/PUT 写入数据
  * @param [options.timeout=15000] {Number} 超时时间
  * @param [options.query=null] {Object} querystring
  * @param callback
@@ -133,7 +137,11 @@ function _remote(options, callback) {
     var querystring = '';
 
     if (typeis.object(options.query)) {
-        querystring = qs.stringify(options.query);
+        try {
+            querystring = qs.stringify(options.query);
+        } catch (err) {
+            return callback(err);
+        }
     }
 
     if (querystring) {
@@ -200,8 +208,9 @@ function _remote(options, callback) {
  * @param [options.method="GET"] {String} 请求方法
  * @param [options.headers=null] {Object} 请求头
  * @param [options.encoding="utf8"] {String} 响应处理编码，可选 utf8/binary
- * @param [options.body=""] {String|Stream|Object} POST/PUT 写入数据
- * @param [options.file=""] {String} POST/PUT 写入的文件地址
+ * @param [options.form=null] {String|Stream|Object} POST/PUT 写入数据
+ * @param [options.file=null] {String|Stream|Object} POST/PUT 写入数据
+ * @param [options.body=null] {String|Stream|Object} POST/PUT 写入数据
  * @param callback
  * @private
  */
@@ -212,8 +221,9 @@ function _request(options, callback) {
 
     var requestOptions = url.parse(options.url);
     var _http = requestOptions.protocol === 'https:' ? https : http;
-    var body = options.body || '';
-    var file = options.file || '';
+    var form = options.form;
+    var file = options.file;
+    var body = options.body;
     var headers = options.headers = _lowerCaseHeaders(options.headers);
     var bodyLength = headers['content-length'];
 
@@ -232,8 +242,11 @@ function _request(options, callback) {
         requestOptions.method !== 'HEAD';
     var stat;
 
-    if (canSend && bodyLength === undefined) {
+    if (form && form instanceof  FormData) {
+        options.headers = form.getHeaders(options.headers);
+    } else if (canSend && bodyLength === undefined) {
         if (file) {
+            form = null;
             try {
                 stat = fs.statSync(file);
             } catch (err) {
@@ -243,11 +256,18 @@ function _request(options, callback) {
             bodyLength = stat.size;
             body = fs.createReadStream(file);
         } else if (body instanceof Buffer) {
+            form = null;
+            file = null;
             bodyLength = body.length;
         } else if (body instanceof String) {
+            form = null;
+            file = null;
             bodyLength = Buffer.byteLength(body);
         }
     } else if (!canSend) {
+        form = null;
+        file = null;
+        body = null;
         bodyLength = 0;
     }
 
@@ -266,7 +286,7 @@ function _request(options, callback) {
         options: requestOptions
     };
 
-    console.log(requestOptions);
+    //console.log(requestOptions);
 
     var req = _http.request(requestOptions, function (res) {
         var bufferList = [];
@@ -311,8 +331,9 @@ function _request(options, callback) {
     req.on('error', callback.bind(context));
 
     if (canSend) {
-        //steam
-        if (body && typeis.function(body.pipe)) {
+        if (form && typeis.function(form)) {
+            form.pipe(req);
+        } else if (body && typeis.function(body.pipe)) {
             body.pipe(req);
         } else {
             req.end(body);
