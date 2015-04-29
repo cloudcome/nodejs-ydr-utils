@@ -13,16 +13,34 @@ var https = require('https');
 var qs = require('querystring');
 var typeis = require('./typeis.js');
 var dato = require('./dato.js');
+var gunzip = require('zlib').createGunzip();
+var browserHeaders = {
+    'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+    'accept-encoding': 'gzip, deflate, sdch',
+    'accept-language': 'zh-CN,zh;q=0.8,en;q=0.6',
+    'user-agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 8_0 like Mac OS X) AppleWebKit/600.1.3 (KHTML, like Gecko) Version/8.0 Mobile/12A4345d Safari/600.1.4'
+};
 var defaults = {
+    // 请求方法
     method: 'GET',
+    // 响应编码
     encoding: 'utf8',
+    // 是否在接收到 30x 后自动跳转
     isRedirectOnHeadWhen30x: true,
-    max30x: 10,
+    // 最大 30x 跳转次数
+    max30xRedirectTimes: 10,
+    // 头信息
     headers: {},
+    // 请求体
     body: null,
+    // 请求文件
     file: null,
     // 超时时间：15 秒
-    timeout: 15000
+    timeout: 15000,
+    // 是否自动解压 gzip 压缩
+    autoGunzip: true,
+    // 是否模拟浏览器
+    simulateBrowser: true
 };
 var methods = 'head get post put delete options'.split(' ');
 var Stream = require('stream');
@@ -79,15 +97,19 @@ exports.down = function (options, callback) {
 };
 
 
+exports.setBrowserHeaders = function () {
+
+};
+
+
 /**
  * 远程请求
  * @param options
  * @param options.url {String} 请求地址
  * @param [options.isRedirectOnHeadWhen30x=true] {Boolean} head 请求时出现 301 是否跳转
- * @param [options.max30x=10] {Number} 30x 最大跳转次数
+ * @param [options.max30xRedirectTimes=10] {Number} 30x 最大跳转次数
  * @param [options.method="GET"] {String} 请求方法
  * @param [options.headers=null] {Object} 请求头
- * @param [options.agent=null] {String} 请求代理信息
  * @param [options.encoding="utf8"] {String} 响应处理编码，可选 utf8/binary
  * @param [options.body=""] {String|Stream} POST/PUT 写入数据
  * @param [options.file=""] {String} POST/PUT 写入的文件地址
@@ -102,7 +124,7 @@ function _remote(options, callback) {
 
     // ！！！这里千万不要深度复制！！！
     options = dato.extend(false, {}, defaults, options);
-    options.max30x = dato.parseInt(options.max30x, 10);
+    options.max30xRedirectTimes = dato.parseInt(options.max30xRedirectTimes, 10);
     callback = typeis.function(callback) ? callback : noop;
 
     var querystring = '';
@@ -111,7 +133,7 @@ function _remote(options, callback) {
         querystring = qs.stringify(options.query);
     }
 
-    if(querystring){
+    if (querystring) {
         querystring = (options.url.indexOf('?') > -1 ? '&' : '?') + querystring;
     }
 
@@ -133,9 +155,9 @@ function _remote(options, callback) {
                 int30x++;
             }
 
-            if (is30x && int30x > options.max30x) {
+            if (is30x && int30x > options.max30xRedirectTimes) {
                 clearTimeout(timeid);
-                return callback.call(context, new Error('redirect count over ' + options.max30x));
+                return callback.call(context, new Error('redirect count over ' + options.max30xRedirectTimes));
             }
 
             if (is30x) {
@@ -174,9 +196,8 @@ function _remote(options, callback) {
  * @param options.url {String} 请求地址
  * @param [options.method="GET"] {String} 请求方法
  * @param [options.headers=null] {Object} 请求头
- * @param [options.agent=null] {String} 请求代理信息
  * @param [options.encoding="utf8"] {String} 响应处理编码，可选 utf8/binary
- * @param [options.body=""] {String|Stream} POST/PUT 写入数据
+ * @param [options.body=""] {String|Stream|Object} POST/PUT 写入数据
  * @param [options.file=""] {String} POST/PUT 写入的文件地址
  * @param callback
  * @private
@@ -193,10 +214,19 @@ function _request(options, callback) {
     var headers = options.headers = _lowerCaseHeaders(options.headers);
     var bodyLength = headers['content-length'];
 
-    requestOptions.agent = options.agent;
+    if (typeis.plainObject(body)) {
+        try {
+            body = JSON.stringify(body);
+        } catch (err) {
+            return callback(err);
+        }
+    }
+
     requestOptions.method = options.method.toUpperCase();
 
-    var canSend = requestOptions.method !== 'GET' && requestOptions.method !== 'HEAD';
+    var canSend = requestOptions.method !== 'GET' &&
+        requestOptions.method !== 'OPTIONS' &&
+        requestOptions.method !== 'HEAD';
     var stat;
 
     if (canSend && bodyLength === undefined) {
@@ -224,15 +254,16 @@ function _request(options, callback) {
     }
 
     requestOptions.headers = options.headers;
-    requestOptions.headers['user-agent'] = typeis.undefined(requestOptions.headers['user-agent']) ?
-        USER_AGENT :
-        requestOptions.headers['user-agent'];
+    requestOptions.headers.host = requestOptions.host;
+    requestOptions.headers.origin = requestOptions.protocol + '//' + requestOptions.host;
+    requestOptions.headers.referer = requestOptions.headers.referrer = options.url;
+    dato.extend(requestOptions.headers, browserHeaders);
 
     var context = {
         options: requestOptions
     };
 
-    //console.log(requestOptions);
+    console.log(requestOptions);
 
     var req = _http.request(requestOptions, function (res) {
         var bufferList = [];
@@ -244,25 +275,34 @@ function _request(options, callback) {
             return callback.call(context, null, res.headers, res);
         }
 
-        res.setEncoding(options.encoding);
+        var isGzip = res['content-encoding'] !== 'gzip';
+        var onreceive = function (stream) {
+            stream.setEncoding(options.encoding);
 
-        res.on('data', function (chunk) {
-            if (isUtf8) {
-                bufferList.push(new Buffer(chunk, 'utf8'));
-            } else {
-                binarys += chunk;
-            }
-        }).on('end', function () {
-            var data;
+            stream.on('data', function (chunk) {
+                if (isUtf8) {
+                    bufferList.push(new Buffer(chunk, 'utf8'));
+                } else {
+                    binarys += chunk;
+                }
+            }).on('end', function () {
+                var data;
 
-            if (isUtf8) {
-                data = Buffer.concat(bufferList).toString();
-            } else {
-                data = binarys;
-            }
+                if (isUtf8) {
+                    data = Buffer.concat(bufferList).toString();
+                } else {
+                    data = binarys;
+                }
 
-            callback.call(context, null, data, res);
-        }).on('error', callback.bind(context));
+                callback.call(context, null, data, res);
+            }).on('error', callback.bind(context));
+        };
+
+        if (isGzip) {
+            onreceive(res.pipe(gunzip));
+        } else {
+            onreceive(res);
+        }
     });
 
     req.on('error', callback.bind(context));
