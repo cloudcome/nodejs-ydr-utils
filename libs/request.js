@@ -48,7 +48,6 @@ var noop = function () {
     //
 };
 var REG_HTTP = /^https?:\/\//i;
-var USER_AGENT = 'node; ydr-utils.request';
 
 
 /**
@@ -97,8 +96,12 @@ exports.down = function (options, callback) {
 };
 
 
-exports.setBrowserHeaders = function () {
-
+/**
+ * 设置模拟浏览器请求的 headers
+ * @param options {Object}
+ */
+exports.setBrowserHeaders = function (options) {
+    dato.extend(browserHeaders, options);
 };
 
 
