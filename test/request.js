@@ -5,7 +5,7 @@ var zlib = require('zlib');
 var gunzipStream = zlib.createGunzip();
 
 req.post({
-    url: 'http://localhost:8080/services/banner/list.do',
+    url: 'http://192.168.2.163:10085/services/banner/list.do',
     query: {},
     body: {
         bannerType: 1,

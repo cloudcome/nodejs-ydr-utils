@@ -298,7 +298,7 @@ function _request(options, callback) {
             return callback.call(context, null, res.headers, res);
         }
 
-        var isGzip = res['content-encoding'] !== 'gzip';
+        var isGzip = res['content-encoding'] === 'gzip';
         var onreceive = function (stream) {
             stream.setEncoding(options.encoding);
 
