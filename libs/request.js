@@ -13,7 +13,7 @@ var https = require('https');
 var qs = require('querystring');
 var typeis = require('./typeis.js');
 var dato = require('./dato.js');
-var gunzip = require('zlib').createGunzip();
+var zlib = require('zlib');
 var FormData = require('form-data');
 var browserHeaders = {
     'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
@@ -298,7 +298,7 @@ function _request(options, callback) {
             return callback.call(context, null, res.headers, res);
         }
 
-        var isGzip = res['content-encoding'] === 'gzip';
+        var isGzip = res.headers['content-encoding'] === 'gzip';
         var onreceive = function (stream) {
             stream.setEncoding(options.encoding);
 
@@ -322,7 +322,10 @@ function _request(options, callback) {
         };
 
         if (isGzip) {
-            onreceive(res.pipe(gunzip));
+            var gunzip = zlib.createGunzip();
+
+            res.pipe(gunzip)
+            onreceive(gunzip);
         } else {
             onreceive(res);
         }
