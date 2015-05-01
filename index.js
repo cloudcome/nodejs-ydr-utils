@@ -7,10 +7,12 @@
 'use strict';
 
 module.exports = {
-    // 调用
-    allocation: require('./libs/allocation.js'),
     // 阿里云 OSS 上传
     AliOSS: require('./libs/ali-oss.js'),
+    // 调用
+    allocation: require('./libs/allocation.js'),
+    // 调用
+    cache: require('./libs/cache.js'),
     // 类
     class: require('./libs/class.js'),
     // csrf
