@@ -227,8 +227,10 @@ function _request(options, callback) {
     var form = options.form;
     var file = options.file;
     var body = options.body;
-    var headers = options.headers = _lowerCaseHeaders(options.headers);
-    var bodyLength = headers['content-length'];
+
+    options.headers = _lowerCaseHeaders(options.headers);
+
+    var bodyLength = options.headers['content-length'];
 
     if (typeis.plainObject(body)) {
         try {
@@ -279,11 +281,13 @@ function _request(options, callback) {
         options.headers['content-length'] = bodyLength;
     }
 
-    requestOptions.headers = options.headers;
-    requestOptions.headers.host = requestOptions.host;
-    requestOptions.headers.origin = requestOptions.protocol + '//' + requestOptions.host;
-    requestOptions.headers.referer = requestOptions.headers.referrer = options.url;
-    dato.extend(requestOptions.headers, browserHeaders);
+    requestOptions.headers = {
+        host: requestOptions.host,
+        origin: requestOptions.protocol + '//' + requestOptions.host,
+        referer: options.url,
+        referrer: options.url
+    };
+    dato.extend(requestOptions.headers, browserHeaders, options.headers);
 
     var context = {
         options: requestOptions
