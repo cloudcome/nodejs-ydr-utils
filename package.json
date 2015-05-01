@@ -15,6 +15,7 @@
     "aliyun",
     "oss",
     "allocation",
+    "cache",
     "class",
     "csrf",
     "date",

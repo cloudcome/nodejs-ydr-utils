@@ -9,10 +9,9 @@
 
 var dato = require('./dato.js');
 var typeis = require('./typeis.js');
+var allocation = require('./allocation.js');
 var cache = Object.create(null);
-var debug = false;
 var length = 0;
-var udf;
 var noop = function () {
     //
 };
@@ -67,6 +66,7 @@ exports.set = function (key, val, expires, isOverride, callback) {
             // override times
             ot: 0
         };
+        length++;
     }
 
     if (_callback !== noop) {
@@ -99,12 +99,45 @@ exports.get = function (key, dftVal) {
 
 
 /**
+ * 删除缓存
+ * @param key
+ */
+exports.remove = function (key) {
+    var cached = cache[key];
+
+    if (cached) {
+        length--;
+    }
+
+    clearTimeout(cached.timeid);
+    delete(cache[key]);
+};
+
+
+/**
+ * 清空缓存
+ */
+exports.clear = function () {
+    dato.each(cache, function (key) {
+        exports.remove(key);
+    });
+};
+
+
+/**
  * 缓存缓存键
  * @returns {Array}
  */
 exports.keys = function () {
     return Object.keys(cache);
 };
+
+
+/**
+ * 缓存缓存键
+ * @returns {Number}
+ */
+exports.length = length;
 
 
 /**
