@@ -19,7 +19,7 @@ var browserHeaders = {
     'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
     'accept-encoding': 'gzip, deflate, sdch',
     'accept-language': 'zh-CN,zh;q=0.8,en;q=0.6',
-    'user-agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 8_0 like Mac OS X) AppleWebKit/600.1.3 (KHTML, like Gecko) Version/8.0 Mobile/12A4345d Safari/600.1.4'
+    'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.90 Safari/537.36'
 };
 var defaults = {
     // 请求方法
@@ -28,6 +28,8 @@ var defaults = {
     encoding: 'utf8',
     // 是否在接收到 30x 后自动跳转
     isRedirectOnHeadWhen30x: true,
+    // 是否回调 stream
+    isCallbackStream: false,
     // 最大 30x 跳转次数
     max30xRedirectTimes: 10,
     // 头信息
@@ -46,7 +48,6 @@ var defaults = {
     simulateBrowser: true
 };
 var methods = 'head get post put delete options'.split(' ');
-var Stream = require('stream');
 var noop = function () {
     //
 };
@@ -83,7 +84,7 @@ methods.forEach(function (method) {
  * 下载资源
  * @param options {String|Object}
  * @param [options.method="get"] {String}
- * @param [options.encoding="binary"] {String}
+ * @param [options.isCallbackStream=true] {Boolean}
  * @param callback {Function}
  */
 exports.down = function (options, callback) {
@@ -94,7 +95,7 @@ exports.down = function (options, callback) {
     }
 
     options.method = 'get';
-    options.encoding = 'binary';
+    options.isCallbackStream = true;
     _remote(options, callback);
 };
 
@@ -112,7 +113,8 @@ exports.setBrowserHeaders = function (options) {
  * 远程请求
  * @param options
  * @param options.url {String} 请求地址
- * @param [options.isRedirectOnHeadWhen30x=true] {Boolean} head 请求时出现 301 是否跳转
+ * @param [options.isRedirectOnHeadWhen30x=true] {Boolean} head 请求时出现 30x 是否跳转
+ * @param [options.isCallbackStream=false] {Boolean} 是否回调 stream
  * @param [options.max30xRedirectTimes=10] {Number} 30x 最大跳转次数
  * @param [options.method="GET"] {String} 请求方法
  * @param [options.headers=null] {Object} 请求头
@@ -152,12 +154,12 @@ function _remote(options, callback) {
     options.query = null;
 
     var request = function () {
-        req = _request(options, function (err, bodyORheaders, res) {
+        req = _request(options, function (err, bodyORheadersORstream, res) {
             var context = this;
 
             if (!options.isRedirectOnHeadWhen30x && options.method === 'head' || err) {
                 clearTimeout(timeid);
-                return callback.call(context, err, bodyORheaders, res);
+                return callback.call(context, err, bodyORheadersORstream, res);
             }
 
             var is30x = res.statusCode === 301 || res.statusCode === 302;
@@ -168,7 +170,7 @@ function _remote(options, callback) {
 
             if (is30x && int30x > options.max30xRedirectTimes) {
                 clearTimeout(timeid);
-                return callback.call(context, new Error('redirect count over ' + options.max30xRedirectTimes));
+                return callback.call(context, new Error('30x redirect times over ' + options.max30xRedirectTimes));
             }
 
             if (is30x) {
@@ -180,7 +182,7 @@ function _remote(options, callback) {
                 request();
             } else {
                 clearTimeout(timeid);
-                callback.call(context, err, bodyORheaders, res);
+                callback.call(context, err, bodyORheadersORstream, res);
             }
         });
     };
@@ -208,6 +210,7 @@ function _remote(options, callback) {
  * @param [options.method="GET"] {String} 请求方法
  * @param [options.headers=null] {Object} 请求头
  * @param [options.encoding="utf8"] {String} 响应处理编码，可选 utf8/binary
+ * @param [options.isCallbackStream=false] {Boolean} 是否回调 stream
  * @param [options.form=null] {String|Stream|Object} POST/PUT 写入数据
  * @param [options.file=null] {String|Stream|Object} POST/PUT 写入数据
  * @param [options.body=null] {String|Stream|Object} POST/PUT 写入数据
@@ -286,8 +289,6 @@ function _request(options, callback) {
         options: requestOptions
     };
 
-    //console.log(requestOptions);
-
     var req = _http.request(requestOptions, function (res) {
         var bufferList = [];
         var binarys = '';
@@ -300,31 +301,34 @@ function _request(options, callback) {
 
         var isGzip = res.headers['content-encoding'] === 'gzip';
         var onreceive = function (stream) {
-            stream.setEncoding(options.encoding);
+            if (options.isCallbackStream) {
+                callback.call(context, null, stream, res);
+            } else {
+                stream.setEncoding(options.encoding);
+                stream.on('data', function (chunk) {
+                    if (isUtf8) {
+                        bufferList.push(new Buffer(chunk, 'utf8'));
+                    } else {
+                        binarys += chunk;
+                    }
+                }).on('end', function () {
+                    var data;
 
-            stream.on('data', function (chunk) {
-                if (isUtf8) {
-                    bufferList.push(new Buffer(chunk, 'utf8'));
-                } else {
-                    binarys += chunk;
-                }
-            }).on('end', function () {
-                var data;
+                    if (isUtf8) {
+                        data = Buffer.concat(bufferList).toString();
+                    } else {
+                        data = binarys;
+                    }
 
-                if (isUtf8) {
-                    data = Buffer.concat(bufferList).toString();
-                } else {
-                    data = binarys;
-                }
-
-                callback.call(context, null, data, res);
-            }).on('error', callback.bind(context));
+                    callback.call(context, null, data, res);
+                }).on('error', callback.bind(context));
+            }
         };
 
         if (isGzip) {
             var gunzip = zlib.createGunzip();
 
-            res.pipe(gunzip)
+            res.pipe(gunzip);
             onreceive(gunzip);
         } else {
             onreceive(res);

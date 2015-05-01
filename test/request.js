@@ -1,21 +1,29 @@
 'use strict';
 
 var req = require('../libs/request.js');
-var zlib = require('zlib');
-var gunzipStream = zlib.createGunzip();
+var path = require('path');
+var file = path.join(__dirname, 'alien.zip');
+var fs = require('fs');
+var writeStream = fs.createWriteStream(file);
+var url = 'http://s-ydr-me.oss-cn-hangzhou.aliyuncs.com/p/j/alien.zip';
+var unzip = require('unzip');
 
-req.post({
-    url: 'http://192.168.2.163:10085/services/banner/list.do',
-    query: {},
-    body: {
-        bannerType: 1,
-        state: 'U'
-    },
-    headers: {
-        'content-type':'application/json; charset=UTF-8'
-    }
-}, function (err, body, res) {
-    //console.log(err);
-    console.log(body);
-    //console.log(res.headers);
+//var http = require('http');
+//
+//http.get(url, function (res) {
+//    res.pipe(writeStream);
+//});
+
+req.down({
+    url: url,
+    timeout: 100000
+}, function (err, stream, res) {
+    stream.pipe(writeStream);
+    //stream.pipe(unzip2.Extract({ path: 'output/path' })).on('error', function (err) {
+    //    console.log(err);
+    //    console.log(err.stack);
+    //}).on('close', function () {
+    //    console.log('zip close');
+    //    process.exit();
+    //});
 });
