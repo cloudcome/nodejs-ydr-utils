@@ -38,6 +38,12 @@ console.log(cache.get('a'));
 cache.splice('a', 1, 2);
 console.log(cache.get('a'));
 
+cache.remove('a');
+console.log(cache.get('a'));
+
+cache.clear('a');
+console.log(cache.get('a'));
+
 setTimeout(function () {
     console.log(cache.get('a'));
 }, 1000);

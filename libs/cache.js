@@ -9,7 +9,6 @@
 
 var dato = require('./dato.js');
 var typeis = require('./typeis.js');
-var allocation = require('./allocation.js');
 var cache = Object.create(null);
 var length = 0;
 var noop = function () {
