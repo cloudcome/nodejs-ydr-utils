@@ -103,7 +103,46 @@ exports.set = function (key, val, expires, isOverride, callback) {
         }, _expires);
     }
 
-    return exports;
+    return cached;
+};
+
+
+/**
+ * 添加属性值
+ * @param key {String} 缓存键
+ * @param propKey {String} 属性键
+ * @param propVal {*} 属性值
+ * @returns {*}
+ */
+exports.addProp = function (key, propKey, propVal) {
+    var cached = exports.get('key');
+
+    if (!cached) {
+        cached = {};
+    }
+
+    cached[propKey] = propVal;
+    exports.set('key', cached);
+    return cached;
+};
+
+
+/**
+ * 移除属性值
+ * @param key {String} 缓存键
+ * @param propKey {String} 属性键
+ * @returns {*}
+ */
+exports.removeProp = function (key, propKey) {
+    var cached = exports.get('key');
+
+    if (!cached) {
+        return;
+    }
+
+    delete(cached[propKey]);
+
+    return cached;
 };
 
 
