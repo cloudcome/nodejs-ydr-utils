@@ -1,6 +1,6 @@
 {
   "name": "ydr-utils",
-  "version": "17.37.0",
+  "version": "17.38.0",
   "private": false,
   "description": "utils for ydr.me",
   "scripts": {},
@@ -14,6 +14,7 @@
     "utils",
     "aliyun",
     "oss",
+    "alioss",
     "allocation",
     "cache",
     "class",
