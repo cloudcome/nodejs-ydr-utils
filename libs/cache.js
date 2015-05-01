@@ -11,8 +11,20 @@ var dato = require('./dato.js');
 var typeis = require('./typeis.js');
 var cache = Object.create(null);
 var length = 0;
+var configs = {
+    debug: true
+};
 var noop = function () {
     //
+};
+
+
+/**
+ * 配置
+ * @param options
+ */
+exports.config = function (options) {
+    dato.extend(configs, options);
 };
 
 
@@ -53,6 +65,10 @@ exports.set = function (key, val, expires, isOverride, callback) {
         if (_isOverride) {
             cached.val = val;
             cached.ot++;
+
+            if (configs.debug) {
+                console.warn('override', 'set', key, 'as', val, 'in', cached.ot, 'times');
+            }
         } else {
             return exports;
         }
@@ -65,6 +81,11 @@ exports.set = function (key, val, expires, isOverride, callback) {
             // override times
             ot: 0
         };
+
+        if (configs.debug) {
+            console.log('first', 'set', key, 'as', val);
+        }
+
         length++;
     }
 
