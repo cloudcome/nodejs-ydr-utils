@@ -67,7 +67,7 @@ exports.set = function (key, val, expires, isOverride, callback) {
             cached.ot++;
 
             if (configs.debug) {
-                console.warn('override', 'set', key, 'as', val, 'in', cached.ot, 'times');
+                console.warn('[cache] ', 'override', 'set', key, 'as', val, 'in', cached.ot, 'times');
             }
         } else {
             return exports;
@@ -83,7 +83,7 @@ exports.set = function (key, val, expires, isOverride, callback) {
         };
 
         if (configs.debug) {
-            console.log('first', 'set', key, 'as', val);
+            console.log('[cache] ', 'first', 'set', key, 'as', val);
         }
 
         length++;
