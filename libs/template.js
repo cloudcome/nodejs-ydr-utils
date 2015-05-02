@@ -77,7 +77,7 @@ var Template = klass.create(function (tmplate, options) {
  * @type {Object}
  * @static
  */
-Template.defaults = defaults;
+Template.configs = configs;
 
 
 /**
@@ -374,8 +374,14 @@ Template.fn.render = function (data) {
 
 
     ret = String(ret);
+    ret = options.compress ? _cleanHTML(ret) : ret;
 
-    return options.compress ? _cleanHTML(ret) : ret;
+    // 恢复占位
+    dato.each(the._placeholders, function (key, val) {
+        ret = ret.replace(key, val);
+    });
+
+    return ret;
 };
 
 
@@ -640,7 +646,7 @@ function _cleanPice(str) {
  * @private
  */
 function _generateKey() {
-    return ':' + random.string(40, 'aA0') + ':';
+    return 'œ' + random.string(40, 'aA0') + 'œ';
 }
 
 
