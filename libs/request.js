@@ -264,7 +264,7 @@ function _request(options, callback) {
             form = null;
             file = null;
             bodyLength = body.length;
-        } else if (body instanceof String) {
+        } else if (typeis.string(body)) {
             form = null;
             file = null;
             bodyLength = Buffer.byteLength(body);
@@ -292,6 +292,7 @@ function _request(options, callback) {
     var context = {
         options: requestOptions
     };
+
 
     var req = _http.request(requestOptions, function (res) {
         var bufferList = [];
