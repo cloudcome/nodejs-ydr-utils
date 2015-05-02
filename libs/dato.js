@@ -565,7 +565,7 @@ exports.removeComments = function (str) {
  * @param [options.size=100] {Number} 尺寸
  * @param [options.default="retro"] {Number} 默认头像
  * @param [options.forcedefault=false] {*} 是否忽略默认头像
- * @param [options.rating] {*} 评级
+ * @param [options.rating=null] {*} 评级
  * @returns {string}
  */
 exports.gravatar = function (email, options) {
@@ -609,7 +609,7 @@ exports.gravatar = function (email, options) {
         query.r = options.rating;
     }
 
-    return options.host + qs.stringify(query);
+    return options.origin + qs.stringify(query);
 };
 
 
