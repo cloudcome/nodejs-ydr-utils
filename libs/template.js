@@ -560,72 +560,6 @@ Template.implement({
 });
 
 
-/*===========================================================================================*/
-/*======================================【NODEJS】============================================*/
-/*===========================================================================================*/
-
-
-/**
- * 适配 express
- * @param file {String} 模板的绝对路径
- * @param data {Object} 模板的数据
- * @param [data.cache=false] {Boolean} 是否缓存模板
- * @param [data.locals=null] {Object} 动态助手
- * @param [data.settings=null] {Object} app 配置
- * @param callback {Function} 回调
- */
-Template.__express = function (file, data, callback) {
-    var template;
-    var tpl;
-    var args = arguments;
-
-    if (typeis.function(args[1])) {
-        callback = args[1];
-        data = {};
-    }
-
-    callback = callback || noop;
-
-    if (configs.cache && templateMap[file]) {
-        tpl = templateMap[file];
-    } else {
-        try {
-            template = fs.readFileSync(file, 'utf8');
-            template = _preCompile(file, template);
-        } catch (err) {
-            return callback(err);
-        }
-
-        tpl = new Template(template);
-
-        if (configs.cache) {
-            templateMap[file] = tpl;
-        }
-    }
-
-    callback(null, tpl.render(data));
-};
-
-
-/*===========================================================================================*/
-/*======================================【NODEJS】============================================*/
-/*===========================================================================================*/
-
-
-/**
- * 模板引擎
- *
- * @param {Object} [options] 配置
- * @param {Boolean} [options.cache=true] 是否缓存，默认为 true
- * @param {Boolean} [options.compress=true] 是否压缩，默认为 true
- * @constructor
- *
- * @example
- * var tpl = new Template('{{name}}');
- * tpl.render({name: 'yundanran'});
- * // => 'yundanran'
- */
-module.exports = Template;
 
 
 /**
@@ -708,10 +642,10 @@ function _cleanHTML(code) {
 
 
 
+
 /*===========================================================================================*/
 /*======================================【NODEJS】============================================*/
 /*===========================================================================================*/
-
 /**
  * 编译之前做的事情
  * @param file {String} 当前模板所在的路径
@@ -737,6 +671,70 @@ function _preCompile(file, template) {
         }
     });
 }
+
+/**
+ * 适配 express
+ * @param file {String} 模板的绝对路径
+ * @param data {Object} 模板的数据
+ * @param [data.cache=false] {Boolean} 是否缓存模板
+ * @param [data.locals=null] {Object} 动态助手
+ * @param [data.settings=null] {Object} app 配置
+ * @param callback {Function} 回调
+ */
+Template.__express = function (file, data, callback) {
+    var template;
+    var tpl;
+    var args = arguments;
+
+    if (typeis.function(args[1])) {
+        callback = args[1];
+        data = {};
+    }
+
+    callback = callback || noop;
+
+    if (configs.cache && templateMap[file]) {
+        tpl = templateMap[file];
+    } else {
+        try {
+            template = fs.readFileSync(file, 'utf8');
+            template = _preCompile(file, template);
+        } catch (err) {
+            return callback(err);
+        }
+
+        tpl = new Template(template);
+
+        if (configs.cache) {
+            templateMap[file] = tpl;
+        }
+    }
+
+    callback(null, tpl.render(data));
+};
+
+
+
 /*===========================================================================================*/
 /*======================================【NODEJS】============================================*/
 /*===========================================================================================*/
+
+
+
+
+/**
+ * 模板引擎
+ *
+ * @param {Object} [options] 配置
+ * @param {Boolean} [options.cache=true] 是否缓存上次结果
+ * @param {Boolean} [options.compress=true] 是否输出压缩内容
+ * @param {Boolean} [options.debug=false] 是否输出调试新
+ * @constructor
+ *
+ * @example
+ * var tpl = new Template('{{name}}');
+ * tpl.render({name: 'yundanran'});
+ * // => 'yundanran'
+ */
+module.exports = Template;
+
