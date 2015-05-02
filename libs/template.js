@@ -56,11 +56,20 @@ var escapes = [
 var openTag = '{{';
 var closeTag = '}}';
 var configs = {
-    // 是否保留缓存
+    /**
+     * 是否保留缓存，只对后端模板引擎有效
+     * @type Boolean
+     */
     cache: true,
-    // 是否压缩
+    /**
+     * 是否压缩输出内容
+     * @type Boolean
+     */
     compress: true,
-    // 是否 debug 模式
+    /**
+     * 是否 debug 模式
+     * @type Boolean
+     */
     debug: false
 };
 var filters = {};
@@ -359,6 +368,7 @@ Template.fn.render = function (data) {
     });
 
     try {
+        /* jshint evil: true */
         fn = new Function(_var, 'try{' + vars.join('') + this._fn + '}catch(err){return this.debug?err.message:"";}');
     } catch (err) {
         fn = function () {
