@@ -33,8 +33,9 @@ var REG_CODE = /(`+)\s*([\s\S]*?[^`])\s*\1(?!`)/g;
 var REG_HEADING = /^(#{1,6})(.*)$/mg;
 var REG_STRONG = /\b__([\s\S]+?)__(?!_)|\*\*([\s\S]+?)\*\*(?!\*)/mg;
 var REG_EM = /^\b_((?:__|[\s\S])+?)_\b|^\*((?:\*\*|[\s\S])+?)\*(?!\*)/mg;
+var REG_BLOCKQUOTE = /^( *>[^\n]+(\n(?!def)[^\n]+)*\n*)+/;
 var REG_LINK = /<http.*?>/ig;
-var REG_TAG = /<\/?[a-z][a-z\d]*(\s\b[^>]*)?>/g;
+var REG_TAG = /<(\/?[a-z][a-z\d]*(\s\b[^>]*)?)>/g;
 var REG_TAG_P = /<\/?p>/ig;
 //var REG_BLOKQUOTE = /^( *>[^\n]+(\n(?!def)[^\n]+)*\n*)+/g;
 var REG_PATH = /^(\/|\.{0,2})(\/[^/]+)+$/;
@@ -141,12 +142,14 @@ exports.mdSafe = function (source) {
         return key;
     });
 
+
     // <>
-    dato.each(ENCODE_LIST, function (index, en) {
-        source = source.replace(en.f, en.t);
+    source = source.replace(REG_TAG, function ($0, $1) {
+        return '&lt;' + $1 + '&gt;';
     });
 
 
+    // fix heading
     source = source.replace(REG_HEADING, function ($0, $1, $2) {
         minHeadering = !minHeadering || minHeadering > $1.length ? $1.length : minHeadering;
 

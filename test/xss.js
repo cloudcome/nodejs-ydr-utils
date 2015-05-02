@@ -8,7 +8,7 @@
 
 var fs = require('fs');
 var path = require('path');
-var dangerMarkdown = fs.readFileSync(path.join(__dirname, './md2.md'), 'utf8');
+var dangerMarkdown = fs.readFileSync(path.join(__dirname, './markdown.md'), 'utf8');
 var xss = require('../libs/xss.js');
 
 var ret = xss.mdSafe(dangerMarkdown);
