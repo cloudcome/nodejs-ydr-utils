@@ -2,6 +2,7 @@
  * ydr-template
  * @author ydr.me
  * @create 2014-12-04 16:47
+ * @2015年05月03日00:07:41 增加 {{ignore}}...{{/ignore}} 忽略 parse 区间
  */
 
 'use strict';
@@ -23,7 +24,8 @@ var REG_IF = /^((else\s+)?if)\s+(.*)$/;
 var REH_LIST = /^list\s+([^,]*)\s+as\s+([^,]*)(\s*,\s*([^,]*))?$/;
 var REG_ELSE_IF = /^else\s+if\s/;
 var REG_HASH = /^#/;
-var REG_INCLUDE = /{{\s*?include (.*?)\s*?}}/g;
+var REG_INCLUDE = /\{\{\s*?include (.*?)\s*?}}/g;
+var REG_IGNORE = /\{\{ignore}}([\s\S]*?)\{\{\/ignore}}/ig;
 var regLines = [{
     'n': /\n/g,
     'r': /\r/g,
@@ -53,18 +55,20 @@ var escapes = [
 ];
 var openTag = '{{';
 var closeTag = '}}';
-var defaults = {
+var configs = {
     // 是否保留缓存
     cache: true,
     // 是否压缩
-    compress: true
+    compress: true,
+    // 是否 debug 模式
+    debug: false
 };
 var filters = {};
 // 模板缓存
 var templateMap = {};
 var includeMap = {};
 var Template = klass.create(function (tmplate, options) {
-    this._options = dato.extend(true, {}, defaults, options);
+    this._options = dato.extend(true, {}, configs, options);
     this._init(tmplate);
 });
 
@@ -73,7 +77,7 @@ var Template = klass.create(function (tmplate, options) {
  * @type {Object}
  * @static
  */
-Template.defaults = defaults,
+Template.defaults = defaults;
 
 
 /**
@@ -81,15 +85,16 @@ Template.defaults = defaults,
  * @type {Object}
  * @static
  */
-    Template.filters = filters,
+Template.filters = filters;
+
 
 /**
- * 设置默认配置
+ * 设置配置
  * @param options
  */
-    Template.setDefaults = function (options) {
-        dato.extend(defaults, options);
-    };
+Template.config = function (options) {
+    dato.extend(configs, options);
+};
 
 
 /**
@@ -166,8 +171,15 @@ Template.fn._init = function (template) {
         filters: {}
     };
     the._useFilters = {};
+    the._placeholders = {};
 
-    template.split(openTag).forEach(function (value, times) {
+    template.replace(REG_IGNORE, function ($0, $1) {
+        var key = _generateKey();
+
+        the._placeholders[key] = $1;
+
+        return key;
+    }).split(openTag).forEach(function (value, times) {
         var array = value.split(closeTag);
         var $0 = array[0];
         var $1 = array[1];
@@ -331,7 +343,8 @@ Template.fn.render = function (data) {
     var self = dato.extend(true, {}, {
         each: dato.each,
         escape: _escape,
-        filters: existFilters
+        filters: existFilters,
+        configs: configs
     });
     var ret;
 
@@ -346,17 +359,17 @@ Template.fn.render = function (data) {
     });
 
     try {
-        fn = new Function(_var, 'try{' + vars.join('') + this._fn + '}catch(err){return err.message;}');
+        fn = new Function(_var, 'try{' + vars.join('') + this._fn + '}catch(err){return this.debug?err.message:"";}');
     } catch (err) {
         fn = function () {
-            return err;
+            return configs.debug ? err.message : '';
         };
     }
 
     try {
         ret = fn.call(self, data);
     } catch (err) {
-        ret = err.message;
+        ret = configs.debug ? err.message : '';
     }
 
 
@@ -547,7 +560,7 @@ Template.__express = function (file, data, callback) {
 
     callback = callback || noop;
 
-    if (defaults.cache && templateMap[file]) {
+    if (configs.cache && templateMap[file]) {
         tpl = templateMap[file];
     } else {
         try {
@@ -559,7 +572,7 @@ Template.__express = function (file, data, callback) {
 
         tpl = new Template(template);
 
-        if (defaults.cache) {
+        if (configs.cache) {
             templateMap[file] = tpl;
         }
     }
@@ -606,7 +619,7 @@ function _escape(str) {
  * @returns {string}
  * @private
  */
-function _cleanPice(str){
+function _cleanPice(str) {
     str = str
         .replace(REG_STRING_WRAP, '\\$1');
 
@@ -674,7 +687,7 @@ function _preCompile(file, template) {
         var includeName = $1.trim();
         var includeFile = path.join(relativeDir, includeName);
 
-        if (defaults.cache && includeMap[includeFile]) {
+        if (configs.cache && includeMap[includeFile]) {
             return includeMap[includeFile];
         }
 
