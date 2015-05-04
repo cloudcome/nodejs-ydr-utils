@@ -561,7 +561,7 @@ exports.removeComments = function (str) {
  * 获取 gravatar
  * @param email {String} 邮箱
  * @param [options] {Object} 配置
- * @param [options.origin="//s.gravatar.com/avatar/"] {String} 服务器
+ * @param [options.origin="http://gravatar.duoshuo.com/avatar/"] {String} 服务器
  * @param [options.size=100] {Number} 尺寸
  * @param [options.default="retro"] {Number} 默认头像
  * @param [options.forcedefault=false] {*} 是否忽略默认头像
@@ -573,7 +573,8 @@ exports.gravatar = function (email, options) {
     email = email.toLowerCase();
 
     if (!options.origin) {
-        options.origin = '//s.gravatar.com/avatar/';
+        options.origin = 'http://gravatar.duoshuo.com/avatar/';
+        //options.origin = '//s.gravatar.com/avatar/';
     }
 
     options.origin += encryption.md5(email) + '?';
