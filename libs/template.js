@@ -9,6 +9,7 @@
 
 var fs = require('fs');
 var path = require('path');
+var promiseify = require('promiseify');
 var dato = require('./dato.js');
 var typeis = require('./typeis.js');
 var random = require('./random.js');
@@ -672,6 +673,13 @@ function _preCompile(file, template) {
     });
 }
 
+
+/**
+ * empty function
+ */
+function noop(){}
+
+
 /**
  * 适配 express
  * @param file {String} 模板的绝对路径
@@ -711,6 +719,15 @@ Template.__express = function (file, data, callback) {
     }
 
     callback(null, tpl.render(data));
+};
+
+
+/**
+ * 适配 koa
+ * @param app {Object} koa app
+ */
+Template.__koa = function (app) {
+    app.context.render = promiseify(Template.__express);
 };
 
 
