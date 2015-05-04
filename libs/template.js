@@ -725,9 +725,12 @@ Template.__express = function (file, data, callback) {
 /**
  * 适配 koa
  * @param app {Object} koa app
+ * @param viewsRoot {String} views 根路径
  */
-Template.__koa = function (app) {
-    app.context.render = promiseify(Template.__express);
+Template.__koa = function (app, viewsRoot) {
+    app.context.render = promiseify(function (file, data, callback) {
+        Template.__express(path.join(viewsRoot, file), data, callback);
+    });
 };
 
 
