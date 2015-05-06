@@ -100,7 +100,7 @@ exports.getset = function (getset, args, setLength) {
 exports.args = function (args) {
     var argL = args.length;
 
-    while (typeis.undefined(args[argL - 1])) {
+    while (argL >= 0 && typeis.undefined(args[argL - 1])) {
         argL -= 1;
     }
 
