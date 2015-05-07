@@ -28,6 +28,14 @@ code: `<pre>~</pre>`
 
 ## **<span>on()写法</span>**
 
+
+## 的风312 [abc](http://abc.com)
+
+
+## 的风ddd ![abc](http://abc.com)
+
+## [abc](http://abc.com)
+
 <pre>$(document).on('click', '#list li', function() {
     //function code here.
 });</pre>

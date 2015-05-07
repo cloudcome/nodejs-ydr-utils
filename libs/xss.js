@@ -34,9 +34,12 @@ var REG_HEADING = /^(#{1,6})(.*)$/mg;
 var REG_STRONG = /\b__([\s\S]+?)__(?!_)|\*\*([\s\S]+?)\*\*(?!\*)/mg;
 var REG_EM = /^\b_((?:__|[\s\S])+?)_\b|^\*((?:\*\*|[\s\S])+?)\*(?!\*)/mg;
 var REG_BLOCKQUOTE = /^( *>[^\n]+(\n(?!def)[^\n]+)*\n*)+/;
-var REG_LINK = /<http.*?>/ig;
+var REG_LINK1 = /<http.*?>/ig;
+// ![]()
+var REG_IMAGE = /!\[.*?][\[\(].*[\]\)]/g;
+// [][] []()
+var REG_LINK2 = /\[(.*?)][\[\(].*[\]\)]/g;
 var REG_TAG = /<(\/?[a-z][a-z\d]*(\s\b[^>]*)?)>/g;
-var REG_TAG_P = /<\/?p>/ig;
 //var REG_BLOKQUOTE = /^( *>[^\n]+(\n(?!def)[^\n]+)*\n*)+/g;
 var REG_PATH = /^(\/|\.{0,2})(\/[^/]+)+$/;
 var REG_SIZE = /(?:\s+?=\s*?(\d+)(?:[x*×](\d+))?)?$/i;
@@ -134,7 +137,7 @@ exports.mdSafe = function (source) {
     });
 
     // <http...>
-    source = source.replace(REG_LINK, function ($0) {
+    source = source.replace(REG_LINK1, function ($0) {
         var key = _generatorKey();
 
         preMap[key] = $0;
@@ -195,10 +198,16 @@ exports.mdTOC = function (source) {
         }
 
         var text = token.text;
-        var depth = new Array((token.depth - 1) * 4 + 1).join(' ');
-        var id = encryption.md5(exports.mdRender(text).replace(REG_TAG_P, '').trim());
 
-        toc += depth + '- [' + text + '](#heading-' + token.depth + '-' + (index++) + '-' + id + ')\n';
+        // remove image
+        text = text.replace(REG_IMAGE, '')
+            // clean link
+            .replace(REG_LINK2, '$1');
+
+        var depth = new Array((token.depth - 1) * 4 + 1).join(' ');
+        //var id = encryption.md5(exports.mdRender(text).replace(REG_TAG_P, '').trim());
+
+        toc += depth + '- [' + text + '](#heading-' + token.depth + '-' + (index++) + ')\n';
     });
 
     return toc + '\n\n';
@@ -255,11 +264,10 @@ exports.mdRender = function (source, isNoFavicon) {
 
     // heading
     markedRender.heading = function (text, level) {
-        var href = encryption.md5(text.trim());
+        //var href = encryption.md5(text.trim());
 
-        var html = '<h' + level + ' id="heading-' + level + '-' + index + '-' + href + '"><a class="heading-link" ' +
-            'href="#toc-' + level + '-' + index + '-' + href + '">' +
-            text + '</a></h' + level + '>';
+        var html = '<h' + level + ' id="heading-' + level + '-' + index + '">' +
+            text + '</h' + level + '>';
 
         index++;
 
@@ -324,7 +332,7 @@ function _buildLink(href, title, text, isBlank, isNoFavicon) {
     text = text.trim();
 
     return '<a href="' + href + '"' +
-        (REG_TOC.test(href) ? ' id="toc' + href.replace(REG_TOC, '$1') + '"' : '') +
+            //(REG_TOC.test(href) ? ' id="toc' + href.replace(REG_TOC, '$1') + '"' : '') +
         (isBlank ? ' target="_blank"' : '') +
         (title ? ' ' + title : '') +
         '>' +
