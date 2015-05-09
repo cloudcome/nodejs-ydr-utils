@@ -31,15 +31,20 @@ var httpStatus = require('./http-status.js');
 var allocation = require('./allocation.js');
 var typeis = require('./typeis.js');
 
+
+/**
+ * 自定义错误
+ * @param [status=500] {Number} HTTP 错误码
+ * @param [message=500] {String} 错误消息
+ * @returns {Error}
+ */
 module.exports = function (status, message) {
     var args = allocation.args(arguments);
     var _status = 500;
 
-    console.log(arguments);
     args.forEach(function (arg) {
         switch (typeis(arg)) {
             case 'number':
-                console.log('...........');
                 _status = arg;
                 break;
 
@@ -49,10 +54,13 @@ module.exports = function (status, message) {
         }
     });
 
-    console.log('status',status);
-
     var err = new Error(message);
 
+    try {
+        Error.captureStackTrace(err, module.exports)
+    } catch (err) {
+        // ignore
+    }
     err.status = _status;
     err.message = message || httpStatus.get(_status);
     err.type = _status < 500 ? 'clientError' : 'serverError';

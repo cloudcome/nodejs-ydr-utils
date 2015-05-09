@@ -13,5 +13,6 @@ var err = error(401, 'hheh');
 
 console.log(err.status);
 console.log(err.type);
+console.log(err.message);
+console.log(err.stack);
 
-//throw err;
