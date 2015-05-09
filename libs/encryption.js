@@ -177,6 +177,34 @@ exports.password = function (originalPassword, signPassword) {
 };
 
 
+/**
+ * ascii to base64
+ * @param ascii {String} ascii 字符串
+ * @returns {String} base64 字符串
+ */
+exports.base64 = function (ascii) {
+    try {
+        return new Buffer(encodeURIComponent(ascii), 'utf8').toString('base64');
+    } catch (err) {
+        return '';
+    }
+};
+
+
+/**
+ * base64 to ascii
+ * @param base64 {String} base64 字符串
+ * @returns {String} ascii 字符串
+ */
+exports.debase64 = function (base64) {
+    try {
+        return decodeURIComponent(new Buffer(base64, 'base64').toString());
+    } catch (err) {
+        return '';
+    }
+};
+
+
 ///////////////////////////////////////////////////////////////////////////
 //var str = '123';
 //console.log(exports.md5(str));
