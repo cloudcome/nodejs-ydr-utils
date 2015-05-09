@@ -453,34 +453,6 @@ var REG_URL = /\\/g;
 
 
 /**
- * ascii to base64
- * @param ascii {String} ascii 字符串
- * @returns {String} base64 字符串
- */
-exports.atob = function (ascii) {
-    try {
-        return new Buffer(encodeURIComponent(ascii), 'utf8').toString('base64');
-    } catch (err) {
-        return '';
-    }
-};
-
-
-/**
- * base64 to ascii
- * @param base64 {String} base64 字符串
- * @returns {String} ascii 字符串
- */
-exports.btoa = function (base64) {
-    try {
-        return decodeURIComponent(new Buffer(base64, 'base64').toString());
-    } catch (err) {
-        return '';
-    }
-};
-
-
-/**
  * 修正 path 路径为系统分隔符
  * @param p
  * @returns {String}
