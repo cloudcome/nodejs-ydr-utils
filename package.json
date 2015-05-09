@@ -1,6 +1,6 @@
 {
   "name": "ydr-utils",
-  "version": "18.20.0",
+  "version": "19.0.0",
   "private": false,
   "description": "utils for ydr.me",
   "scripts": {},
@@ -23,6 +23,7 @@
     "dato",
     "crypto",
     "encryption",
+    "error",
     "favicon",
     "httpStatus",
     "log",
