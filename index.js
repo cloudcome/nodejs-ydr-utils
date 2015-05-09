@@ -23,6 +23,8 @@ module.exports = {
     dato: require('./libs/dato.js'),
     // 加密
     encryption: require('./libs/encryption.js'),
+    // 自定义错误
+    error: require('./libs/error.js'),
     // favicon
     favicon: require('./libs/favicon.js'),
     // HTTP status

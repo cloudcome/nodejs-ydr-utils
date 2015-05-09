@@ -43,9 +43,10 @@ module.exports = function (status, message) {
         // ignore
     }
 
-    err.status = _status;
+    err.status = err.code = _status;
     err.message = message || httpStatus.get(_status);
     err.type = err.name = _status < 500 ? 'clientError' : 'serverError';
+    err.timestamp = Date.now();
 
     return err;
 };
