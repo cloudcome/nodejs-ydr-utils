@@ -91,7 +91,6 @@ exports.string = function (length, dictionary) {
 };
 
 
-
 /////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////[ ONLY NODEJS ]////////////////////////////////////
@@ -106,11 +105,19 @@ exports.string = function (length, dictionary) {
  * 因此为了精确比较，需要控制数据在16位以内，即长度小于16
  * 所以，此处的比较，需要将字符串分成2部分，分别是13位 + 13位
  * 比较两个字符串数值大小使用 dato.than(long1, long2, '>');
+ * @param [isTimeStamp=false] 是否时间戳形式
  * @returns {String}
  */
-exports.guid = function () {
+exports.guid = function (isTimeStamp) {
     var a = [];
     var d = new Date();
+
+    if (isTimeStamp) {
+        // 13 + 13
+        var t = '' + d.getTime();
+        return t + dato.fillString(process.hrtime()[1], 26 - t);
+    }
+
     // 4
     var Y = dato.fillString(d.getFullYear(), 4);
     // 2
