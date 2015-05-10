@@ -11,8 +11,6 @@ var dato = require('./dato.js');
 var random = require('./random.js');
 var encryption = require('./encryption.js');
 var configs = {
-    // 模长
-    length: 12,
     // 有效期：1小时
     expires: 3600000
 };
@@ -27,20 +25,16 @@ exports.config = function (options) {
 };
 
 
-console.log(random.guid());
-console.log(random.guid(true));
-
-
 /**
  * 生成 csrf 令牌
  * @returns {{key: Object, token: String}}
  */
 exports.create = function () {
     // 13 + N
-    var sla = '~!@#$%^&*()_+-={}[]:;,.<>?/';
-    var now = Date.now();
-    var length = now % configs.length;
-    var key = Date.now() + random.string(length, sla);
+    var sla = '.';
+    var now = random.guid(true);
+    var length = random.number(1, 20);
+    var key = now + random.string(length, sla);
     var entry = encryption.encode(String(key), String(key));
 
     return {
