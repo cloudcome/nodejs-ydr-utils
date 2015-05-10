@@ -10,12 +10,10 @@
 var dato = require('./dato.js');
 var random = require('./random.js');
 var encryption = require('./encryption.js');
-var REG_DATE = /^\d{13}$/;
 var configs = {
+    // 模长
     length: 12,
-    // 加密 key
-    key: '123456',
-    // 有效期
+    // 有效期：1小时
     expires: 3600000
 };
 
@@ -24,7 +22,7 @@ var configs = {
  * 配置
  * @param options
  */
-exports.config = function(options){
+exports.config = function (options) {
     dato.extend(configs, options);
 };
 
@@ -35,11 +33,17 @@ exports.config = function(options){
  * @returns {{key: Object, token: String}}
  */
 exports.create = function () {
-    var key = random.string(configs.length, 'aA0');
+    // 13 + N
+    var sla = '~!@#$%^&*()_+-={}[]:;,.<>?/';
+    var now = Date.now();
+    var length = now % configs.length;
+    var key = Date.now() + random.string(length, sla);
+    var entry = encryption.encode(String(key), String(key));
 
     return {
         key: key,
-        token: encryption.encode(key, configs.key) + encryption.encode(String(Date.now()), key)
+        length: length,
+        token: entry.substr(0, length) + random.string(length, sla) + entry.substr(length)
     };
 };
 
@@ -51,24 +55,15 @@ exports.create = function () {
  * @returns {boolean}
  */
 exports.validate = function (csrfty, entry) {
-    var key = entry.slice(0, 32);
-    var val = entry.slice(32);
+    var key = encryption.decode(entry.substr(0, csrfty.length) + entry.substr(csrfty.length * 2), csrfty.key);
 
-    key = encryption.decode(key, configs.key);
-
-    if(!key){
+    if (!key) {
         return false;
     }
 
-    var token = encryption.decode(val, key);
+    var time = key.slice(0, 13);
 
-    if(!REG_DATE.test(token)){
-        return false;
-    }
+    time = dato.parseInt(time, 0);
 
-    var now = Date.now();
-
-    token = dato.parseInt(token, 0);
-
-    return token + configs.expires >= now;
+    return time + configs.expires >= Date.now();
 };
