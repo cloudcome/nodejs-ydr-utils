@@ -23,6 +23,7 @@ var REG_TOC = /^#heading(-\d-\d+-.*)$/;
 // 空白
 //var REG_SPACE = /[\x00-\x20\x7F-\xA0\u1680\u180E\u2000-\u200B\u2028\u2029\u202F\u205F\u3000\uFEFF\t\v]{1,}/g;
 var REG_BREAK_LINE = /\r/g;
+var REG_BREAK_LINE_SAFE = /\n/g;
 var REG_LONG_BREAK_LINE = /\n{3,}/g;
 // 自动关闭标签是安全的，如 br、hr、img 等
 //var REG_CLOSE_TAGNAME = /(?!```)<([a-z\d]+)\b[\s\S]*?>([\s\S]*?)<\/\1>(?!```)/ig;
@@ -211,6 +212,25 @@ exports.mdTOC = function (source) {
     });
 
     return toc + '\n\n';
+};
+
+
+/**
+ * 生成
+ * @param source
+ * @returns {string}
+ */
+exports.mdIntroduction = function (source) {
+    return exports.mdSafe(source)
+        .replace(REG_PRE1, '')
+        .replace(REG_PRE2, '')
+        .replace(REG_IMAGE, '')
+        .replace(REG_LINK1, '')
+        .replace(REG_LINK2, '')
+        .replace(REG_HEADING, '')
+        .replace(REG_LONG_BREAK_LINE, ' ')
+        .replace(REG_BREAK_LINE_SAFE, ' ')
+        .slice(0, 140);
 };
 
 
