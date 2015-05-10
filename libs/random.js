@@ -115,7 +115,7 @@ exports.guid = function (isTimeStamp) {
     if (isTimeStamp) {
         // 13 + 13
         var t = '' + d.getTime();
-        return t + dato.fillString(process.hrtime()[1], 26 - t);
+        return t + dato.fillString(process.hrtime()[1], 26 - t.length);
     }
 
     // 4

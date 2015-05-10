@@ -27,6 +27,9 @@ exports.config = function (options) {
 };
 
 
+console.log(random.guid());
+console.log(random.guid(true));
+
 
 /**
  * 生成 csrf 令牌
