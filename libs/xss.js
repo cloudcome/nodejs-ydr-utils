@@ -23,7 +23,7 @@ var REG_TOC = /^#heading(-\d-\d+-.*)$/;
 // 空白
 //var REG_SPACE = /[\x00-\x20\x7F-\xA0\u1680\u180E\u2000-\u200B\u2028\u2029\u202F\u205F\u3000\uFEFF\t\v]{1,}/g;
 var REG_BREAK_LINE = /\r/g;
-var REG_BREAK_LINE_SAFE = /\n/g;
+var REG_BREAK_LINE_SAFE = /\n+/g;
 var REG_LONG_BREAK_LINE = /\n{3,}/g;
 // 自动关闭标签是安全的，如 br、hr、img 等
 //var REG_CLOSE_TAGNAME = /(?!```)<([a-z\d]+)\b[\s\S]*?>([\s\S]*?)<\/\1>(?!```)/ig;
@@ -34,7 +34,7 @@ var REG_CODE = /(`+)\s*([\s\S]*?[^`])\s*\1(?!`)/g;
 var REG_HEADING = /^(#{1,6})(.*)$/mg;
 var REG_STRONG = /\b__([\s\S]+?)__(?!_)|\*\*([\s\S]+?)\*\*(?!\*)/mg;
 var REG_EM = /^\b_((?:__|[\s\S])+?)_\b|^\*((?:\*\*|[\s\S])+?)\*(?!\*)/mg;
-var REG_BLOCKQUOTE = /^( *>[^\n]+(\n(?!def)[^\n]+)*\n*)+/;
+var REG_BLOCKQUOTE = /^( *>[^\n]*)+/mg;
 var REG_LINK1 = /<http.*?>/ig;
 // ![]()
 var REG_IMAGE = /!\[.*?][\[\(].*[\]\)]/g;
@@ -218,19 +218,37 @@ exports.mdTOC = function (source) {
 /**
  * 生成
  * @param source
+ * @param [maxLength=140]
  * @returns {string}
  */
-exports.mdIntroduction = function (source) {
-    return exports.mdSafe(source)
+exports.mdIntroduction = function (source, maxLength) {
+    maxLength = maxLength || 140;
+
+    var lines = exports.mdSafe(source)
         .replace(REG_PRE1, '')
         .replace(REG_PRE2, '')
         .replace(REG_IMAGE, '')
         .replace(REG_LINK1, '')
         .replace(REG_LINK2, '')
         .replace(REG_HEADING, '')
-        .replace(REG_LONG_BREAK_LINE, ' ')
-        .replace(REG_BREAK_LINE_SAFE, ' ')
-        .slice(0, 140);
+        .replace(REG_BLOCKQUOTE, ' ')
+        .match(/^.*$\n{2,}/mg);
+
+    var length = 0;
+    var ret = '';
+
+    dato.each(lines, function (index, line) {
+        var chunk = line.replace(REG_BREAK_LINE_SAFE, ' ');
+
+        ret += chunk;
+        length += chunk.length;
+
+        if (length >= maxLength) {
+            return false;
+        }
+    });
+
+    return ret;
 };
 
 

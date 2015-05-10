@@ -1,10 +1,20 @@
 xss markdown
 
+公公给
+
+的
+
 > abcdef
     > dewdwedew
         > dedwedwedwe
             > dwedwedwedwedef
 
+
+谢谢写写
+
+在使用React Native开发App的过程中，我们可能需要调用RN没有实现的原生视图组件或第三方组件。甚至，我们可以把本地模块构造成一个React Native组件，提供给别人使用。由于我自己开发中遇到了这样的问题，于是通过查看源码和一些资料总结出了构建的一个流程。
+
+如果是调用本地的Api，那么可以直接使用RCTBridgeModule进行访问，目前已经实现了对Swift的支持，详见文档(中文，英文(较新))。我们这里讲的是如何进行本地视图组件的封装。下面进入正题：
 
 ```
 <pre></pre>
