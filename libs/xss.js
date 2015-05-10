@@ -229,7 +229,7 @@ exports.mdIntroduction = function (source, maxLength) {
         .replace(REG_PRE2, '')
         .replace(REG_IMAGE, '')
         .replace(REG_LINK1, '')
-        .replace(REG_LINK2, '')
+        .replace(REG_LINK2, '$1')
         .replace(REG_HEADING, '')
         .replace(REG_BLOCKQUOTE, ' ')
         .match(/^.*$\n{2,}/mg);
