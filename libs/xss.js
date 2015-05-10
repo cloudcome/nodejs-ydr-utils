@@ -231,7 +231,7 @@ exports.mdIntroduction = function (source, maxLength) {
         .replace(REG_LINK1, '')
         .replace(REG_LINK2, '$1')
         .replace(REG_BLOCKQUOTE, ' ')
-        .match(/^.*$\n{2,}/mg);
+        .split(/\n{2,}/g);
 
     var length = 0;
     var ret = '';
