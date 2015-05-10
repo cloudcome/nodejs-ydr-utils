@@ -11,6 +11,8 @@ var dato = require('./dato.js');
 var random = require('./random.js');
 var encryption = require('./encryption.js');
 var configs = {
+    // 丑化字符
+    ugliy: '.',
     // 有效期：1小时
     expires: 3600000
 };
@@ -31,16 +33,15 @@ exports.config = function (options) {
  */
 exports.create = function () {
     // 13 + N
-    var sla = '.';
     var now = random.guid(true);
     var length = random.number(1, 20);
-    var key = now + random.string(length, sla);
+    var key = now + random.string(length, configs.ugliy);
     var entry = encryption.encode(String(key), String(key));
 
     return {
         key: key,
         length: length,
-        token: entry.substr(0, length) + random.string(length, sla) + entry.substr(length)
+        token: entry.substr(0, length) + random.string(length, configs.ugliy) + entry.substr(length)
     };
 };
 
