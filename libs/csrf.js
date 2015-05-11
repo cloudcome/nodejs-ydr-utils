@@ -42,8 +42,9 @@ exports.create = function () {
  * @returns {boolean}
  */
 exports.validate = function (entry) {
-    var time = encryption.decode(entry);
+    var time = encryption.decode(entry, configs.key);
 
+    console.log(time);
     time = number.parseInt(time, 0);
 
     return time + configs.expires >= Date.now();

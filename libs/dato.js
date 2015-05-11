@@ -29,8 +29,8 @@ exports.each = function (list, callback, context) {
     var j;
 
     // 数组 或 类似数组
-    if (list && list.length !== udf) {
-        for (i = 0, j = exports.parseInt(list.length, 0); i < j; i++) {
+    if (list && typeis.number(list.length)) {
+        for (i = 0, j = list.length; i < j; i++) {
             context = context || global;
             if (callback.call(context, i, list[i]) === false) {
                 break;
@@ -125,8 +125,8 @@ exports.select = function (data, keys, filter) {
     data = data || {};
 
     filter = filter || function (val) {
-        return val !== udf;
-    };
+            return val !== udf;
+        };
 
     keys.forEach(function (key) {
         if (filter(data[key])) {
@@ -232,7 +232,6 @@ exports.compare = function (obj1, obj2) {
         return null;
     }
 };
-
 
 
 /**

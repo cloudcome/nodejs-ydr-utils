@@ -3,15 +3,15 @@
 var csrf = require('../libs/csrf.js');
 
 
-var csrfty1 = csrf.create();
-var csrfty2 = csrf.create();
+var token1 = csrf.create();
+var token2 = csrf.create();
 
-console.log(csrfty1);
-console.log(csrfty2);
+console.log(token1);
+console.log(token2);
 
-var b1 = csrf.validate(csrfty1, csrfty1.token);
-var b2 = csrf.validate(csrfty2, csrfty2.token);
-var b3 = csrf.validate(csrfty1, csrfty1.token + '0');
+var b1 = csrf.validate(token1);
+var b2 = csrf.validate(token2);
+var b3 = csrf.validate('a9fb8e03e0338d6741d4b80c00fddffb');
 
 console.log(b1);
 console.log(b2);
