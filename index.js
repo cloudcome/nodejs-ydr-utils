@@ -33,10 +33,14 @@ module.exports = {
     log: require('./libs/log.js'),
     // MIME
     mime: require('./libs/mime.js'),
+    // MIME
+    number: require('./libs/number.js'),
     // 随机数
     random: require('./libs/random.js'),
-    // 数据类型
+    // 请求
     request: require('./libs/request.js'),
+    // 字符串
+    string: require('./libs/string.js'),
     // 模板引擎
     Template: require('./libs/template.js'),
     // 翻译

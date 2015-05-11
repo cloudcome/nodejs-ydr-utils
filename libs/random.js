@@ -7,6 +7,7 @@
 'use strict';
 
 var dato = require('./dato.js');
+var string = require('./string.js');
 var regExist = /[aA0]/g;
 var dictionaryMap = {
     a: 'abcdefghijklmnopqrstuvwxyz',
@@ -115,25 +116,25 @@ exports.guid = function (isTimeStamp) {
     if (isTimeStamp) {
         // 13 + 13
         var t = '' + d.getTime();
-        return t + dato.fillString(process.hrtime()[1], 26 - t.length);
+        return t + string.padLeft(process.hrtime()[1], 26 - t.length, '0');
     }
 
     // 4
-    var Y = dato.fillString(d.getFullYear(), 4);
+    var Y = string.padLeft(d.getFullYear(), 4, '0');
     // 2
-    var M = dato.fillString(d.getMonth() + 1, 2);
+    var M = string.padLeft(d.getMonth() + 1, 2, '0');
     // 2
-    var D = dato.fillString(d.getDate(), 2);
+    var D = string.padLeft(d.getDate(), 2, '0');
     // 2
-    var H = dato.fillString(d.getHours(), 2);
+    var H = string.padLeft(d.getHours(), 2, '0');
     // 2
-    var I = dato.fillString(d.getMinutes(), 2);
+    var I = string.padLeft(d.getMinutes(), 2, '0');
     // 2
-    var S = dato.fillString(d.getSeconds(), 2);
+    var S = string.padLeft(d.getSeconds(), 2, '0');
     // 3
-    var C = dato.fillString(d.getMilliseconds(), 3);
+    var C = string.padLeft(d.getMilliseconds(), 3, '0');
     // 9
-    var N = dato.fillString(process.hrtime()[1], 9);
+    var N = string.padLeft(process.hrtime()[1], 9, '0');
 
     a.push(Y);
     a.push(M);
