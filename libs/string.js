@@ -38,6 +38,8 @@ var REG_ASSIGN_VARIBLE = /\$\{([^{}]*?)}/g;
 var REG_SEPARATOR = /[-_ ]([a-z])/g;
 var REG_HUMP = /[A-Z]/g;
 var REG_STAR = /\\\*/g;
+var REG_NOT_UTF16_SINGLE = /[^\x00-\xff]{2}/g;
+
 
 
 /**
@@ -265,6 +267,53 @@ exports.glob = function (str, glob, ignoreCase) {
 
 
 
+
+
+/**
+ * 计算字节长度
+ * @param string {String} 原始字符串
+ * @param [doubleLength=2] {Number} 双字节长度，默认为2
+ * @returns {number}
+ *
+ * @example
+ * data.bytes('我123');
+ * // => 5
+ */
+exports.bytes = function (string, doubleLength) {
+    string += '';
+    doubleLength = exports.parseInt(doubleLength, 2);
+
+    var i = 0,
+        j = string.length,
+        k = 0,
+        c;
+
+    for (; i < j; i++) {
+        c = string.charCodeAt(i);
+        k += (c >= 0x0001 && c <= 0x007e) || (0xff60 <= c && c <= 0xff9f) ? 1 : doubleLength;
+    }
+
+    return k;
+};
+
+
+
+/**
+ * 计算字符串长度
+ * 双字节的字符使用 length 属性计算不准确
+ * @ref http://es6.ruanyifeng.com/#docs/string
+ * @param str {String} 原始字符串
+ * @returns {Number}
+ *
+ * @example
+ * var s = "𠮷";
+ * s.length = 2;
+ * dato.length(s);
+ * // => 3
+ */
+exports.length = function (str) {
+    return String(str).replace(REG_NOT_UTF16_SINGLE, '*').length;
+};
 
 
 

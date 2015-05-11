@@ -10,35 +10,7 @@
 var typeis = require('./typeis.js');
 var udf;
 var canListTypeArr = 'array object nodelist htmlcollection arguments namednodemap'.split(' ');
-var REG_NOT_UTF16_SINGLE = /[^\x00-\xff]{2}/g;
-var REG_STRING_FIX = /[.*+?^=!:${}()|[\]/\\]/g;
 var REG_BEGIN_0 = /^0+/;
-
-
-/**
- * 格式化数字，如果是非数字则返回默认值
- * @param {*} obj 待格式化对象
- * @param {*} [dft] 非数字时的默认值
- * @returns {*}
- */
-exports.parseInt = function (obj, dft) {
-    obj = parseInt(obj, 10);
-
-    return isNaN(obj) ? dft : obj;
-};
-
-
-/**
- * 格式化数字，如果是非数字则返回默认值
- * @param {*} obj 待格式化对象
- * @param {*} [dft] 非数字时的默认值
- * @returns {*}
- */
-exports.parseFloat = function (obj, dft) {
-    obj = parseFloat(obj);
-
-    return isNaN(obj) ? dft : obj;
-};
 
 
 /**
@@ -147,7 +119,7 @@ exports.extend = function (isExtendDeep, source, target) {
  * @param [filter] {Function} 过滤方法，默认取不为 undefined 键值
  * @returns {Object}
  */
-exports.pick = function (data, keys, filter) {
+exports.select = function (data, keys, filter) {
     var data2 = {};
 
     data = data || {};
@@ -199,53 +171,6 @@ exports.toArray = function (obj, isConvertWhole) {
     }
 
     return ret;
-};
-
-
-/**
- * 计算字节长度
- * @param string {String} 原始字符串
- * @param [doubleLength=2] {Number} 双字节长度，默认为2
- * @returns {number}
- *
- * @example
- * data.bytes('我123');
- * // => 5
- */
-exports.bytes = function (string, doubleLength) {
-    string += '';
-    doubleLength = exports.parseInt(doubleLength, 2);
-
-    var i = 0,
-        j = string.length,
-        k = 0,
-        c;
-
-    for (; i < j; i++) {
-        c = string.charCodeAt(i);
-        k += (c >= 0x0001 && c <= 0x007e) || (0xff60 <= c && c <= 0xff9f) ? 1 : doubleLength;
-    }
-
-    return k;
-};
-
-
-/**
- * 计算字符串长度
- * 双字节的字符使用 length 属性计算不准确
- * @ref http://es6.ruanyifeng.com/#docs/string
- * @param string {String} 原始字符串
- *
- * @example
- * var s = "𠮷";
- * s.length = 2;
- * dato.length(s);
- * // => 3
- */
-exports.length = function (string) {
-    string += '';
-
-    return string.replace(REG_NOT_UTF16_SINGLE, '*').length;
 };
 
 
@@ -307,7 +232,6 @@ exports.compare = function (obj1, obj2) {
         return null;
     }
 };
-
 
 
 
