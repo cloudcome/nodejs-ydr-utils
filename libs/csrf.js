@@ -32,7 +32,7 @@ exports.config = function (options) {
  * @returns {{key: Object, token: String}}
  */
 exports.create = function () {
-    // 13 + N
+    // 13 + N--
     var now = random.guid(true);
     var length = random.number(1, 20);
     var key = now + random.string(length, configs.ugliy);
