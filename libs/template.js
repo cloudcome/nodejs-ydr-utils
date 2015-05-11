@@ -34,28 +34,6 @@ var regLines = [{
     'r': /\r/g,
     't': /\t/g
 }];
-var escapes = [
-    {
-        reg: /</g,
-        rep: '&#60;'
-    },
-    {
-        reg: />/g,
-        rep: '&#62;'
-    },
-    {
-        reg: /"/g,
-        rep: '&#34;'
-    },
-    {
-        reg: /'/g,
-        rep: '&#39;'
-    },
-    {
-        reg: /&/g,
-        rep: '&#38;'
-    }
-];
 var openTag = '{{';
 var closeTag = '}}';
 var configs = {
