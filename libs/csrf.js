@@ -8,11 +8,11 @@
 'use strict';
 
 var dato = require('./dato.js');
-var random = require('./random.js');
+var number = require('./number.js');
 var encryption = require('./encryption.js');
 var configs = {
-    // 丑化字符
-    ugliy: '.',
+    // 加密字符串
+    key: '123123',
     // 有效期：1小时
     expires: 3600000
 };
@@ -29,39 +29,22 @@ exports.config = function (options) {
 
 /**
  * 生成 csrf 令牌
- * @returns {{key: Object, token: String}}
+ * @returns {String}
  */
 exports.create = function () {
-    // 13 + N--
-    var now = random.guid(true);
-    var length = random.number(1, 20);
-    var key = now + random.string(length, configs.ugliy);
-    var entry = encryption.encode(String(key), String(key));
-
-    return {
-        key: key,
-        length: length,
-        token: entry.substr(0, length) + random.string(length, configs.ugliy) + entry.substr(length)
-    };
+    return encryption.encode(String(Date.now()), configs.key);
 };
 
 
 /**
  * csrf 验证
- * @param csrfty
  * @param entry
  * @returns {boolean}
  */
-exports.validate = function (csrfty, entry) {
-    var key = encryption.decode(entry.substr(0, csrfty.length) + entry.substr(csrfty.length * 2), csrfty.key);
+exports.validate = function (entry) {
+    var time = encryption.decode(entry);
 
-    if (!key) {
-        return false;
-    }
-
-    var time = key.slice(0, 13);
-
-    time = dato.parseInt(time, 0);
+    time = number.parseInt(time, 0);
 
     return time + configs.expires >= Date.now();
 };
