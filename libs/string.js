@@ -49,7 +49,7 @@ var REG_NOT_UTF16_SINGLE = /[^\x00-\xff]{2}/g;
  */
 exports.escapeHTML = function (str) {
     dato.each(escapeHTMLMap, function (src, reg) {
-        str = str.replace(reg, src);
+        str = String(str).replace(reg, src);
     });
 
     return str;
@@ -63,7 +63,7 @@ exports.escapeHTML = function (str) {
  */
 exports.unescapeHTML = function (str) {
     // 转换实体数字为实体字母
-    str.replace(REG_HTML_CODE, function (full, hex, code) {
+    str = String(str).replace(REG_HTML_CODE, function (full, hex, code) {
         return String.fromCharCode(parseInt(code, hex ? 16 : 10));
     });
 
