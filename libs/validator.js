@@ -10,6 +10,7 @@
 
 var klass = require('./class.js');
 var dato = require('./dato.js');
+var string = require('./string.js');
 var typeis = require('./typeis.js');
 var howdo = require('howdo');
 var Emitter = require('events').EventEmitter;
@@ -704,21 +705,13 @@ function _getDataInfo(data) {
     switch (type) {
         case 'string':
             ret.stringLength = data.length;
-            ret.stringBytes = dato.bytes(data);
+            ret.stringBytes = string.bytes(data);
             break;
 
         case 'number':
             ret.number = data;
             break;
-        //
-        //case 'array':
-        //    ret.arrayLength = dato.length;
-        //    break;
-        //
-        //case 'object':
-        //    ret.objectLength = Object.keys(data).length;
-        //    break;
-        //
+
         case 'boolean':
             ret.booleanLength = 1;
             break;

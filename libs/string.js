@@ -308,7 +308,7 @@ exports.bytes = function (string, doubleLength) {
  * @example
  * var s = "𠮷";
  * s.length = 2;
- * dato.length(s);
+ * string.length(s);
  * // => 3
  */
 exports.length = function (str) {
