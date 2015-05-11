@@ -309,23 +309,6 @@ exports.compare = function (obj1, obj2) {
 };
 
 
-/**
- * 人类数字，千位分割
- * @param number {String|Number} 数字（字符串）
- * @param [separator=","] {String} 分隔符
- * @param [length=3] {Number} 分隔长度
- * @returns {string} 分割后的字符串
- */
-exports.humanize = function (number, separator, length) {
-    separator = separator || ',';
-    length = length || 3;
-
-    var reg = new RegExp('(\\d)(?=(\\d{' + length + '})+$)', 'g');
-    var arr = String(number).split('.');
-    var p1 = arr[0].replace(reg, '$1' + separator);
-
-    return p1 + (arr[1] ? '.' + arr[1] : '');
-};
 
 
 /**
