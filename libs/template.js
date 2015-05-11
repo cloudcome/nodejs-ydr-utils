@@ -10,8 +10,9 @@
 var fs = require('fs');
 var path = require('path');
 var promiseify = require('promiseify');
-var string = require('./string.js');
+// begin ======
 var dato = require('./dato.js');
+var string = require('./string.js');
 var typeis = require('./typeis.js');
 var random = require('./random.js');
 var klass = require('./class.js');
