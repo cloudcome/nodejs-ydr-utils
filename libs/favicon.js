@@ -8,6 +8,7 @@
 
 var request = require('./request.js');
 var dato = require('./dato.js');
+var number = require('./number.js');
 var klass = require('./class.js');
 var typeis = require('./typeis.js');
 var urlParser = require('url');
@@ -377,7 +378,7 @@ Favicon.implement({
                 return callback(null);
             }
 
-            var contentLength = dato.parseInt(headers['content-length'], 0);
+            var contentLength = number.parseInt(headers['content-length'], 0);
             var contentType = headers['content-type'];
 
             if (res.statusCode === 200 && contentLength >= 20) {

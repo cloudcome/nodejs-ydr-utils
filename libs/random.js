@@ -7,6 +7,7 @@
 'use strict';
 
 var dato = require('./dato.js');
+var number = require('./number.js');
 var string = require('./string.js');
 var regExist = /[aA0]/g;
 var dictionaryMap = {
@@ -28,8 +29,8 @@ var dictionaryMap = {
 exports.number = function (min, max) {
     var temp;
 
-    min = dato.parseInt(min, 0);
-    max = dato.parseInt(max, 0);
+    min = number.parseInt(min, 0);
+    max = number.parseInt(max, 0);
 
     if (min === max) {
         return min;
@@ -66,7 +67,7 @@ exports.string = function (length, dictionary) {
     var pool = '';
     var max;
 
-    length = Math.abs(dato.parseInt(length, 6));
+    length = Math.abs(number.parseInt(length, 6));
     dictionary = String(dictionary || 'a');
 
     if (dictionary.indexOf('a') > -1) {

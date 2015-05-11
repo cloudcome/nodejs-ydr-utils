@@ -13,6 +13,7 @@ var https = require('https');
 var qs = require('querystring');
 var typeis = require('./typeis.js');
 var dato = require('./dato.js');
+var number = require('./number.js');
 var zlib = require('zlib');
 var FormData = require('form-data');
 var browserHeaders = {
@@ -133,7 +134,7 @@ function _remote(options, callback) {
 
     // ！！！这里千万不要深度复制！！！
     options = dato.extend(false, {}, defaults, options);
-    options.max30xRedirectTimes = dato.parseInt(options.max30xRedirectTimes, 10);
+    options.max30xRedirectTimes = number.parseInt(options.max30xRedirectTimes, 10);
     callback = typeis.function(callback) ? callback : noop;
 
     var querystring = '';
