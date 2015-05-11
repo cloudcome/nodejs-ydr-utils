@@ -8,6 +8,7 @@
 'use strict';
 
 var dato = require('./dato.js');
+var number = require('./number.js');
 var typeis = require('./typeis.js');
 var cache = Object.create(null);
 var length = 0;
@@ -163,17 +164,17 @@ exports.length = length;
 /**
  * 递增值
  * @param key {String} 缓存键
- * @param number {Number} 数值
+ * @param num {Number} 数值
  */
-exports.increase = function (key, number) {
+exports.increase = function (key, num) {
     var cached = exports.get(key);
 
-    number = dato.parseFloat(number, 0);
+    num = number.parseFloat(num, 0);
 
     if (typeis.undefined(cached)) {
-        cached = number;
+        cached = num;
     } else {
-        cached = dato.parseFloat(cached, 0) + number;
+        cached = number.parseFloat(cached, 0) + num;
     }
 
     exports.set(key, cached);
