@@ -1,6 +1,6 @@
 {
   "name": "ydr-utils",
-  "version": "19.7.0",
+  "version": "21.0.0",
   "private": false,
   "description": "utils for ydr.me",
   "scripts": {},
@@ -28,8 +28,10 @@
     "httpStatus",
     "log",
     "mime",
+    "number",
     "random",
     "request",
+    "string",
     "gzip",
     "template",
     "express",
