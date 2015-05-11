@@ -10,6 +10,7 @@
 var fs = require('fs');
 var path = require('path');
 var promiseify = require('promiseify');
+var string = require('./string.js');
 var dato = require('./dato.js');
 var typeis = require('./typeis.js');
 var random = require('./random.js');
@@ -178,7 +179,7 @@ Template.implement({
         var inExp = false;
 
         the._template = {
-            escape: _escape,
+            escape: string.escapeHTML,
             filters: {}
         };
         the._useFilters = {};
@@ -354,7 +355,7 @@ Template.implement({
         var existFilters = dato.extend(true, {}, filters, the._template.filters);
         var self = dato.extend(true, {}, {
             each: dato.each,
-            escape: _escape,
+            escape: string.escapeHTML,
             filters: existFilters,
             configs: configs
         });
@@ -562,21 +563,6 @@ Template.implement({
 });
 
 
-/**
- * HTML 编码
- * @param str
- * @returns {*}
- * @private
- */
-function _escape(str) {
-    str = String(str);
-
-    dato.each(escapes, function (index, obj) {
-        str = str.replace(obj.reg, obj.rep);
-    });
-
-    return str;
-}
 
 
 /**
