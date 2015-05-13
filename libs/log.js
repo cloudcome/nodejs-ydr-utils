@@ -141,15 +141,17 @@ function _log(err, req, res, next) {
     }
 
     if (smtp && smtp.sendMail) {
-        smtp.sendMail({
+        var data = {
             from: emailDefaults.from,
             to: emailDefaults.to,
             subject: emailDefaults.subject + ' ' + time,
             html: '<pre>' + txt + '</pre>'
-        }, function (err) {
+        };
+        smtp.sendMail(data, function (err) {
             if (err) {
                 console.log('邮件发送失败：');
-                console.error(err);
+                console.error(data);
+                console.error(err.stack);
             }
         });
     }
