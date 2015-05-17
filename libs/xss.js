@@ -337,9 +337,9 @@ exports.mdRender = function (source, isNoFavicon) {
 
 
     // 表格
-    markedRender.table = function (thead, tbody) {
-        return '<table class="' + tableClassName + '"><thead>' + thead + '</thead><tbody>' + tbody + '</tbody></table>';
-    };
+    //markedRender.table = function (thead, tbody) {
+    //    return '<table class="' + tableClassName + '"><thead>' + thead + '</thead><tbody>' + tbody + '</tbody></table>';
+    //};
 
 
     marked.setOptions({renderer: markedRender});
