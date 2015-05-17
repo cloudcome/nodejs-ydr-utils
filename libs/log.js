@@ -110,6 +110,7 @@ function _log(err, req, res, next) {
         'time: ' + time + '\n' +
         (request ? 'request: ' + request + '\n' : '') +
         (req ? 'ua: ' + req.headers['user-agent'] + '\n' : '') +
+        (req ? 'headers: ' + req.headers + '\n' : '') +
         (req ? 'ip: ' + ip + '\n' : '') +
         (req ? 'query: \n' + query + '\n' : '') +
         (req ? 'body: \n' + body + '\n' : '');
