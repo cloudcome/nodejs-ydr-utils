@@ -11,6 +11,7 @@ var date = require('./date.js');
 var typeis = require('./typeis.js');
 var fs = require('fs-extra');
 var path = require('path');
+var util = require('util');
 var logDefaults = {
     // 运行环境，默认为开发
     env: 'pro',
@@ -110,7 +111,7 @@ function _log(err, req, res, next) {
         'time: ' + time + '\n' +
         (request ? 'request: ' + request + '\n' : '') +
         (req ? 'ua: ' + req.headers['user-agent'] + '\n' : '') +
-        (req ? 'headers: ' + req.headers + '\n' : '') +
+        (req ? 'headers: ' + util.inspect(req.headers) + '\n' : '') +
         (req ? 'ip: ' + ip + '\n' : '') +
         (req ? 'query: \n' + query + '\n' : '') +
         (req ? 'body: \n' + body + '\n' : '');
