@@ -248,7 +248,7 @@ function _request(options, callback) {
         requestOptions.method !== 'HEAD';
     var stat;
 
-    if (form && form instanceof  FormData) {
+    if (form && typeis.function(form.getHeaders)) {
         options.headers = form.getHeaders(options.headers);
     } else if (canSend && bodyLength === undefined) {
         if (file) {
@@ -293,7 +293,6 @@ function _request(options, callback) {
     var context = {
         options: requestOptions
     };
-
 
     var req = _http.request(requestOptions, function (res) {
         var bufferList = [];
@@ -344,7 +343,7 @@ function _request(options, callback) {
     req.on('error', callback.bind(context));
 
     if (canSend) {
-        if (form && typeis.function(form)) {
+        if (form && typeis.function(form.pipe)) {
             form.pipe(req);
         } else if (body && typeis.function(body.pipe)) {
             body.pipe(req);
