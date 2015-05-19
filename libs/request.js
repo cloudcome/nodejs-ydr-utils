@@ -293,7 +293,6 @@ function _request(options, callback) {
     var context = {
         options: requestOptions
     };
-
     var req = _http.request(requestOptions, function (res) {
         var bufferList = [];
         var binarys = '';
