@@ -15,7 +15,6 @@ var typeis = require('./typeis.js');
 var dato = require('./dato.js');
 var number = require('./number.js');
 var zlib = require('zlib');
-var FormData = require('form-data');
 var browserHeaders = {
     'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
     'accept-encoding': 'gzip, deflate, sdch',
