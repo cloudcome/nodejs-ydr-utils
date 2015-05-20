@@ -37,14 +37,14 @@ var putDefaults = {
 };
 
 /**
- * 实例化一个 oss 服务
+ * 实例化一个 ali oss 上传服务
  * @param options
  * @param options.accessKeyId {String}
  * @param options.accessKeySecret {String}
  * @param options.bucket {String}
  * @param [options.host] {String}
  */
-var OSS = klass.create({
+module.exports = klass.create({
     constructor: function (options) {
         this._options = dato.extend(true, {}, constructorDefaults, options);
     },
@@ -285,5 +285,3 @@ var OSS = klass.create({
             (object ? object : '');
     }
 });
-
-module.exports = OSS;
