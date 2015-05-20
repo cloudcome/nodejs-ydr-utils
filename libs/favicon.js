@@ -44,95 +44,17 @@ var configs = {
     // favicon 文件保存目录
     saveDirection: ''
 };
-var Favicon = klass.create(function (url, isUpdate) {
-    var the = this;
-
-    the._oURL = url;
-    the.url = url;
-    the._isUpdate = Boolean(isUpdate);
-    the.faviconURL = null;
-    the.faviconFile = null;
-}, Emitter);
 var defaultConfigs = {};
+var Favicon = klass.extends(Emitter).create({
+    constructor: function (url, isUpdate) {
+        var the = this;
 
-
-Favicon.REG_MAP = {};
-
-Favicon.config = function (options) {
-    dato.extend(configs, options);
-};
-
-
-/**
- * 构造配置
- */
-Favicon.buildDefaultConfigs = function () {
-    try {
-        defaultConfigs = fse.readJSONFileSync(configs.configsFilePath, 'utf8') || {};
-    } catch (err) {
-        // ignore
-    }
-};
-
-
-/**
- * 更新配置
- */
-Favicon.updateDefaultConfigs = function () {
-    try {
-        fse.writeJSONFileSync(configs.configsFilePath, defaultConfigs, {
-            encoding: 'utf8'
-        });
-    } catch (err) {
-        // ignore
-    }
-};
-
-
-/**
- * url 合并
- * @param from
- * @param to
- * @returns {*}
- * @private
- */
-Favicon.joinURL = function (from, to) {
-    var parseTo = urlParser.parse(to);
-
-    if (parseTo.protocol && parseTo.hostname) {
-        return to;
-    }
-
-    var parse = urlParser.parse(from);
-    var domain = (parse.protocol || 'http:') + '//' + (parse.hostname || '0');
-
-    if (REG_THIS_PROTOCOL.test(to)) {
-        return parse.protocol + to;
-    }
-
-    from = domain + (parse.pathname || '/').replace(REG_URL_SUFFIX, '/');
-
-    if (!to || REG_PATH_ABSOLUTE.test(to)) {
-        return domain + to;
-    }
-
-    var mathes;
-
-    to = './' + to;
-
-    while ((mathes = to.match(REG_PATH_RELATIVE))) {
-        to = to.replace(REG_PATH_RELATIVE, '');
-
-        if (mathes[1].length === 2) {
-            from = REG_HTTP_ROOT.test(from) ? from : from.replace(REG_PATH_END, '/');
-        }
-    }
-
-    return from + to;
-};
-
-
-Favicon.implement({
+        the._oURL = url;
+        the.url = url;
+        the._isUpdate = Boolean(isUpdate);
+        the.faviconURL = null;
+        the.faviconFile = null;
+    },
     get: function (callback) {
         var the = this;
 
@@ -454,5 +376,80 @@ Favicon.implement({
     }
 });
 
+
+Favicon.REG_MAP = {};
+
+Favicon.config = function (options) {
+    dato.extend(configs, options);
+};
+
+
+/**
+ * 构造配置
+ */
+Favicon.buildDefaultConfigs = function () {
+    try {
+        defaultConfigs = fse.readJSONFileSync(configs.configsFilePath, 'utf8') || {};
+    } catch (err) {
+        // ignore
+    }
+};
+
+
+/**
+ * 更新配置
+ */
+Favicon.updateDefaultConfigs = function () {
+    try {
+        fse.writeJSONFileSync(configs.configsFilePath, defaultConfigs, {
+            encoding: 'utf8'
+        });
+    } catch (err) {
+        // ignore
+    }
+};
+
+
+/**
+ * url 合并
+ * @param from
+ * @param to
+ * @returns {*}
+ * @private
+ */
+Favicon.joinURL = function (from, to) {
+    var parseTo = urlParser.parse(to);
+
+    if (parseTo.protocol && parseTo.hostname) {
+        return to;
+    }
+
+    var parse = urlParser.parse(from);
+    var domain = (parse.protocol || 'http:') + '//' + (parse.hostname || '0');
+
+    if (REG_THIS_PROTOCOL.test(to)) {
+        return parse.protocol + to;
+    }
+
+    from = domain + (parse.pathname || '/').replace(REG_URL_SUFFIX, '/');
+
+    if (!to || REG_PATH_ABSOLUTE.test(to)) {
+        return domain + to;
+    }
+
+    var mathes;
+
+    to = './' + to;
+
+    while ((mathes = to.match(REG_PATH_RELATIVE))) {
+        to = to.replace(REG_PATH_RELATIVE, '');
+
+        if (mathes[1].length === 2) {
+            from = REG_HTTP_ROOT.test(from) ? from : from.replace(REG_PATH_END, '/');
+        }
+    }
+
+    return from + to;
+};
 
 module.exports = Favicon;
