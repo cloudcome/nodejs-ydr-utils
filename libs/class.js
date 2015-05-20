@@ -23,19 +23,19 @@ var typeis = require('./typeis.js');
  *
  * // 子类
  * var Child = function(){
- *     // 执行一次父类的方法
- *     Father.apply(this, arguments);
- *
- *     // 这里执行子类的方法、属性
- *     this.sth = 123;
- * };
+     *     // 执行一次父类的方法
+     *     Father.apply(this, arguments);
+     *
+     *     // 这里执行子类的方法、属性
+     *     this.sth = 123;
+     * };
  *
  * klass.inherit(Child, Father);
  *
  * // 这里开始写子类的原型方法
- * Child.prototype = {};
+ * Child.prototype.fn = fn;
  */
-exports.inherit = function (constructor, superConstructor, isCopyStatic) {
+var inherit = function (constructor, superConstructor, isCopyStatic) {
     constructor.super_ = superConstructor;
     //var F = function () {
     //    // ignore
@@ -60,60 +60,140 @@ exports.inherit = function (constructor, superConstructor, isCopyStatic) {
 };
 
 
-
 /**
- * 创建一个类（构造函数）
- * @param {Function} constructor 构造函数
+ * 创建一个类（构造函数）【旧的方法，会在下一个大版本中废弃】
+ * @param {Object} prototypes 原型链
  * @param {Function} [superConstructor=null] 父类
  * @param {Boolean} [isInheritStatic=false] 是否继承父类的静态方法
- *
- * @example
- * var Father = klass.create(function(name){
- *     this.name = name;
- * });
- *
- * var pro = Father.prototype;
- *
- * pro.sayName = function(){
- *     console.log(this.name);
- * };
- *
- * var Child = klass.create(function(name, age){
- *    this.age = age;
- * }, Father, true);
- *
- * Child.fn.speak = function(){
- *     console.log('My name is ' + this.name + ', I\'m ' + this.age + ' years old.');
- * };
- *
- * var f1 = new Father('Fimme');
- * var c1 = new Child('Cmoo', 20);
+ * @returns {Function}
  */
-exports.create = function (constructor, superConstructor, isInheritStatic) {
-    var isConstructorFn = typeis.function(constructor);
-    var isSuperConstructorFn = typeis.function(superConstructor);
-    var c = function () {
-        if (isSuperConstructorFn) {
-            superConstructor.apply(this, arguments);
-        }
-
-        if (isConstructorFn) {
-            return constructor.apply(this, arguments);
-        }
-    };
-
-    if (isConstructorFn && isSuperConstructorFn) {
-        exports.inherit(c, superConstructor, isInheritStatic);
+var create = function (prototypes, superConstructor, isInheritStatic) {
+    if (typeis.function(prototypes)) {
+        prototypes = {
+            constructor: prototypes
+        };
     }
 
-    c.fn = c.prototype;
-    c.fn.constructor = c;
-    c.implement = c.fn.extend = function (properties) {
-        dato.extend(true, c.fn, properties);
-    };
-    c.extend = function (properties) {
-        dato.extend(true, c, properties);
+    if (!typeis.function(prototypes.constructor)) {
+        throw Error('propertypes.constructor must be a function');
+    }
+
+    var con = prototypes.constructor;
+
+    prototypes.constructor = null;
+
+    var superConstructorIsAFn = typeis.function(superConstructor);
+    var c = function () {
+        var the = this;
+        var args = arguments;
+
+        if (superConstructorIsAFn) {
+            superConstructor.apply(the, args);
+        }
+
+        con.apply(the, args);
     };
 
+    if (superConstructorIsAFn) {
+        inherit(c, superConstructor, isInheritStatic);
+    }
+
+    dato.each(prototypes, function (key, val) {
+        c.prototype[key] = val;
+    });
+
+    /**
+     * 原始的 constructor
+     * @type {Function}
+     * @private
+     */
+    c.prototype.__constructor__ = con;
+
+    /**
+     * 输出的 constructor
+     * @type {Function}
+     */
+    c.prototype.constructor = c;
+
     return c;
+};
+
+
+/**
+ * 类的构造器
+ * @param prototypes
+ * @param superConstructor
+ * @param isInheritStatic
+ * @constructor
+ */
+var Class = function (prototypes, superConstructor, isInheritStatic) {
+    var the = this;
+
+    the.p = prototypes;
+    the.s = superConstructor;
+    the.i = isInheritStatic;
+};
+
+Class.prototype = {
+    constructor: Class,
+
+    /**
+     * 类的创建
+     * @param {Object} [prototypes] 原型链
+     * @returns {Function}
+     */
+    create: function (prototypes) {
+        var the = this;
+
+        the.p = prototypes || the.p;
+
+        return create(the.p, the.s, the.i);
+    }
+};
+
+
+/**
+ * 类的继承，参考了 es6 的 class 表现
+ * @param superConstructor
+ * @param isInheritStatic
+ * @returns {Class}
+ */
+exports.extends = function (superConstructor, isInheritStatic) {
+    return new Class(null, superConstructor, isInheritStatic);
+};
+
+
+/**
+ * 类的创建
+ * @param {Object} prototypes 原型链
+ * @param {Function} [superConstructor=null] 父类
+ * @param {Boolean} [isInheritStatic=false] 是否继承父类的静态方法
+ * @returns {Function}
+ *
+ * @example
+ * // 1. 创建一个空原型链的类
+ * var A = klass.create(fn);
+ *
+ * // 2. 创建一个有原型链的类
+ * var B = klass.create({
+     *     constructor: fn,
+     *     ...
+     * });
+ *
+ * // 3. 创建一个子类
+ * var C = klass.extends(B).create(fn);
+ * var D = klass.extends(C).create({
+     *     constructor: fn,
+     *     ...
+     * });
+ */
+exports.create = function (prototypes, superConstructor, isInheritStatic) {
+    var the = this;
+
+    // 上一个级联应该是 extends
+    if (the.constructor === Class && the instanceof Class) {
+        return the.create(prototypes);
+    }
+
+    return new Class(prototypes, superConstructor, isInheritStatic).create();
 };
