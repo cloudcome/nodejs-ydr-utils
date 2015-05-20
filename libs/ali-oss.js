@@ -44,13 +44,10 @@ var putDefaults = {
  * @param options.bucket {String}
  * @param [options.host] {String}
  */
-var OSS = klass.create(function (options) {
-    this._options = dato.extend(true, {}, constructorDefaults, options);
-});
-
-
-OSS.implement({
-
+var OSS = klass.create({
+    constructor: function (options) {
+        this._options = dato.extend(true, {}, constructorDefaults, options);
+    },
 
     /**
      * 重新设置配置
