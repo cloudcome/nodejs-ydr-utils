@@ -58,6 +58,7 @@
   },
   "dependencies": {
     "busboy": "^0.2.9",
+    "form-data": "^0.2.0",
     "fs-extra": "^0.18.0",
     "howdo": "^1.1.5",
     "imagesize": "^1.0.0",
