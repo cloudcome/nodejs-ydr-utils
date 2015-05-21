@@ -35,9 +35,10 @@ exports.config = function (options) {
 /**
  * 生成上传 key 和上传凭证
  * @param [config] {Object} 配置
- * @param [config.dirname] {String} 上传目录
+ * @param [config.dirname="/"] {String} 上传目录
  * @param [config.filename] {String} 上传文件名，否则随机生成
  * @param [config.expires] {Number} 凭证有效期，默认 10 分钟
+ * @param [config.mimeLimit="image/*"] {String} 上传文件限制类型
  * @returns {{key: *, token: string}}
  */
 exports.generateKeyAndToken = function (config) {
@@ -62,7 +63,8 @@ exports.generateKeyAndToken = function (config) {
     var encoded = urlsafeBase64Encode(JSON.stringify({
         scope: configs.bucket + ':' + key,
         // 有效期
-        deadline: (config.expires || tenMinutes) + Math.floor(Date.now() / 1000)
+        deadline: (config.expires || tenMinutes) + Math.floor(Date.now() / 1000),
+        mimeLimit: config.mimeLimit
     }));
     var encoded_signed = base64ToUrlSafe(hmacSha1(encoded, configs.secret_key));
 
