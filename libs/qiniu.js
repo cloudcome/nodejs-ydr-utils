@@ -69,7 +69,7 @@ exports.generateKeyAndToken = function (config) {
     return {
         key: key,
         token: configs.access_key + ':' + encoded_signed + ':' + encoded,
-        url: configs.host + '/' + key
+        url: configs.host + key
     };
 };
 
