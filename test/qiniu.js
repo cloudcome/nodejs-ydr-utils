@@ -11,11 +11,13 @@ var qiniu = require('../libs/qiniu.js');
 
 
 qiniu.config({
-    access_key: '1',
-    secret_key: '2',
-    bucket: '3',
-    host: 'http://s.example.com'
+    access_key: '-',
+    secret_key: '-',
+    bucket: 'fed-community',
+    host: 'https://dn-fed.qbox.me/@/'
 });
 
-var kat = qiniu.generateKeyAndToken();
+var kat = qiniu.generateKeyAndToken({
+    dirname: '/res/'
+});
 console.log(kat);
