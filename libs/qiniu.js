@@ -49,6 +49,10 @@ exports.generateKeyAndToken = function (config) {
         config.dirname = '';
     }
 
+    if (configs.host.slice(-1) === '/') {
+        configs.host = configs.host.slice(0, -1);
+    }
+
     var key = config.dirname + (config.filename || random.guid());
     var tenMinutes = 10 * 60;
 
