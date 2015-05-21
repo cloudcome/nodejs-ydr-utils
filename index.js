@@ -35,6 +35,8 @@ module.exports = {
     mime: require('./libs/mime.js'),
     // MIME
     number: require('./libs/number.js'),
+    // MIME
+    qiniu: require('./libs/qiniu.js'),
     // 随机数
     random: require('./libs/random.js'),
     // 请求
