@@ -340,7 +340,7 @@ var Validator = klass.extends(Emitter).create({
                      * @param value {*} 字段值
                      */
                     the.emit('validateoneend', name, err, data[name]);
-                    callback.call(the, err, data[name]);
+                    callback.call(the, err, data[name], data);
                 });
             } else {
                 /**
@@ -351,7 +351,7 @@ var Validator = klass.extends(Emitter).create({
                  * @param value {*} 字段值
                  */
                 the.emit('validateoneend', name, null, data[name]);
-                callback.call(the, null, data[name]);
+                callback.call(the, null, data[name], data);
             }
         } else {
             /**
@@ -369,7 +369,7 @@ var Validator = klass.extends(Emitter).create({
              * @param value {*} 字段值
              */
             the.emit('validateoneend', name, null, data[name]);
-            callback.call(the, null, data[name]);
+            callback.call(the, null, data[name], data);
         }
     },
 
