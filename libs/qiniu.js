@@ -8,22 +8,9 @@
 'use strict';
 
 
-
-
-var path = require('path');
-var klass = require('./class.js');
 var dato = require('./dato.js');
-var typeis = require('./typeis.js');
-var request = require('./request.js');
 var random = require('./random.js');
-var mime = require('./mime.js');
-var Busboy = require('busboy');
 var crypto = require('crypto');
-var xmlParse = require('xml2js').parseString;
-var howdo = require('howdo');
-var imagesize = require('imagesize');
-var REG_META = /^x-oss-meta-/i;
-var REG_TITLE = /<title>([\s\S]*?)<\/title>/;
 var configs = {
     access_key: '',
     secret_key: '',
@@ -45,50 +32,42 @@ exports.config = function (options) {
 };
 
 
-
 /**
- * 根据上传生成上传 key 和上传凭证
+ * 生成上传 key 和上传凭证
+ * @param [config] {Object} 配置
+ * @param [config.dirname] {String} 上传目录
+ * @param [config.filename] {String} 上传文件名，否则随机生成
+ * @param [config.expires] {Number} 凭证有效期，默认 10 分钟
+ * @returns {{key: *, token: string}}
  */
 exports.generateKeyAndToken = function (config) {
-    if (config.dirname.length > 1) {
+    config = config || {};
+
+    if (config.dirname && config.dirname.length > 1) {
         config.dirname = REG_END.test(config.dirname) ? config.dirname : config.dirname + '/';
     } else {
         config.dirname = '';
     }
 
     var key = config.dirname + (config.filename || random.guid());
+    var tenMinutes = 10 * 60;
 
-    if (!config.scope) {
-        // 文件名
-        config.dirname = String(config.dirname).trim();
+    // 文件名
+    config.dirname = String(config.dirname).trim();
 
-
-        //config.saveKey = config.dirname + random.guid();
-        config.scope = config.bucket + ':' + key;
-        //config.scope = config.bucket;
-    }
-
-
-    config.bucket = undefined;
-    config.dirname = undefined;
-
-
-    // 有效期
-    config.deadline = config.expires + Math.floor(Date.now() / 1000);
-    config.expires = undefined;
-
-    //console.log(config);
-
-    var encoded = urlsafeBase64Encode(JSON.stringify(config));
-    var encoded_signed = base64ToUrlSafe(hmacSha1(encoded, sk));
+    var encoded = urlsafeBase64Encode(JSON.stringify({
+        scope: configs.bucket + ':' + key,
+        // 有效期
+        deadline: (config.expires || tenMinutes) + Math.floor(Date.now() / 1000)
+    }));
+    var encoded_signed = base64ToUrlSafe(hmacSha1(encoded, configs.secret_key));
 
     return {
         key: key,
-        token: ak + ':' + encoded_signed + ':' + encoded
+        token: configs.access_key + ':' + encoded_signed + ':' + encoded,
+        url: configs.host + '/' + key
     };
 };
-
-
 
 
 function urlsafeBase64Encode(jsonFlags) {
