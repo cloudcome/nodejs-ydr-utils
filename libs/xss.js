@@ -10,6 +10,7 @@ var marked = require('marked');
 var random = require('./random.js');
 var typeis = require('./typeis.js');
 var dato = require('./dato.js');
+var string = require('./string.js');
 var encryption = require('./encryption.js');
 var url = require('url');
 var REG_DOUBLE = /^\/\//;
@@ -40,7 +41,7 @@ var REG_LINK1 = /<http.*?>/ig;
 var REG_IMAGE = /!\[.*?][\[\(].*[\]\)]/g;
 // [][] []()
 var REG_LINK2 = /\[(.*?)][\[\(].*[\]\)]/g;
-var REG_TAG = /<(\/?[a-z][a-z\d]*(\s\b[^>]*)?)>/g;
+var REG_TAG = /<(\/?[a-z][a-z\d]*[\s\S]*?)>/gi;
 //var REG_BLOKQUOTE = /^( *>[^\n]+(\n(?!def)[^\n]+)*\n*)+/g;
 var REG_PATH = /^(\/|\.{0,2})(\/[^/]+)+$/;
 var REG_SIZE = /(?:\s+?=\s*?(\d+)(?:[x*×](\d+))?)?$/i;
@@ -54,7 +55,19 @@ var ENCODE_LIST = [{
 // 影响页面的危险标签
 //var dangerTagNameList = 'script iframe frameset body head html link base style'.split(' ');
 var tableClassName = 'table table-radius table-bordered table-hover';
-var SAFE_HOSTS = ['*.FrontEndDev.org', '*.ydr.me', '*.qianduanblog.com'];
+
+// 信任的安全域名，其他域名都加上 nofollow
+var SAFE_HOSTS = [
+    '*.FrontEndDev.org',
+    'FrontEndDev.org',
+    '*.ydr.me',
+    'ydr.me',
+    '*.qianduanblog.com',
+    'qianduanblog.com',
+    '*.front-end.io',
+    'front-end.io'
+];
+
 //var filterDefaults = {
 //    /**
 //     * link 配置
@@ -84,7 +97,9 @@ var sanitizeOptions = {
         // list
         'ol', 'ul', 'li',
         // table
-        'table', 'thead', 'tbody', 'tr', 'th', 'td', 'caption'
+        'table', 'thead', 'tbody', 'tr', 'th', 'td', 'caption',
+        // iframe
+        'iframe'
     ],
     allowedAttributes: {
         a: ['href', 'target', 'class', 'id'],
@@ -169,7 +184,6 @@ exports.mdSafe = function (source) {
         });
     }
 
-
     // back
     dato.each(preMap, function (key, val) {
         source = source.replace(key, val);
@@ -187,8 +201,6 @@ exports.mdSafe = function (source) {
  * @returns {string}
  */
 exports.mdTOC = function (source) {
-    source = exports.mdSafe(source);
-
     var tokens = marked.lexer(source);
     var toc = '\n\n';
     var index = 0;
@@ -280,7 +292,7 @@ exports.mdRender = function (source, isNoFavicon) {
         }
 
         dato.each(SAFE_HOSTS, function (index, item) {
-            if (_regExp(item).test(host)) {
+            if (string.glob(host, item, true)) {
                 inHost = true;
                 return false;
             }
@@ -289,6 +301,10 @@ exports.mdRender = function (source, isNoFavicon) {
         // 指定域内的 NO _blank
         if (inHost) {
             return _buildLink(href, title, text, false, isNoFavicon);
+        }
+
+        if (host === 'jsbin.com') {
+            return _buildJSBin(href);
         }
 
         // 其他的使用传入对象处理
@@ -344,7 +360,7 @@ exports.mdRender = function (source, isNoFavicon) {
 
     marked.setOptions({renderer: markedRender});
     source = marked(source);
-    source = sanitizeHtml(source, sanitizeOptions);
+    //source = sanitizeHtml(source, sanitizeOptions);
 
     return source;
 };
@@ -370,11 +386,25 @@ function _buildLink(href, title, text, isBlank, isNoFavicon) {
 
     return '<a href="' + href + '"' +
             //(REG_TOC.test(href) ? ' id="toc' + href.replace(REG_TOC, '$1') + '"' : '') +
-        (isBlank ? ' target="_blank"' : '') +
+        (isBlank ? ' target="_blank" rel="nofollow"' : '') +
         (title ? ' ' + title : '') +
         '>' +
         (isNoFavicon ? '' : '<img src="http://f.ydr.me/' + href + '" class="favicon" width="16" height="16" alt="f">') +
         (text || href) + '</a>';
+}
+
+
+/**
+ * jsbin 在线代码演示平台
+ * @param href
+ * @private
+ */
+function _buildJSBin(href) {
+    // href: http://jsbin.com/pufoxinejo/1/
+    // <iframe src="http://jsbin.com/pufoxinejo/1/embed?html,css,js,output"
+    // style="border: 1px solid rgb(170, 170, 170); width: 100%; min-height: 300px; height: 38px;"></iframe>
+
+    return '<iframe src="' + href + 'embed?html,css,js,output" class="codedemo-jsbin"></iframe>';
 }
 
 

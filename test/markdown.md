@@ -1,6 +1,9 @@
 #xss markdown
 公公给
 
+<http://jsbin.com/pufoxinejo/1/>
+
+
 的
 
 > abcdef
@@ -35,7 +38,7 @@ code: `<pre>~</pre>`
 
 <http://link>
 
-## **<span>on()写法</span>**
+## **<span onclick="alert(1)">on()写法</span>**
 
 
 ## 的风312 [abc](http://abc.com)
@@ -58,7 +61,6 @@ code: `<pre>~</pre>`
 ``````
 
 
-http://jsbin.com/pufoxinejo/1/
 
 
 

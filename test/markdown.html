@@ -1,6 +1,6 @@
 <!DOCTYPE html><meta charset="utf-8"/><style>body{margin-top: 600px;}h1,h2,h3,h4,h5,h6{margin-top: 500px;}</style><ul>
 <li><a href="#heading-1-0">xss markdown</a><ul>
-<li><a href="#heading-2-1"><strong>&lt;span&gt;on()写法&lt;/span&gt;</strong></a></li>
+<li><a href="#heading-2-1"><strong>&lt;span onclick=&quot;alert(1)&quot;&gt;on()写法&lt;/span&gt;</strong></a></li>
 <li><a href="#heading-2-2">的风312 abc</a></li>
 <li><a href="#heading-2-3">的风ddd</a></li>
 <li><a href="#heading-2-4">abc</a></li>
@@ -9,6 +9,7 @@
 </li>
 </ul>
 <h1 id="heading-1-0">xss markdown</h1><p>公公给</p>
+<p><iframe src="http://jsbin.com/pufoxinejo/1/embed?html,css,js,output" class="codedemo-jsbin"></iframe></p>
 <p>的</p>
 <blockquote>
 <p>abcdef
@@ -28,15 +29,11 @@ dwedwedwedwedef</p>
 </code></pre><p>code: <code>~</code></p>
 <p>code: <code>&lt;pre&gt;~&lt;/pre&gt;</code></p>
 <p></p>
-<h2 id="heading-2-1"><strong>on()写法</strong></h2><h2 id="heading-2-2">的风312 <a href="http://abc.com" target="_blank"><img src="http://f.ydr.me/http://abc.com" class="favicon" alt="f" />abc</a></h2><h2 id="heading-2-3">的风ddd <img alt="abc" src="http://abc.com" /></h2><h2 id="heading-2-4"><a href="http://abc.com" target="_blank"><img src="http://f.ydr.me/http://abc.com" class="favicon" alt="f" />abc</a></h2><pre>$(document).on('click', '#list li', function() {
+<h2 id="heading-2-1"><strong>&lt;span onclick=&quot;alert(1)&quot;&gt;on()写法&lt;/span&gt;</strong></h2><h2 id="heading-2-2">的风312 <a href="http://abc.com" target="_blank" rel="nofollow"><img src="http://f.ydr.me/http://abc.com" class="favicon" width="16" height="16" alt="f">abc</a></h2><h2 id="heading-2-3">的风ddd <img alt="abc" src="http://abc.com"></h2><h2 id="heading-2-4"><a href="http://abc.com" target="_blank" rel="nofollow"><img src="http://f.ydr.me/http://abc.com" class="favicon" width="16" height="16" alt="f">abc</a></h2><p>&lt;pre&gt;$(document).on(&#39;click&#39;, &#39;#list li&#39;, function() {
     //function code here.
-});</pre>
-
-
-
+});&lt;/pre&gt;</p>
 <h2 id="heading-2-5">erji</h2><pre><code>0 =&gt; 1 =&gt; 2 =&gt; 3
 ```
-</code></pre><p><a href="http://jsbin.com/pufoxinejo/1/" target="_blank"><img src="http://f.ydr.me/http://jsbin.com/pufoxinejo/1/" class="favicon" alt="f" />http://jsbin.com/pufoxinejo/1/</a></p>
-<pre><code>&lt;a class=&quot;jsbin-embed&quot; href=&quot;http://jsbin.com/pufoxinejo/1/embed?html,css,js,output&quot;&gt;JS Bin&lt;/a&gt;
+</code></pre><pre><code>&lt;a class=&quot;jsbin-embed&quot; href=&quot;http://jsbin.com/pufoxinejo/1/embed?html,css,js,output&quot;&gt;JS Bin&lt;/a&gt;
 &lt;script src=&quot;http://static.jsbin.com/js/embed.js&quot;&gt;&lt;/script&gt;
 </code></pre>

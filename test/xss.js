@@ -11,8 +11,9 @@ var path = require('path');
 var dangerMarkdown = fs.readFileSync(path.join(__dirname, './markdown.md'), 'utf8');
 var xss = require('../libs/xss.js');
 
-var ret2 = xss.mdRender(xss.mdTOC(dangerMarkdown), true);
-var ret3 = xss.mdRender(dangerMarkdown);
+var safeMarkdown = xss.mdSafe(dangerMarkdown);
+var ret2 = xss.mdRender(xss.mdTOC(safeMarkdown), true);
+var ret3 = xss.mdRender(safeMarkdown);
 var html = '<!DOCTYPE html><meta charset="utf-8"/><style>body{margin-top: 600px;}h1,h2,h3,h4,h5,h6{margin-top: 500px;}</style>';
 
 fs.writeFileSync(path.join(__dirname, './markdown.html'), html + ret2 + ret3, 'utf8');
