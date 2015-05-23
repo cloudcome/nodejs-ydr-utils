@@ -87,32 +87,32 @@ var SAFE_HOSTS = [
 //        }
 //    }
 //};
-var sanitizeHtml = require('sanitize-html');
-var sanitizeOptions = {
-    allowedTags: [
-        // inline
-        'b', 'i', 'em', 'strong', 'a', 'img', 'code', 'del',
-        // block
-        'p', 'blockquote', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'br', 'hr',
-        // list
-        'ol', 'ul', 'li',
-        // table
-        'table', 'thead', 'tbody', 'tr', 'th', 'td', 'caption',
-        // iframe
-        'iframe'
-    ],
-    allowedAttributes: {
-        a: ['href', 'target', 'class', 'id'],
-        img: ['src', 'title', 'alt', 'class'],
-        h1: ['id', 'class'],
-        h2: ['id', 'class'],
-        h3: ['id', 'class'],
-        h4: ['id', 'class'],
-        h5: ['id', 'class'],
-        h6: ['id', 'class'],
-        table: ['class']
-    }
-};
+//var sanitizeHtml = require('sanitize-html');
+//var sanitizeOptions = {
+//    allowedTags: [
+//        // inline
+//        'b', 'i', 'em', 'strong', 'a', 'img', 'code', 'del',
+//        // block
+//        'p', 'blockquote', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'br', 'hr',
+//        // list
+//        'ol', 'ul', 'li',
+//        // table
+//        'table', 'thead', 'tbody', 'tr', 'th', 'td', 'caption',
+//        // iframe
+//        'iframe'
+//    ],
+//    allowedAttributes: {
+//        a: ['href', 'target', 'class', 'id'],
+//        img: ['src', 'title', 'alt', 'class'],
+//        h1: ['id', 'class'],
+//        h2: ['id', 'class'],
+//        h3: ['id', 'class'],
+//        h4: ['id', 'class'],
+//        h5: ['id', 'class'],
+//        h6: ['id', 'class'],
+//        table: ['class']
+//    }
+//};
 
 
 /**
