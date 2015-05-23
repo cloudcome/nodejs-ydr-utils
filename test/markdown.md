@@ -58,3 +58,13 @@ code: `<pre>~</pre>`
 ``````
 
 
+http://jsbin.com/pufoxinejo/1/
+
+
+
+```
+<a class="jsbin-embed" href="http://jsbin.com/pufoxinejo/1/embed?html,css,js,output">JS Bin</a>
+<script src="http://static.jsbin.com/js/embed.js"></script>
+```
+
+

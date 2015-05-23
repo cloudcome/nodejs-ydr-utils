@@ -11,13 +11,11 @@ var path = require('path');
 var dangerMarkdown = fs.readFileSync(path.join(__dirname, './markdown.md'), 'utf8');
 var xss = require('../libs/xss.js');
 
-//var ret1 = xss.mdSafe(dangerMarkdown);
-//var ret2 = xss.mdTOC(ret1);
-//var ret3 = xss.mdRender(ret1);
-//var ret4 = xss.mdRender(ret2, true);
-//var html = '<!DOCTYPE html><meta charset="utf-8"/><style>body{margin-top: 600px;}h1,h2,h3,h4,h5,h6{margin-top: 500px;}</style>';
+var ret2 = xss.mdRender(xss.mdTOC(dangerMarkdown), true);
+var ret3 = xss.mdRender(dangerMarkdown);
+var html = '<!DOCTYPE html><meta charset="utf-8"/><style>body{margin-top: 600px;}h1,h2,h3,h4,h5,h6{margin-top: 500px;}</style>';
 
-//fs.writeFileSync(path.join(__dirname, './markdown.html'), html + ret4 + ret3, 'utf8');
+fs.writeFileSync(path.join(__dirname, './markdown.html'), html + ret2 + ret3, 'utf8');
 
 //console.log(ret2);
 
@@ -26,4 +24,4 @@ var xss = require('../libs/xss.js');
 //console.log(xss.mdRender(xss.mdTOC(xss.mdSafe(dangerMarkdown))));
 
 
-console.log(xss.mdIntroduction(dangerMarkdown));
+//console.log(xss.mdIntroduction(dangerMarkdown));
