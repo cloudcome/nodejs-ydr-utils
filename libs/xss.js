@@ -69,6 +69,7 @@ var SAFE_HOSTS = [
 ];
 var REG_JSBIN_EDIT = /\/edit\/?$/i;
 var REG_JSBIN_EMBED = /\/embed\/?$/i;
+var REG_JSFIDDLE = /^https?:\/\/jsfiddle\.net\/[^/]*\//i;
 var REG_JSFIDDLE_EMBED = /\/embedded\/?$/i;
 var REG_JSFIDDLE_RESULT = /\/result$\/?$/i;
 var REG_URL_SUFFIX = /[?#].*$/;
@@ -309,7 +310,7 @@ exports.mdRender = function (source, isNoFavicon) {
             return _buildLink(href, title, text, false, isNoFavicon);
         }
 
-        if (host === 'jsfiddle.net') {
+        if (REG_JSFIDDLE.test(href)) {
             return _buildJsfiddle(href);
         }
 
