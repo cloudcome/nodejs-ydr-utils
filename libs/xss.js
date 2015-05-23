@@ -67,6 +67,9 @@ var SAFE_HOSTS = [
     '*.front-end.io',
     'front-end.io'
 ];
+var REG_JSBIN_EDIT = /\/edit$/i;
+var REG_JSBIN_EMBED = /\/embed$/i;
+var REG_URL_SUFFIX = /[?#].*$/;
 
 //var filterDefaults = {
 //    /**
@@ -403,6 +406,17 @@ function _buildJSBin(href) {
     // href: http://jsbin.com/pufoxinejo/1/
     // <iframe src="http://jsbin.com/pufoxinejo/1/embed?html,css,js,output"
     // style="border: 1px solid rgb(170, 170, 170); width: 100%; min-height: 300px; height: 38px;"></iframe>
+
+    // http://jsbin.com/pufoxinejo/1/edit
+
+    href = href
+        .replace(REG_URL_SUFFIX, '')
+        .replace(REG_JSBIN_EDIT, '/')
+        .replace(REG_JSBIN_EMBED, '/');
+
+    if (href.slice(-1) !== '/') {
+        href += '/';
+    }
 
     return '<iframe src="' + href + 'embed?html,css,js,output" class="codedemo-jsbin"></iframe>';
 }
