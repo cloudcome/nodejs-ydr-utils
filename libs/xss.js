@@ -418,7 +418,8 @@ function _buildJSBin(href) {
         href += '/';
     }
 
-    return '<iframe src="' + href + 'embed?html,css,js,output" class="codedemo-jsbin"></iframe>';
+    return '<a href="' + href + '" rel="nofollow" target="_blank">' + href + '</a>\n\n' +
+        '<iframe src="' + href + 'embed?html,css,js,output" class="codedemo-jsbin"></iframe>';
 }
 
 
