@@ -309,8 +309,8 @@ exports.mdRender = function (source, isNoFavicon) {
             return _buildLink(href, title, text, false, isNoFavicon);
         }
 
-        if (host === 'jsbin.com') {
-            return _buildJSBin(href);
+        if (host === 'jsfiddle.net') {
+            return _buildJsfiddle(href);
         }
 
         // 其他的使用传入对象处理
