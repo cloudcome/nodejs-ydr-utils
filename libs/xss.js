@@ -67,9 +67,12 @@ var SAFE_HOSTS = [
     '*.front-end.io',
     'front-end.io'
 ];
-var REG_JSBIN_EDIT = /\/edit$/i;
-var REG_JSBIN_EMBED = /\/embed$/i;
+var REG_JSBIN_EDIT = /\/edit\/?$/i;
+var REG_JSBIN_EMBED = /\/embed\/?$/i;
+var REG_JSFIDDLE_EMBED = /\/embedded\/?$/i;
+var REG_JSFIDDLE_RESULT = /\/result$\/?$/i;
 var REG_URL_SUFFIX = /[?#].*$/;
+var REG_URL_PROTOCOL = /^https?:/i;
 
 //var filterDefaults = {
 //    /**
@@ -418,8 +421,38 @@ function _buildJSBin(href) {
         href += '/';
     }
 
-    return '<a href="' + href + '" rel="nofollow" target="_blank">' + href + '</a>\n\n' +
+    return '<a href="' + href + '" rel="nofollow" target="_blank">' +
+        '<img src="http://f.ydr.me/' + href + '" class="favicon" width="16" height="16" alt="f">' +
+        href + '</a>' +
         '<iframe src="' + href + 'embed?html,css,js,output" class="codedemo-jsbin"></iframe>';
+}
+
+
+/**
+ * jsfiddle 在线代码演示平台
+ * @param href
+ * @private
+ */
+function _buildJsfiddle(href) {
+    // https://jsfiddle.net/rwtud3nw/
+    // <iframe width="100%" height="300" src="//jsfiddle.net/rwtud3nw/embedded/"
+    // allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+
+    href = href
+        .replace(REG_URL_SUFFIX, '')
+        .replace(REG_JSFIDDLE_RESULT, '/')
+        .replace(REG_JSFIDDLE_EMBED, '/');
+
+    if (href.slice(-1) !== '/') {
+        href += '/';
+    }
+
+    var hrefClean = href.replace(REG_URL_PROTOCOL, '');
+
+    return '<a href="' + href + '" rel="nofollow" target="_blank">' +
+        '<img src="http://f.ydr.me/' + href + '" class="favicon" width="16" height="16" alt="f">' +
+        href + '</a>' +
+        '<iframe src="' + hrefClean + 'embedded/" allowfullscreen="allowfullscreen" class="codedemo-jsfiddle"></iframe>';
 }
 
 
