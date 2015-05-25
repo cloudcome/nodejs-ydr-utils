@@ -1,7 +1,7 @@
 #xss markdown
 公公给
 
-@bb1
+[@bb1](http://FrontEndDev.org/developer/bb1/)
 [@bb2](http://a.com/bb2/)
 
 <https://jsfiddle.net/rwtud3nw/>
@@ -34,16 +34,14 @@
     <pre></pre>
 
 
-
 code: `~`
 
 code: `<pre>~</pre>`
 
 
-
 <http://link>
 
-## **<span onclick="alert(1)">on()写法</span>**
+## **&lt;span onclick="alert(1)"&gt;on()写法&lt;/span&gt;**
 
 
 ## 的风312 [abc](http://abc.com)
@@ -53,10 +51,9 @@ code: `<pre>~</pre>`
 
 ## [abc](http://abc.com)
 
-<pre>$(document).on('click', '#list li', function() {
+&lt;pre&gt;$(document).on('click', '#list li', function() {
     //function code here.
-});</pre>
-
+});&lt;/pre&gt;
 
 
 ## erji
@@ -64,9 +61,6 @@ code: `<pre>~</pre>`
 ```
 0 => 1 => 2 => 3
 ``````
-
-
-
 
 
 ```

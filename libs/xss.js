@@ -74,6 +74,9 @@ var REG_JSFIDDLE_EMBED = /\/embedded\/?$/i;
 var REG_JSFIDDLE_RESULT = /\/result$\/?$/i;
 var REG_URL_SUFFIX = /[?#].*$/;
 var REG_URL_PROTOCOL = /^https?:/i;
+var REG_AT_TEXT = /@[^\s]+/g;
+var REG_AT_LINK = /\[@[^\]]*?]\([^)]*?\)/;
+
 
 //var filterDefaults = {
 //    /**
@@ -122,6 +125,20 @@ var REG_URL_PROTOCOL = /^https?:/i;
 //};
 
 
+var configs = {
+    atLink: 'http://FrontEndDev.org/developer/${at}/',
+    atClass: 'at'
+};
+
+/**
+ * 配置
+ * @param config
+ */
+exports.config = function (config) {
+    dato.extend(configs, config);
+};
+
+
 /**
  * markdown 语法安全过滤，虽然 markdown 支持兼容 HTML 标签，但为了安全考虑，
  * 这里必须去掉相当一部分的标签
@@ -168,6 +185,15 @@ exports.mdSafe = function (source) {
         return key;
     });
 
+    // [@..](http://...)
+    source = source.replace(REG_AT_LINK, function ($0) {
+        var key = _generatorKey();
+
+        preMap[key] = $0;
+
+        return key;
+    });
+
 
     // <>
     source = source.replace(REG_TAG, function ($0, $1) {
@@ -190,6 +216,15 @@ exports.mdSafe = function (source) {
             return $1.slice(detaHeading) + $2;
         });
     }
+
+    // @someone
+    source = source.replace(REG_AT_TEXT, function ($0) {
+        var link = string.assign(configs.atLink, {
+            at: $0.slice(1)
+        });
+
+        return '[' + $0 + '](' + link + ')';
+    });
 
     // back
     dato.each(preMap, function (key, val) {
@@ -391,7 +426,14 @@ exports.mdRender = function (source, isNoFavicon) {
 function _buildLink(href, title, text, isBlank, isNoFavicon) {
     text = text.trim();
 
-    return '<a href="' + href + '"' +
+    var isAt = false;
+
+    if (REG_AT_TEXT.test(text)) {
+        isNoFavicon = isAt = true;
+    }
+
+    return '<a' + (isAt ? ' class="' + configs.atClass + '"' : '') +
+        ' href="' + href + '"' +
             //(REG_TOC.test(href) ? ' id="toc' + href.replace(REG_TOC, '$1') + '"' : '') +
         (isBlank ? ' target="_blank" rel="nofollow"' : '') +
         (title ? ' ' + title : '') +
@@ -454,32 +496,6 @@ function _buildJsfiddle(href) {
         '<img src="http://f.ydr.me/' + href + '" class="favicon" width="16" height="16" alt="f">' +
         href + '</a>' +
         '<iframe src="' + hrefClean + 'embedded/" allowfullscreen="allowfullscreen" class="codedemo-jsfiddle"></iframe>';
-}
-
-
-/**
- * 生成正则
- * @param regstr
- * @returns {RegExp}
- * @private
- */
-function _regExp(regstr) {
-    var arr = regstr.split('*.');
-    var ret = '';
-
-    arr = arr.map(function (item) {
-        return item.replace(REG_POINT, '\\.');
-    });
-
-    arr.forEach(function (item, index) {
-        if (index > 0) {
-            ret += '([^.]+\\.)*';
-        }
-
-        ret += item;
-    });
-
-    return new RegExp('^' + ret + '$', 'i');
 }
 
 
