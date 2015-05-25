@@ -437,7 +437,7 @@ var Validator = klass.extends(Emitter).create({
                         return false;
                     }
 
-                    data[rule.name] = onafter.call(rule, ret, data);
+                    data[rule.name] = ret;
                 });
             }
 
