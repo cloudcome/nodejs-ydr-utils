@@ -143,7 +143,7 @@ exports.config = function (config) {
  * markdown 语法安全过滤，虽然 markdown 支持兼容 HTML 标签，但为了安全考虑，
  * 这里必须去掉相当一部分的标签
  * @param source {String} 原始内容
- * @returns {string} 过滤后的内容
+ * @returns {Object} 过滤后的内容及 At 的人
  */
 exports.mdSafe = function (source) {
     var preMap = {};
@@ -218,10 +218,14 @@ exports.mdSafe = function (source) {
     }
 
     // @someone
+    var atList = [];
     source = source.replace(REG_AT_TEXT, function ($0) {
+        var name = $0.slice(1);
         var link = string.assign(configs.atLink, {
-            at: $0.slice(1)
+            at: name
         });
+
+        atList.push(name);
 
         return '[' + $0 + '](' + link + ')';
     });
@@ -231,9 +235,14 @@ exports.mdSafe = function (source) {
         source = source.replace(key, val);
     });
 
-    return source
+    source = source
         .replace(REG_BREAK_LINE, '\n')
         .replace(REG_LONG_BREAK_LINE, '\n\n\n');
+
+    return {
+        markdown: source,
+        atList: atList
+    };
 };
 
 
