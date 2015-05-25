@@ -278,7 +278,7 @@ exports.mdTOC = function (source) {
 exports.mdIntroduction = function (source, maxLength) {
     maxLength = maxLength || 140;
 
-    var lines = exports.mdSafe(source)
+    var lines = source
         .replace(REG_PRE1, '')
         .replace(REG_PRE2, '')
         .replace(REG_IMAGE, '')
