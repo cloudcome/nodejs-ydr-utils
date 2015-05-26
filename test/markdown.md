@@ -2,7 +2,9 @@
 公公给
 
 @bb1
-[@bb2](http://a.com/bb2/)
+[@bb2](http://a.com/@bb2/)
+
+![@](http://abc.com/@/123.com/)
 
 <https://jsfiddle.net/rwtud3nw/>
 

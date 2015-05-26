@@ -194,6 +194,15 @@ exports.mdSafe = function (source) {
         return key;
     });
 
+    // ![..](http://...)
+    source = source.replace(REG_IMAGE, function ($0) {
+        var key = _generatorKey();
+
+        preMap[key] = $0;
+
+        return key;
+    });
+
 
     // <>
     source = source.replace(REG_TAG, function ($0, $1) {
