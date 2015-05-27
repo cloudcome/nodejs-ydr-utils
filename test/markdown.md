@@ -5,6 +5,7 @@
 [@bb2](http://a.com/@bb2/)
 
 ![@](http://abc.com/@/123.com/)
+![@](http://abc.com/@/123.com/ =123x456)
 
 <https://jsfiddle.net/rwtud3nw/>
 
