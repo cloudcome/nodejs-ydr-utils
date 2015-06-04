@@ -67,16 +67,13 @@ var SAFE_HOSTS = [
     '*.front-end.io',
     'front-end.io'
 ];
-var REG_JSBIN_EDIT = /\/edit\/?$/i;
-var REG_JSBIN_EMBED = /\/embed\/?$/i;
-var REG_JSFIDDLE = /^https?:\/\/jsfiddle\.net\/[^/]*\//i;
-var REG_JSFIDDLE_EMBED = /\/embedded\/?$/i;
-var REG_JSFIDDLE_RESULT = /\/result$\/?$/i;
 var REG_URL_SUFFIX = /[?#].*$/;
 var REG_URL_PROTOCOL = /^https?:/i;
+var REG_JSBIN = /^http:\/\/jsbin\.com\/[^/]+/i;
+var REG_JSFIDDLE = /^https?:\/\/jsfiddle\.net\/[^/]+/i;
+var REG_JSDM = /^http:\/\/jsdm\.com\/[^/]+\/[^/]+\/[^/]+/i;
 var REG_AT_TEXT = /@[^\s]+/g;
 var REG_AT_LINK = /\[@[^\]]*?]\([^)]*?\)/;
-
 
 //var filterDefaults = {
 //    /**
@@ -363,8 +360,16 @@ exports.mdRender = function (source, isNoFavicon) {
             return _buildLink(href, title, text, false, isNoFavicon);
         }
 
+        if (REG_JSBIN.test(href)) {
+            return _buildJSBin(href);
+        }
+
         if (REG_JSFIDDLE.test(href)) {
             return _buildJsfiddle(href);
+        }
+
+        if (REG_JSDM.test(href)) {
+            return _buildJSDM(href);
         }
 
         // 其他的使用传入对象处理
@@ -466,6 +471,8 @@ function _buildLink(href, title, text, isBlank, isNoFavicon) {
  * @param href
  * @private
  */
+var REG_JSBIN_EDIT = /\/edit\/?$/i;
+var REG_JSBIN_EMBED = /\/embed\/?$/i;
 function _buildJSBin(href) {
     // href: http://jsbin.com/pufoxinejo/1/
     // <iframe src="http://jsbin.com/pufoxinejo/1/embed?html,css,js,output"
@@ -482,10 +489,7 @@ function _buildJSBin(href) {
         href += '/';
     }
 
-    return '<a href="' + href + '" rel="nofollow" target="_blank">' +
-        '<img src="http://f.ydr.me/' + href + '" class="favicon" width="16" height="16" alt="f">' +
-        href + '</a>' +
-        '<iframe src="' + href + 'embed?html,css,js,output" class="codedemo-jsbin"></iframe>';
+    return '<iframe src="' + href + 'embed?output" class="codedemo-jsbin"></iframe>';
 }
 
 
@@ -494,6 +498,8 @@ function _buildJSBin(href) {
  * @param href
  * @private
  */
+var REG_JSFIDDLE_EMBED = /\/embedded\/?$/i;
+var REG_JSFIDDLE_RESULT = /\/result$\/?$/i;
 function _buildJsfiddle(href) {
     // https://jsfiddle.net/rwtud3nw/
     // <iframe width="100%" height="300" src="//jsfiddle.net/rwtud3nw/embedded/"
@@ -510,10 +516,30 @@ function _buildJsfiddle(href) {
 
     var hrefClean = href.replace(REG_URL_PROTOCOL, '');
 
-    return '<a href="' + href + '" rel="nofollow" target="_blank">' +
-        '<img src="http://f.ydr.me/' + href + '" class="favicon" width="16" height="16" alt="f">' +
-        href + '</a>' +
-        '<iframe src="' + hrefClean + 'embedded/" allowfullscreen="allowfullscreen" class="codedemo-jsfiddle"></iframe>';
+    return '<iframe src="' + hrefClean + 'embedded/result,js,html,css/" allowfullscreen="allowfullscreen" class="codedemo-jsfiddle"></iframe>';
+}
+
+
+/**
+ * jsdm 在线代码演示平台
+ * @param href
+ * @private
+ */
+var REG_JSDM_ID = /\/([^/]+)\/paint\/([^/]+)/i;
+function _buildJSDM(href) {
+    // http://jsdm.com/jsw/paint/9WfZX
+    // http://jsdm.com/anon/embed/0bM5i?height=500&theme-id=0&slug-hash=0bM5i&default-tab=result
+    var matches = (href.match(REG_JSDM_ID) || ['', '', '']);
+    var user = matches[1];
+    var id = matches[2];
+
+    if (!user || !id) {
+        return '';
+    }
+
+    return '<iframe src="http://jsdm.com/' + user + '/embed/' + id + '' +
+        '?height=500&theme-id=0&default-tab=result&slug-hash=' + id + '" ' +
+        'class="codedemo-jsdm"></iframe>';
 }
 
 
