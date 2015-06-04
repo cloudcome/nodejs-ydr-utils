@@ -538,7 +538,7 @@ function _buildJSDM(href) {
     }
 
     return '<iframe src="http://jsdm.com/' + user + '/embed/' + id + '' +
-        '?height=500&theme-id=0&default-tab=result&slug-hash=' + id + '" ' +
+        '?height=300&theme-id=0&default-tab=result&slug-hash=' + id + '" ' +
         'class="codedemo-jsdm"></iframe>';
 }
 
@@ -551,15 +551,3 @@ function _buildJSDM(href) {
 function _generatorKey() {
     return 'œ' + random.string(10, 'aA0') + random.guid() + Date.now() + 'œ';
 }
-
-
-//var fs = require('fs');
-//var path = require('path');
-//var file1 = path.join(__dirname, '../test/test.md');
-//var file2 = path.join(__dirname, '../test/test.html');
-//var md1 = fs.readFileSync(file1, 'utf8');
-//
-//var toc = exports.mdRender(exports.mdTOC(md1));
-//var content = exports.mdRender(md1);
-//
-//fs.writeFileSync(file2, toc + content, 'utf8');
