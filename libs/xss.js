@@ -413,15 +413,13 @@ exports.mdRender = function (source, options) {
     //    return '<table class="' + tableClassName + '"><thead>' + thead + '</thead><tbody>' + tbody + '</tbody></table>';
     //};
 
-    // @someone
-    var atList = [];
-
-
-
 
     marked.setOptions({renderer: markedRender});
     source = marked(source);
 
+    var atList = [];
+
+    // @someone
     if (options.parseAt) {
         source = source.replace(REG_AT_TEXT, function ($0, $1, $2) {
             if ($1 === '\\') {

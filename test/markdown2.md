@@ -1,8 +1,11 @@
 #xss markdown
 公公给
 
-@bb1 \@nnnnn -@mmmm
-[@bb2](http://a.com/@bb2/)
+@bb1 \@bb2 -@bb3==
+
+[@bb4](/@bb5/)
+
+[@bb6](http://a.com/@bb7/)
 
 ![@](http://abc.com/@/123.com/)
 ![@](http://abc.com/@/123.com/ =123x456)
