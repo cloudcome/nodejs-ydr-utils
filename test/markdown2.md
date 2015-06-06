@@ -1,7 +1,7 @@
 #xss markdown
 公公给
 
-<a href="/developer/bb1/" class="at">@bb1</a> nnnnn -<a href="/developer/mmmm/" class="at">@mmmm</a>
+<a href="/developer/bb1/" class="at">@bb1</a> @nnnnn -<a href="/developer/mmmm/" class="at">@mmmm</a>
 [@bb2](http://a.com/@bb2/)
 
 ![@](http://abc.com/@/123.com/)
