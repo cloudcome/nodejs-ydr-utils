@@ -310,7 +310,6 @@ var encryption = require('./encryption.js');
  * @param [options.default="retro"] {Number} 默认头像
  * @param [options.forcedefault=false] {*} 是否忽略默认头像
  * @param [options.rating=null] {*} 评级
- * @param [options.isImgProxy=true] {*} 通过 http://images.weserv.nl/?url= 代理
  * @returns {string}
  */
 exports.gravatar = function (email, options) {
@@ -318,8 +317,8 @@ exports.gravatar = function (email, options) {
     email = email.toLowerCase();
 
     if (!options.origin) {
-        //options.origin = 'http://gravatar.duoshuo.com/avatar/';
-        options.origin = 's.gravatar.com/avatar/';
+        options.origin = 'http://gravatar.duoshuo.com/avatar/';
+        //options.origin = 's.gravatar.com/avatar/';
     }
 
     options.origin += encryption.md5(email) + '?';
@@ -355,17 +354,7 @@ exports.gravatar = function (email, options) {
         query.r = options.rating;
     }
 
-    var url = options.origin + qs.stringify(query);
-
-    if (options.isImgProxy === undefined) {
-        options.isImgProxy = true;
-    }
-
-    if (!options.isImgProxy) {
-        return url;
-    }
-
-    return 'https://images.weserv.nl/?url=' + encodeURIComponent(url);
+    return options.origin + qs.stringify(query);
 };
 
 
