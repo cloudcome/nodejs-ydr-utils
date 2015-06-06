@@ -72,7 +72,7 @@ var REG_URL_PROTOCOL = /^https?:/i;
 var REG_JSBIN = /^http:\/\/jsbin\.com\/[^/]+/i;
 var REG_JSFIDDLE = /^https?:\/\/jsfiddle\.net\/[^/]+/i;
 var REG_JSDM = /^http:\/\/jsdm\.com\/[^/]+\/[^/]+\/[^/]+/i;
-var REG_AT_TEXT = /(?:[^\\])@([a-z\d]+)\b/ig;
+var REG_AT_TEXT = /(.?)@([a-z\d]+)\b/ig;
 var REG_AT_LINK = /\[@[^\]]*?]\([^)]*?\)/;
 
 //var filterDefaults = {
@@ -228,15 +228,19 @@ exports.mdSafe = function (source, parseAt) {
     var atList = [];
 
     if (parseAt) {
-        source = source.replace(REG_AT_TEXT, function ($0, $1) {
-            var name = $1;
+        source = source.replace(REG_AT_TEXT, function ($0, $1, $2) {
+            if ($1 === '\\') {
+                return '@' + $2;
+            }
+
+            var name = $2;
             var link = string.assign(configs.atLink, {
                 at: name
             });
 
             atList.push(name);
 
-            return '<a href="' + link + '" class="' + configs.atClass + '">@' + name + '</a>';
+            return $1 + '<a href="' + link + '" class="' + configs.atClass + '">@' + name + '</a>';
         });
     }
 
