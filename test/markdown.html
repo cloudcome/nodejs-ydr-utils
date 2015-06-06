@@ -1,16 +1,16 @@
 <!DOCTYPE html><meta charset="utf-8"/><style>body{margin-top: 600px;}h1,h2,h3,h4,h5,h6{margin-top: 500px;}</style><ul>
-<li><a href="#heading-1-0">xss markdown</a><ul>
-<li><a href="#heading-2-1"><strong>&lt;span onclick=&quot;alert(1)&quot;&gt;on()写法&lt;/span&gt;</strong></a></li>
-<li><a href="#heading-2-2">的风312 abc</a></li>
-<li><a href="#heading-2-3">的风ddd</a></li>
-<li><a href="#heading-2-4">abc</a></li>
-<li><a href="#heading-2-5">erji</a></li>
+<li><a href="#heading-1-0"><img src="http://f.ydr.me/#heading-1-0" class="favicon" width="16" height="16" alt="f">xss markdown</a><ul>
+<li><a href="#heading-2-1"><img src="http://f.ydr.me/#heading-2-1" class="favicon" width="16" height="16" alt="f"><strong>&lt;span onclick=&quot;alert(1)&quot;&gt;on()写法&lt;/span&gt;</strong></a></li>
+<li><a href="#heading-2-2"><img src="http://f.ydr.me/#heading-2-2" class="favicon" width="16" height="16" alt="f">的风312 abc</a></li>
+<li><a href="#heading-2-3"><img src="http://f.ydr.me/#heading-2-3" class="favicon" width="16" height="16" alt="f">的风ddd</a></li>
+<li><a href="#heading-2-4"><img src="http://f.ydr.me/#heading-2-4" class="favicon" width="16" height="16" alt="f">abc</a></li>
+<li><a href="#heading-2-5"><img src="http://f.ydr.me/#heading-2-5" class="favicon" width="16" height="16" alt="f">erji</a></li>
 </ul>
 </li>
 </ul>
 <h1 id="heading-1-0">xss markdown</h1><p>公公给</p>
 <p><a href="/developer/bb1/" class="at">@bb1</a> @nnnnn -<a href="/developer/mmmm/" class="at">@mmmm</a>
-<a href="http://a.com/@bb2/" target="_blank" rel="nofollow">@bb2</a></p>
+<a href="http://a.com/<a href="/developer/bb2/" class="at">@bb2</a>/" target="_blank" rel="nofollow"><a href="/developer/bb2/" class="at">@bb2</a></a></p>
 <p><img alt="@" src="http://abc.com/@/123.com/">
 <img alt="@" src="http://abc.com/@/123.com/" width="123" height="456"></p>
 <p><iframe src="//jsfiddle.net/rwtud3nw/embedded/result,js,html,css/" allowfullscreen="allowfullscreen" class="codedemo-jsfiddle"></iframe></p>
@@ -36,7 +36,7 @@ dwedwedwedwedef</p>
 </code></pre><p>code: <code>~</code></p>
 <p>code: <code>&lt;pre&gt;~&lt;/pre&gt;</code></p>
 <p></p>
-<h2 id="heading-2-1"><strong>&lt;span onclick=&quot;alert(1)&quot;&gt;on()写法&lt;/span&gt;</strong></h2><h2 id="heading-2-2">的风312 <a href="http://abc.com" target="_blank" rel="nofollow"><img src="http://f.ydr.me/http://abc.com" class="favicon" width="16" height="16" alt="f">abc</a></h2><h2 id="heading-2-3">的风ddd <img alt="abc" src="http://abc.com"></h2><h2 id="heading-2-4"><a href="http://abc.com" target="_blank" rel="nofollow"><img src="http://f.ydr.me/http://abc.com" class="favicon" width="16" height="16" alt="f">abc</a></h2><p>&lt;pre&gt;$(document).on(&#39;click&#39;, &#39;#list li&#39;, function() {
+<h2 id="heading-2-1"><strong>&lt;span onclick=&quot;alert(1)&quot;&gt;on()写法&lt;/span&gt;</strong></h2><h2 id="heading-2-2">的风312 <a href="http://abc.com" target="_blank" rel="nofollow">abc</a></h2><h2 id="heading-2-3">的风ddd <img alt="abc" src="http://abc.com"></h2><h2 id="heading-2-4"><a href="http://abc.com" target="_blank" rel="nofollow">abc</a></h2><p>&lt;pre&gt;$(document).on(&#39;click&#39;, &#39;#list li&#39;, function() {
     //function code here.
 });&lt;/pre&gt;</p>
 <h2 id="heading-2-5">erji</h2><pre><code>0 =&gt; 1 =&gt; 2 =&gt; 3

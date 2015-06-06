@@ -313,7 +313,7 @@ exports.mdIntroduction = function (source, maxLength) {
 exports.mdRender = function (source, options) {
     var markedRender = new marked.Renderer();
     var defaults = {
-        favicon: false,
+        favicon: true,
         parseAt: false
     };
 
