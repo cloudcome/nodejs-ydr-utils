@@ -1,7 +1,6 @@
 #xss markdown
 公公给
-
-@bb1
+<a href="/developer/bb1/" class="at">@bb1</a>
 [@bb2](http://a.com/@bb2/)
 
 ![@](http://abc.com/@/123.com/)

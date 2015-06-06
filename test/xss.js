@@ -11,7 +11,7 @@ var path = require('path');
 var dangerMarkdown = fs.readFileSync(path.join(__dirname, './markdown.md'), 'utf8');
 var xss = require('../libs/xss.js');
 
-var safeMarkdown = xss.mdSafe(dangerMarkdown);
+var safeMarkdown = xss.mdSafe(dangerMarkdown, true);
 fs.writeFileSync(path.join(__dirname, './markdown2.md'), safeMarkdown.markdown, 'utf8');
 var ret2 = xss.mdRender(xss.mdTOC(safeMarkdown.markdown), true);
 var ret3 = xss.mdRender(safeMarkdown.markdown);

@@ -72,7 +72,7 @@ var REG_URL_PROTOCOL = /^https?:/i;
 var REG_JSBIN = /^http:\/\/jsbin\.com\/[^/]+/i;
 var REG_JSFIDDLE = /^https?:\/\/jsfiddle\.net\/[^/]+/i;
 var REG_JSDM = /^http:\/\/jsdm\.com\/[^/]+\/[^/]+\/[^/]+/i;
-var REG_AT_TEXT =/(?:[^\\])@([a-z\d]+)\b/ig;
+var REG_AT_TEXT = /(?:[^\\])@([a-z\d]+)\b/ig;
 var REG_AT_LINK = /\[@[^\]]*?]\([^)]*?\)/;
 
 //var filterDefaults = {
@@ -123,7 +123,7 @@ var REG_AT_LINK = /\[@[^\]]*?]\([^)]*?\)/;
 
 
 var configs = {
-    atLink: 'http://FrontEndDev.org/developer/${at}/',
+    atLink: '/developer/${at}/',
     atClass: 'at'
 };
 
@@ -236,7 +236,7 @@ exports.mdSafe = function (source, parseAt) {
 
             atList.push(name);
 
-            return '[@' + name + '](' + link + ')';
+            return '<a href="' + link + '" class="' + configs.atClass + '">@' + name + '</a>';
         });
     }
 
@@ -453,14 +453,11 @@ exports.mdRender = function (source, isNoFavicon) {
 function _buildLink(href, title, text, isBlank, isNoFavicon) {
     text = text.trim();
 
-    var isAt = false;
-
     if (REG_AT_TEXT.test(text)) {
-        isNoFavicon = isAt = true;
+        isNoFavicon = true;
     }
 
-    return '<a' + (isAt ? ' class="' + configs.atClass + '"' : '') +
-        ' href="' + href + '"' +
+    return '<a href="' + href + '"' +
             //(REG_TOC.test(href) ? ' id="toc' + href.replace(REG_TOC, '$1') + '"' : '') +
         (isBlank ? ' target="_blank" rel="nofollow"' : '') +
         (title ? ' ' + title : '') +
