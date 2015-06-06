@@ -36,11 +36,11 @@ var REG_HEADING = /^(#{1,6})(.*)$/mg;
 var REG_STRONG = /\b__([\s\S]+?)__(?!_)|\*\*([\s\S]+?)\*\*(?!\*)/mg;
 var REG_EM = /^\b_((?:__|[\s\S])+?)_\b|^\*((?:\*\*|[\s\S])+?)\*(?!\*)/mg;
 var REG_BLOCKQUOTE = /^( *>[^\n]*)+/mg;
-var REG_LINK1 = /<http.*?>/ig;
+var REG_LINK1 = /<(http|ftp).*?>/ig;
 // ![]()
 var REG_IMAGE = /!\[.*?][\[\(].*[\]\)]/g;
 // [][] []()
-var REG_LINK2 = /\[(.*?)][\[\(].*[\]\)]/g;
+var REG_LINK2 = /\[(.*?)][\[\(].*?[\]\)]/g;
 var REG_TAG = /<(\/?[a-z][a-z\d]*[\s\S]*?)>/gi;
 //var REG_BLOKQUOTE = /^( *>[^\n]+(\n(?!def)[^\n]+)*\n*)+/g;
 var REG_PATH = /^((http|ftp)s?:|\/|\.{1,2})/i;
@@ -316,12 +316,11 @@ exports.mdRender = function (source, options) {
     options = dato.extend(defaults, options);
 
     var preMap = {};
-    // @someone
     var atList = [];
 
     if (options.at) {
-        // [@..](http://...)
-        source = source.replace(REG_AT_LINK, function ($0) {
+        // <http>
+        source = source.replace(REG_LINK1, function ($0) {
             var key = _generatorKey();
 
             preMap[key] = $0;
@@ -329,6 +328,16 @@ exports.mdRender = function (source, options) {
             return key;
         });
 
+        // [...](http://...)
+        source = source.replace(REG_LINK2, function ($0) {
+            var key = _generatorKey();
+
+            preMap[key] = $0;
+
+            return key;
+        });
+
+        // @someone
         source = source.replace(REG_AT_TEXT, function ($0, $1, $2) {
             if ($1 === '\\') {
                 return '@' + $2;
@@ -343,6 +352,13 @@ exports.mdRender = function (source, options) {
 
             return $1 + '[@' + name + '](' + link + ')';
         });
+
+        // back
+        dato.each(preMap, function (key, val) {
+            source = source.replace(key, val);
+        });
+
+        console.log(source);
     }
 
     // 定义 A 链接的 target
