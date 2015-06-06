@@ -13,11 +13,17 @@ var xss = require('../libs/xss.js');
 
 var safeMarkdown = xss.mdSafe(dangerMarkdown, true);
 fs.writeFileSync(path.join(__dirname, './markdown2.md'), safeMarkdown.markdown, 'utf8');
-var ret2 = xss.mdRender(xss.mdTOC(safeMarkdown.markdown), true);
-var ret3 = xss.mdRender(safeMarkdown.markdown);
+var ret2 = xss.mdRender(xss.mdTOC(safeMarkdown.markdown), {
+    favicon: false,
+    at: false
+});
+var ret3 = xss.mdRender(safeMarkdown.markdown, {
+    favicon: true,
+    at: true
+});
 var html = '<!DOCTYPE html><meta charset="utf-8"/><style>body{margin-top: 600px;}h1,h2,h3,h4,h5,h6{margin-top: 500px;}</style>';
 
-fs.writeFileSync(path.join(__dirname, './markdown.html'), html + ret2 + ret3, 'utf8');
+fs.writeFileSync(path.join(__dirname, './markdown.html'), html + ret2.html + ret3.html, 'utf8');
 
 //console.log(ret2);
 

@@ -305,6 +305,7 @@ exports.mdIntroduction = function (source, maxLength) {
  * markdown 内容渲染成 HTML 内容
  * @param source {String} 原始 markdown 内容
  * @param [options] {Object} 配置
+ * @returns {{html: String, atList: Array}}
  */
 exports.mdRender = function (source, options) {
     var markedRender = new marked.Renderer();
@@ -357,8 +358,6 @@ exports.mdRender = function (source, options) {
         dato.each(preMap, function (key, val) {
             source = source.replace(key, val);
         });
-
-        console.log(source);
     }
 
     // 定义 A 链接的 target
@@ -460,7 +459,10 @@ exports.mdRender = function (source, options) {
     source = marked(source);
     //source = sanitizeHtml(source, sanitizeOptions);
 
-    return source;
+    return {
+        html: source,
+        atList: atList
+    };
 };
 
 
