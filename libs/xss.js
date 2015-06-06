@@ -184,15 +184,6 @@ exports.mdSafe = function (source, parseAt) {
         return key;
     });
 
-    //// [@..](http://...)
-    //source = source.replace(REG_AT_LINK, function ($0) {
-    //    var key = _generatorKey();
-    //
-    //    preMap[key] = $0;
-    //
-    //    return key;
-    //});
-
     // ![..](http://...)
     source = source.replace(REG_IMAGE, function ($0) {
         var key = _generatorKey();
@@ -224,7 +215,6 @@ exports.mdSafe = function (source, parseAt) {
             return $1.slice(detaHeading) + $2;
         });
     }
-
 
 
     // back
@@ -324,30 +314,41 @@ exports.mdRender = function (source, options) {
     };
 
     options = dato.extend(defaults, options);
+
+    var preMap = {};
     // @someone
     var atList = [];
 
-    //if (parseAt) {
-    //    source = source.replace(REG_AT_TEXT, function ($0, $1, $2) {
-    //        if ($1 === '\\') {
-    //            return '@' + $2;
-    //        }
-    //
-    //        var name = $2;
-    //        var link = string.assign(configs.atLink, {
-    //            at: name
-    //        });
-    //
-    //        atList.push(name);
-    //
-    //        return $1 + '[@' + name + '](' + link + ')';
-    //    });
-    //}
+    if (options.at) {
+        // [@..](http://...)
+        source = source.replace(REG_AT_LINK, function ($0) {
+            var key = _generatorKey();
+
+            preMap[key] = $0;
+
+            return key;
+        });
+
+        source = source.replace(REG_AT_TEXT, function ($0, $1, $2) {
+            if ($1 === '\\') {
+                return '@' + $2;
+            }
+
+            var name = $2;
+            var link = string.assign(configs.atLink, {
+                at: name
+            });
+
+            atList.push(name);
+
+            return $1 + '[@' + name + '](' + link + ')';
+        });
+    }
 
     // 定义 A 链接的 target
     markedRender.link = function (href, title, text) {
         if (REG_SHAP.test(href)) {
-            return _buildLink(href, title, text, false, isNoFavicon);
+            return _buildLink(href, title, text, false, !options.favicon);
         }
 
         var fixHref = REG_DOUBLE.test(href) ? 'http:' + href : href;
@@ -361,7 +362,7 @@ exports.mdRender = function (source, options) {
         }
 
         if (!host) {
-            return _buildLink(href, title, text, false, isNoFavicon);
+            return _buildLink(href, title, text, false, !options.favicon);
         }
 
         dato.each(SAFE_HOSTS, function (index, item) {
@@ -373,7 +374,7 @@ exports.mdRender = function (source, options) {
 
         // 指定域内的 NO _blank
         if (inHost) {
-            return _buildLink(href, title, text, false, isNoFavicon);
+            return _buildLink(href, title, text, false, !options.favicon);
         }
 
         if (REG_JSBIN.test(href)) {
@@ -389,7 +390,7 @@ exports.mdRender = function (source, options) {
         }
 
         // 其他的使用传入对象处理
-        return _buildLink(href, title, text, true, isNoFavicon);
+        return _buildLink(href, title, text, true, !options.favicon);
     };
 
 

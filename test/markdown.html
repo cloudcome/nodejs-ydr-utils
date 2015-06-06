@@ -1,17 +1,17 @@
 <!DOCTYPE html><meta charset="utf-8"/><style>body{margin-top: 600px;}h1,h2,h3,h4,h5,h6{margin-top: 500px;}</style><ul>
-<li><a href="#heading-1-0">xss markdown</a><ul>
-<li><a href="#heading-2-1"><strong>&lt;span onclick=&quot;alert(1)&quot;&gt;on()写法&lt;/span&gt;</strong></a></li>
-<li><a href="#heading-2-2">的风312 abc</a></li>
-<li><a href="#heading-2-3">的风ddd</a></li>
-<li><a href="#heading-2-4">abc</a></li>
-<li><a href="#heading-2-5">erji</a></li>
+<li><a href="#heading-1-0"><img src="http://f.ydr.me/#heading-1-0" class="favicon" width="16" height="16" alt="f">xss markdown</a><ul>
+<li><a href="#heading-2-1"><img src="http://f.ydr.me/#heading-2-1" class="favicon" width="16" height="16" alt="f"><strong>&lt;span onclick=&quot;alert(1)&quot;&gt;on()写法&lt;/span&gt;</strong></a></li>
+<li><a href="#heading-2-2"><img src="http://f.ydr.me/#heading-2-2" class="favicon" width="16" height="16" alt="f">的风312 abc</a></li>
+<li><a href="#heading-2-3"><img src="http://f.ydr.me/#heading-2-3" class="favicon" width="16" height="16" alt="f">的风ddd</a></li>
+<li><a href="#heading-2-4"><img src="http://f.ydr.me/#heading-2-4" class="favicon" width="16" height="16" alt="f">abc</a></li>
+<li><a href="#heading-2-5"><img src="http://f.ydr.me/#heading-2-5" class="favicon" width="16" height="16" alt="f">erji</a></li>
 </ul>
 </li>
 </ul>
 <h1 id="heading-1-0">xss markdown</h1><p>公公给</p>
-<p>@bb1 \@bb2 -@bb3==</p>
-<p><a href="/@bb5/" class="at">@bb4</a></p>
-<p><a href="http://a.com/@bb7/" class="at" target="_blank" rel="nofollow">@bb6</a></p>
+<p><a href="/developer/bb1/" class="at">@bb1</a> @bb2 -<a href="/developer/bb3/" class="at">@bb3</a>==</p>
+<p><a href="/[@bb5](/developer/bb5/"><img src="http://f.ydr.me//[@bb5](/developer/bb5/" class="favicon" width="16" height="16" alt="f"><a href="/developer/bb4/" class="at">@bb4</a></a>/)</p>
+<p><a href="http://a.com/[@bb7](/developer/bb7/" target="_blank" rel="nofollow"><img src="http://f.ydr.me/http://a.com/[@bb7](/developer/bb7/" class="favicon" width="16" height="16" alt="f"><a href="/developer/bb6/" class="at">@bb6</a></a>/)</p>
 <p><img alt="@" src="http://abc.com/@/123.com/">
 <img alt="@" src="http://abc.com/@/123.com/" width="123" height="456"></p>
 <p><iframe src="//jsfiddle.net/rwtud3nw/embedded/result,js,html,css/" allowfullscreen="allowfullscreen" class="codedemo-jsfiddle"></iframe></p>
