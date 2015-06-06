@@ -12,12 +12,12 @@ var dangerMarkdown = fs.readFileSync(path.join(__dirname, './markdown.md'), 'utf
 var xss = require('../libs/xss.js');
 
 var safeMarkdown = xss.mdSafe(dangerMarkdown, true);
-fs.writeFileSync(path.join(__dirname, './markdown2.md'), safeMarkdown.markdown, 'utf8');
-var ret2 = xss.mdRender(xss.mdTOC(safeMarkdown.markdown), {
+fs.writeFileSync(path.join(__dirname, './markdown2.md'), safeMarkdown, 'utf8');
+var ret2 = xss.mdRender(xss.mdTOC(safeMarkdown), {
     favicon: false,
     at: false
 });
-var ret3 = xss.mdRender(safeMarkdown.markdown, {
+var ret3 = xss.mdRender(safeMarkdown, {
     favicon: true,
     at: true
 });
