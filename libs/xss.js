@@ -43,7 +43,7 @@ var REG_IMAGE = /!\[.*?][\[\(].*[\]\)]/g;
 var REG_LINK2 = /\[(.*?)][\[\(].*[\]\)]/g;
 var REG_TAG = /<(\/?[a-z][a-z\d]*[\s\S]*?)>/gi;
 //var REG_BLOKQUOTE = /^( *>[^\n]+(\n(?!def)[^\n]+)*\n*)+/g;
-var REG_PATH = /^(\/|\.{0,2})(\/[^/]+)+$/;
+var REG_PATH = /^((http|ftp)s?:|\/|\.{1,2})/i;
 var REG_SIZE = /(?:\s+?=\s*?(\d+)(?:[x*×](\d+))?)?$/i;
 var ENCODE_LIST = [{
     f: />/g,
@@ -347,8 +347,8 @@ exports.mdRender = function (source, isNoFavicon) {
         var host = parse.host;
         var inHost = false;
 
-        // 非 URL && 非 PATH
-        if (!typeis.url(href) && !REG_PATH.test(href)) {
+        // 非 PATH
+        if (!REG_PATH.test(href)) {
             return '';
         }
 
