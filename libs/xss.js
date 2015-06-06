@@ -140,10 +140,9 @@ exports.config = function (config) {
  * markdown 语法安全过滤，虽然 markdown 支持兼容 HTML 标签，但为了安全考虑，
  * 这里必须去掉相当一部分的标签
  * @param source {String} 原始内容
- * @param [parseAt=false] {Boolean} 是否解析 at
  * @returns {String} 过滤后的内容
  */
-exports.mdSafe = function (source, parseAt) {
+exports.mdSafe = function (source) {
     var preMap = {};
     var minHeadering = 0;
 
@@ -314,7 +313,7 @@ exports.mdIntroduction = function (source, maxLength) {
 exports.mdRender = function (source, options) {
     var markedRender = new marked.Renderer();
     var defaults = {
-        isNoFavicon: false,
+        favicon: false,
         parseAt: false
     };
 
@@ -323,7 +322,7 @@ exports.mdRender = function (source, options) {
     // 定义 A 链接的 target
     markedRender.link = function (href, title, text) {
         if (REG_SHAP.test(href)) {
-            return _buildLink(href, title, text, false, options.isNoFavicon);
+            return _buildLink(href, title, text, false, options.favicon);
         }
 
         var fixHref = REG_DOUBLE.test(href) ? 'http:' + href : href;
@@ -337,7 +336,7 @@ exports.mdRender = function (source, options) {
         }
 
         if (!host) {
-            return _buildLink(href, title, text, false, options.isNoFavicon);
+            return _buildLink(href, title, text, false, options.favicon);
         }
 
         dato.each(SAFE_HOSTS, function (index, item) {
@@ -349,7 +348,7 @@ exports.mdRender = function (source, options) {
 
         // 指定域内的 NO _blank
         if (inHost) {
-            return _buildLink(href, title, text, false, options.isNoFavicon);
+            return _buildLink(href, title, text, false, options.favicon);
         }
 
         if (REG_JSBIN.test(href)) {
@@ -365,7 +364,7 @@ exports.mdRender = function (source, options) {
         }
 
         // 其他的使用传入对象处理
-        return _buildLink(href, title, text, true, options.isNoFavicon);
+        return _buildLink(href, title, text, true, options.favicon);
     };
 
 
@@ -466,10 +465,6 @@ exports.mdRender = function (source, options) {
  */
 function _buildLink(href, title, text, isBlank, isNoFavicon) {
     text = text.trim();
-
-    if (REG_AT_TEXT.test(text)) {
-        isNoFavicon = true;
-    }
 
     return '<a href="' + href + '"' +
             //(REG_TOC.test(href) ? ' id="toc' + href.replace(REG_TOC, '$1') + '"' : '') +

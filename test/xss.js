@@ -13,7 +13,9 @@ var xss = require('../libs/xss.js');
 
 var safeMarkdown = xss.mdSafe(dangerMarkdown);
 fs.writeFileSync(path.join(__dirname, './markdown2.md'), safeMarkdown, 'utf8');
-var ret2 = xss.mdRender(xss.mdTOC(safeMarkdown), true);
+var ret2 = xss.mdRender(xss.mdTOC(safeMarkdown), {
+    favicon: false
+});
 var ret3 = xss.mdRender(safeMarkdown);
 var html = '<!DOCTYPE html><meta charset="utf-8"/><style>body{margin-top: 600px;}h1,h2,h3,h4,h5,h6{margin-top: 500px;}</style>';
 
