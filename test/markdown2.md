@@ -1,7 +1,7 @@
 #xss markdown
 公公给
 
-[@bb1](http://FrontEndDev.org/developer/bb1/)
+@bb1
 [@bb2](http://a.com/@bb2/)
 
 ![@](http://abc.com/@/123.com/)
