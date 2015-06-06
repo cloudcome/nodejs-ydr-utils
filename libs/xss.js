@@ -141,7 +141,7 @@ exports.config = function (config) {
  * 这里必须去掉相当一部分的标签
  * @param source {String} 原始内容
  * @param [parseAt=false] {Boolean} 是否解析 at
- * @returns {Object} 过滤后的内容及 At 的人
+ * @returns {String} 过滤后的内容
  */
 exports.mdSafe = function (source, parseAt) {
     var preMap = {};
