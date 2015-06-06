@@ -72,7 +72,7 @@ var REG_URL_PROTOCOL = /^https?:/i;
 var REG_JSBIN = /^http:\/\/jsbin\.com\/[^/]+/i;
 var REG_JSFIDDLE = /^https?:\/\/jsfiddle\.net\/[^/]+/i;
 var REG_JSDM = /^http:\/\/jsdm\.com\/[^/]+\/[^/]+\/[^/]+/i;
-var REG_AT_TEXT = /@[^\s]+/g;
+var REG_AT_TEXT = /@[a-z\d]+\b/ig;
 var REG_AT_LINK = /\[@[^\]]*?]\([^)]*?\)/;
 
 //var filterDefaults = {
@@ -140,9 +140,10 @@ exports.config = function (config) {
  * markdown 语法安全过滤，虽然 markdown 支持兼容 HTML 标签，但为了安全考虑，
  * 这里必须去掉相当一部分的标签
  * @param source {String} 原始内容
+ * @param [parseAt=false] {Boolean} 是否解析 at
  * @returns {Object} 过滤后的内容及 At 的人
  */
-exports.mdSafe = function (source) {
+exports.mdSafe = function (source, parseAt) {
     var preMap = {};
     var minHeadering = 0;
 
@@ -225,16 +226,19 @@ exports.mdSafe = function (source) {
 
     // @someone
     var atList = [];
-    source = source.replace(REG_AT_TEXT, function ($0) {
-        var name = $0.slice(1);
-        var link = string.assign(configs.atLink, {
-            at: name
+
+    if (parseAt) {
+        source = source.replace(REG_AT_TEXT, function ($0) {
+            var name = $0.slice(1);
+            var link = string.assign(configs.atLink, {
+                at: name
+            });
+
+            atList.push(name);
+
+            return '[' + $0 + '](' + link + ')';
         });
-
-        atList.push(name);
-
-        return '[' + $0 + '](' + link + ')';
-    });
+    }
 
     // back
     dato.each(preMap, function (key, val) {
