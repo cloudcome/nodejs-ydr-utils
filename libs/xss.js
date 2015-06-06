@@ -140,9 +140,10 @@ exports.config = function (config) {
  * markdown 语法安全过滤，虽然 markdown 支持兼容 HTML 标签，但为了安全考虑，
  * 这里必须去掉相当一部分的标签
  * @param source {String} 原始内容
- * @returns {String} 过滤后的内容
+ * @param [parseAt=false] {Boolean} 是否解析 at
+ * @returns {Object} 过滤后的内容及 At 的人
  */
-exports.mdSafe = function (source) {
+exports.mdSafe = function (source, parseAt) {
     var preMap = {};
     var minHeadering = 0;
 
@@ -223,6 +224,26 @@ exports.mdSafe = function (source) {
         });
     }
 
+    // @someone
+    var atList = [];
+
+    if (parseAt) {
+        source = source.replace(REG_AT_TEXT, function ($0, $1, $2) {
+            if ($1 === '\\') {
+                return '@' + $2;
+            }
+
+            var name = $2;
+            var link = string.assign(configs.atLink, {
+                at: name
+            });
+
+            atList.push(name);
+
+            return $1 + '[@' + name + '](' + link + ')';
+        });
+    }
+
     // back
     dato.each(preMap, function (key, val) {
         source = source.replace(key, val);
@@ -232,7 +253,10 @@ exports.mdSafe = function (source) {
         .replace(REG_BREAK_LINE, '\n')
         .replace(REG_LONG_BREAK_LINE, '\n\n\n');
 
-    return source;
+    return {
+        markdown: source,
+        atList: atList
+    };
 };
 
 
@@ -307,22 +331,15 @@ exports.mdIntroduction = function (source, maxLength) {
 /**
  * markdown 内容渲染成 HTML 内容
  * @param source {String} 原始 markdown 内容
- * @param [options] {Object} 配置
- * @returns {{html: String, atList: Array}}
+ * @param [isNoFavicon=false] {Boolean} 是否添加链接的 favicon
  */
-exports.mdRender = function (source, options) {
+exports.mdRender = function (source, isNoFavicon) {
     var markedRender = new marked.Renderer();
-    var defaults = {
-        favicon: true,
-        parseAt: false
-    };
-
-    options = dato.extend(defaults, options);
 
     // 定义 A 链接的 target
     markedRender.link = function (href, title, text) {
         if (REG_SHAP.test(href)) {
-            return _buildLink(href, title, text, false, options.favicon);
+            return _buildLink(href, title, text, false, isNoFavicon);
         }
 
         var fixHref = REG_DOUBLE.test(href) ? 'http:' + href : href;
@@ -336,7 +353,7 @@ exports.mdRender = function (source, options) {
         }
 
         if (!host) {
-            return _buildLink(href, title, text, false, options.favicon);
+            return _buildLink(href, title, text, false, isNoFavicon);
         }
 
         dato.each(SAFE_HOSTS, function (index, item) {
@@ -348,7 +365,7 @@ exports.mdRender = function (source, options) {
 
         // 指定域内的 NO _blank
         if (inHost) {
-            return _buildLink(href, title, text, false, options.favicon);
+            return _buildLink(href, title, text, false, isNoFavicon);
         }
 
         if (REG_JSBIN.test(href)) {
@@ -364,7 +381,7 @@ exports.mdRender = function (source, options) {
         }
 
         // 其他的使用传入对象处理
-        return _buildLink(href, title, text, true, options.favicon);
+        return _buildLink(href, title, text, true, isNoFavicon);
     };
 
 
@@ -416,33 +433,9 @@ exports.mdRender = function (source, options) {
 
     marked.setOptions({renderer: markedRender});
     source = marked(source);
-
-    var atList = [];
-
-    // @someone
-    if (options.parseAt) {
-        source = source.replace(REG_AT_TEXT, function ($0, $1, $2) {
-            if ($1 === '\\') {
-                return '@' + $2;
-            }
-
-            var name = $2;
-            var link = string.assign(configs.atLink, {
-                at: name
-            });
-
-            atList.push(name);
-
-            return $1 + '<a href="' + link + '" class="' + configs.atClass + '">@' + name + '</a>';
-        });
-    }
-
     //source = sanitizeHtml(source, sanitizeOptions);
 
-    return {
-        html: source,
-        atList: atList
-    };
+    return source;
 };
 
 
@@ -464,7 +457,14 @@ exports.mdRender = function (source, options) {
 function _buildLink(href, title, text, isBlank, isNoFavicon) {
     text = text.trim();
 
+    var isAt = false;
+
+    if (REG_AT_TEXT.test(text)) {
+        isNoFavicon = isAt = true;
+    }
+
     return '<a href="' + href + '"' +
+        (isAt ? ' class="' + configs.atClass + '"' : '') +
             //(REG_TOC.test(href) ? ' id="toc' + href.replace(REG_TOC, '$1') + '"' : '') +
         (isBlank ? ' target="_blank" rel="nofollow"' : '') +
         (title ? ' ' + title : '') +
