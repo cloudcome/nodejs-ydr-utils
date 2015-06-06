@@ -141,10 +141,9 @@ exports.config = function (config) {
  * markdown 语法安全过滤，虽然 markdown 支持兼容 HTML 标签，但为了安全考虑，
  * 这里必须去掉相当一部分的标签
  * @param source {String} 原始内容
- * @param [parseAt=false] {Boolean} 是否解析 at
  * @returns {String} 过滤后的内容
  */
-exports.mdSafe = function (source, parseAt) {
+exports.mdSafe = function (source) {
     var preMap = {};
     var minHeadering = 0;
 
