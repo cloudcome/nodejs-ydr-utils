@@ -73,7 +73,8 @@ var REG_JSBIN = /^http:\/\/jsbin\.com\/[^/]+/i;
 var REG_JSFIDDLE = /^https?:\/\/jsfiddle\.net\/[^/]+/i;
 var REG_JSDM = /^http:\/\/jsdm\.com\/[^/]+\/[^/]+\/[^/]+/i;
 var REG_AT_TEXT = /(.?)@([a-z\d]+)\b/ig;
-var REG_AT_LINK = /\[@[^\]]*?]\([^)]*?\)/;
+var REG_AT_LINK = /\[@[^]]+]\([^)]+\)/;
+var REG_AT_LINK_TEXT = /^@[a-z\d]+$/i;
 
 //var filterDefaults = {
 //    /**
@@ -183,14 +184,14 @@ exports.mdSafe = function (source, parseAt) {
         return key;
     });
 
-    // [@..](http://...)
-    source = source.replace(REG_AT_LINK, function ($0) {
-        var key = _generatorKey();
-
-        preMap[key] = $0;
-
-        return key;
-    });
+    //// [@..](http://...)
+    //source = source.replace(REG_AT_LINK, function ($0) {
+    //    var key = _generatorKey();
+    //
+    //    preMap[key] = $0;
+    //
+    //    return key;
+    //});
 
     // ![..](http://...)
     source = source.replace(REG_IMAGE, function ($0) {
@@ -224,25 +225,7 @@ exports.mdSafe = function (source, parseAt) {
         });
     }
 
-    // @someone
-    var atList = [];
 
-    if (parseAt) {
-        source = source.replace(REG_AT_TEXT, function ($0, $1, $2) {
-            if ($1 === '\\') {
-                return '@' + $2;
-            }
-
-            var name = $2;
-            var link = string.assign(configs.atLink, {
-                at: name
-            });
-
-            atList.push(name);
-
-            return $1 + '[@' + name + '](' + link + ')';
-        });
-    }
 
     // back
     dato.each(preMap, function (key, val) {
@@ -255,7 +238,7 @@ exports.mdSafe = function (source, parseAt) {
 
     return {
         markdown: source,
-        atList: atList
+        atList: []
     };
 };
 
@@ -331,10 +314,35 @@ exports.mdIntroduction = function (source, maxLength) {
 /**
  * markdown 内容渲染成 HTML 内容
  * @param source {String} 原始 markdown 内容
- * @param [isNoFavicon=false] {Boolean} 是否添加链接的 favicon
+ * @param [options] {Object} 配置
  */
-exports.mdRender = function (source, isNoFavicon) {
+exports.mdRender = function (source, options) {
     var markedRender = new marked.Renderer();
+    var defaults = {
+        favicon: true,
+        at: true
+    };
+
+    options = dato.extend(defaults, options);
+    // @someone
+    var atList = [];
+
+    //if (parseAt) {
+    //    source = source.replace(REG_AT_TEXT, function ($0, $1, $2) {
+    //        if ($1 === '\\') {
+    //            return '@' + $2;
+    //        }
+    //
+    //        var name = $2;
+    //        var link = string.assign(configs.atLink, {
+    //            at: name
+    //        });
+    //
+    //        atList.push(name);
+    //
+    //        return $1 + '[@' + name + '](' + link + ')';
+    //    });
+    //}
 
     // 定义 A 链接的 target
     markedRender.link = function (href, title, text) {
@@ -459,7 +467,7 @@ function _buildLink(href, title, text, isBlank, isNoFavicon) {
 
     var isAt = false;
 
-    if (REG_AT_TEXT.test(text)) {
+    if (REG_AT_LINK_TEXT.test(text)) {
         isNoFavicon = isAt = true;
     }
 
