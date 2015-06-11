@@ -31,8 +31,8 @@ var REG_LONG_BREAK_LINE = /\n{3,}/g;
 // @link marked
 var REG_PRE1 = /^`{3,}.*$\n((^.*$\n)*?)^`{3,}.*$/mg;
 var REG_PRE2 = /(^ {4}.*$)+\n/mg;
-var REG_PRE_TAG = /<pre>[\s\S]*?<\/pre>/;
-var REG_CODE_TAG = /<code>[\s\S]*?<\/code>/;
+var REG_PRE_TAG = /<pre\b[^>]*?>[\s\S]*?<\/pre>/ig;
+var REG_CODE_TAG = /<code\b[^>]*?>[\s\S]*?<\/code>/ig;
 var REG_CODE = /(`+)\s*([\s\S]*?[^`])\s*\1(?!`)/g;
 var REG_HEADING = /^(#{1,6})(.*)$/mg;
 var REG_STRONG = /\b__([\s\S]+?)__(?!_)|\*\*([\s\S]+?)\*\*(?!\*)/mg;
