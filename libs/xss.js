@@ -318,8 +318,8 @@ exports.mdRender = function (source, options) {
     var atList = [];
 
     if (options.at) {
-        // <pre>
-        source = source.replace(REG_PRE_TAG, function ($0) {
+        // ```
+        source = source.replace(REG_PRE1, function ($0) {
             var key = _generatorKey();
 
             preMap[key] = $0;
@@ -327,8 +327,17 @@ exports.mdRender = function (source, options) {
             return key;
         });
 
-        // <code>
-        source = source.replace(REG_CODE_TAG, function ($0) {
+        // \s\s\s\s
+        source = source.replace(REG_PRE2, function ($0) {
+            var key = _generatorKey();
+
+            preMap[key] = $0;
+
+            return key;
+        });
+
+        // ``
+        source = source.replace(REG_CODE, function ($0) {
             var key = _generatorKey();
 
             preMap[key] = $0;
