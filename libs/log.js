@@ -142,21 +142,21 @@ function _log(err, req, res, next) {
         console.log(txt);
     }
 
-    if (smtp && smtp.sendMail) {
-        var data = {
-            from: emailDefaults.from,
-            to: emailDefaults.to,
-            subject: emailDefaults.subject + ' ' + time,
-            html: '<pre>' + txt + '</pre>'
-        };
-        smtp.sendMail(data, function (err) {
-            if (err) {
-                console.log('邮件发送失败：');
-                console.error(data);
-                console.error(err.stack);
-            }
-        });
-    }
+    //if (smtp && smtp.sendMail) {
+    //    var data = {
+    //        from: emailDefaults.from,
+    //        to: emailDefaults.to,
+    //        subject: emailDefaults.subject + ' ' + time,
+    //        html: '<pre>' + txt + '</pre>'
+    //    };
+    //    smtp.sendMail(data, function (err) {
+    //        if (err) {
+    //            console.log('邮件发送失败：');
+    //            console.error(data);
+    //            console.error(err.stack);
+    //        }
+    //    });
+    //}
 
     if (typeis(next) === 'function') {
         next(err);
