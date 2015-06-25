@@ -191,8 +191,6 @@ var Favicon = klass.extends(Emitter).create({
 
             the.faviconURL = the._parseFaviconURLFromBody(body);
 
-            console.log('from body', the.faviconURL);
-
             if (!the.faviconURL) {
                 return next();
             }
