@@ -191,6 +191,8 @@ var Favicon = klass.extends(Emitter).create({
 
             the.faviconURL = the._parseFaviconURLFromBody(body);
 
+            console.log('from body', the.faviconURL);
+
             if (!the.faviconURL) {
                 return next();
             }
@@ -395,11 +397,11 @@ var Favicon = klass.extends(Emitter).create({
      * @private
      */
     _getAttr: function (html, attrName) {
-        var reg = Favicon.REG_MAP[attrName] || new RegExp('\\b' + attrName + '\\s*?=\\s*?(["\'])([\s\S]*?)\1', 'i');
+        var reg = Favicon.REG_MAP[attrName] || new RegExp('\\b' + attrName + '\\s*?=\\s*?(["\'])([\\s\\S]*?)\\1', 'i');
 
         Favicon.REG_MAP[attrName] = reg;
 
-        return (html.match(reg) || ['', ''])[1];
+        return (html.match(reg) || ['', '', ''])[2];
     }
 });
 
