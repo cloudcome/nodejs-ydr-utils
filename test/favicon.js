@@ -16,6 +16,7 @@ var favicon = new Favicon('http://evanyou.me');
 
 favicon.get(function () {
     console.log('file:', this.faviconFile);
+    console.log('url:', this.faviconURL);
 }).on('error', function (err) {
     console.log('err:', err);
 });

@@ -41,7 +41,6 @@ var REG_STAR = /\\\*/g;
 var REG_NOT_UTF16_SINGLE = /[^\x00-\xff]{2}/g;
 
 
-
 /**
  * 转换 HTML 字符串为实体符
  * @param str {String} html 字符串
@@ -263,12 +262,6 @@ exports.glob = function (str, glob, ignoreCase) {
 };
 
 
-
-
-
-
-
-
 /**
  * 计算字节长度
  * @param string {String} 原始字符串
@@ -295,7 +288,6 @@ exports.bytes = function (string, doubleLength) {
 
     return k;
 };
-
 
 
 /**

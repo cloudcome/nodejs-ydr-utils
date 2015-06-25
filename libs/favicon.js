@@ -22,8 +22,8 @@ var REG_LINK = /<link[^<>]*?>/ig;
 //var REG_HREF = /\bhref\s*?=\s*?['"]([^'"]*?)['"]/i;
 var REG_REL_ICON = /\s\bicon\b/i;
 var REG_TYPE_ICON = /\s-icon\b/i;
-var REG_HTTP = /^https?:\/\//i;
-var REG_HTTP_ROOT = /^https?:\/\/[^/]+\/$/i;
+var REG_HTTP = /^(http|ftp)s?:\/\//i;
+var REG_HTTP_ROOT = /^(http|ftp)s?:\/\/[^/]+\/$/i;
 var REG_URL_SUFFIX = /\/[^/]*$/;
 var REG_HOSTNAME = /^((xn--)?[a-z\d-]+\.)+([a-z]{2,}|xn--[a-z\d]+)$/i;
 var REG_PATH_ABSOLUTE = /^\//;
@@ -31,6 +31,7 @@ var REG_THIS_PROTOCOL = /^\/\//;
 var REG_PATH_RELATIVE = /^(\.{1,2})\//;
 var REG_PATH_END = /\/[^/]+?\/$/;
 var REG_FAVICON_TYPE = /^image\/x-icon$/i;
+var REG_BASE_64 = /^data:image.*?;base64,/i;
 var noop = function () {
     //
 };
@@ -240,6 +241,23 @@ var Favicon = klass.extends(Emitter).create({
             return next();
         }
 
+        // data:image/vnd.microsoft.icon;base64,....
+        if (REG_BASE_64.test(the.faviconURL)) {
+            var file = path.join(configs.saveDirection, the._url.hostname + configs.extname);
+            console.log('base64:', the.faviconURL.replace(REG_BASE_64, ''));
+
+            try {
+                fse.outputFileSync(file, the.faviconURL.replace(REG_BASE_64, ''), 'base64');
+                the.faviconFile = file;
+                the.faviconURL = '';
+            } catch (err) {
+                // ignore
+                the.emit('erorr', err);
+            }
+
+            return next();
+        }
+
         if (!REG_HTTP.test(the.faviconURL)) {
             the.faviconURL = '';
             return next();
@@ -259,12 +277,12 @@ var Favicon = klass.extends(Emitter).create({
                 var filePath = path.join(configs.saveDirection, the._url.hostname + configs.extname);
 
                 try {
-                    fse.writeFileSync(filePath, binary, 'binary');
+                    fse.outputFileSync(filePath, binary, 'binary');
                     the.faviconURL = this.options.href;
                     the.faviconFile = filePath;
                 } catch (err) {
-                    the.emit('erorr', err);
                     // ignore
+                    the.emit('erorr', err);
                 }
 
                 next();
@@ -377,11 +395,11 @@ var Favicon = klass.extends(Emitter).create({
      * @private
      */
     _getAttr: function (html, attrName) {
-        var reg = Favicon.REG_MAP[attrName] || new RegExp('\\b' + attrName + '\\s*?=\\s*?["\']([^"\']*?)["\']', 'i');
+        var reg = Favicon.REG_MAP[attrName] || new RegExp('\\b' + attrName + '\\s*?=\\s*?(["\'])([\s\S]*?)\1', 'i');
 
         Favicon.REG_MAP[attrName] = reg;
 
-        return (html.match(reg) || ['', ''])[1].toLowerCase();
+        return (html.match(reg) || ['', ''])[1];
     }
 });
 
