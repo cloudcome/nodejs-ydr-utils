@@ -8,14 +8,14 @@ var configs = {
 Favicon.config(configs);
 Favicon.buildDefaultConfigs();
 
-var favicon = new Favicon('jt://dqw.com');
+var favicon = new Favicon('http://evanyou.me');
 
-var u = Favicon.joinURL('http://gruntjs.com/getting-started','../img/favicon.ico');
-console.log(u);
+//var u = Favicon.joinURL('http://gruntjs.com/getting-started','../img/favicon.ico');
+//console.log(u);
 
-//
-//favicon.get(function () {
-//    console.log('file:', this.faviconFile);
-//}).on('error', function (err) {
-//    console.log('err:', err);
-//});
+
+favicon.get(function () {
+    console.log('file:', this.faviconFile);
+}).on('error', function (err) {
+    console.log('err:', err);
+});

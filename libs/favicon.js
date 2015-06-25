@@ -55,6 +55,11 @@ var Favicon = klass.extends(Emitter).create({
         the.faviconURL = null;
         the.faviconFile = null;
     },
+    /**
+     * 获取 favicon 的信息
+     * @param callback
+     * @returns {Favicon}
+     */
     get: function (callback) {
         var the = this;
 
@@ -191,7 +196,6 @@ var Favicon = klass.extends(Emitter).create({
 
             the.faviconURL = REG_HTTP.test(the.faviconURL) ? the.faviconURL : Favicon.joinURL(href, the.faviconURL);
 
-            console.log(the.faviconURL);
             next();
         });
     },
@@ -233,6 +237,11 @@ var Favicon = klass.extends(Emitter).create({
         }
 
         if (!the.faviconURL) {
+            return next();
+        }
+
+        if (!REG_HTTP.test(the.faviconURL)) {
+            the.faviconURL = '';
             return next();
         }
 
