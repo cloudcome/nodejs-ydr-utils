@@ -8,7 +8,7 @@ var configs = {
 Favicon.config(configs);
 Favicon.buildDefaultConfigs();
 
-var favicon = new Favicon('http://evanyou.me');
+var favicon = new Favicon('http://div.io/topic/1027');
 
 //var u = Favicon.joinURL('http://gruntjs.com/getting-started','../img/favicon.ico');
 //console.log(u);
