@@ -604,6 +604,25 @@ function _buildJSDM(href) {
 
 
 /**
+ * code pen 在线代码演示平台
+ * @param href
+ * @returns {string}
+ * @private
+ */
+var REG_CODE_PEN = /codepen\.io\/([^/]+)\/[^/]+\/([^/]+)/i;
+function _buildCodePen(href) {
+    var matches = href.match(REG_CODE_PEN) || ['', '', ''];
+    // http://codepen.io/ClearDesign/pen/oXeBOp
+    // http://codepen.io/ClearDesign/full/oXeBOp
+    // //codepen.io/ClearDesign/embed/oXeBOp?
+    // height=324&theme-id=15483&slug-hash=oXeBOp
+    // &default-tab=result&user=ClearDesign
+
+    return '';
+}
+
+
+/**
  * 生成唯一随机字符串
  * @returns {string}
  * @private
