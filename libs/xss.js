@@ -74,6 +74,7 @@ var REG_URL_PROTOCOL = /^https?:/i;
 var REG_JSBIN = /^http:\/\/jsbin\.com\/[^/]+/i;
 var REG_JSFIDDLE = /^https?:\/\/jsfiddle\.net\/[^/]+/i;
 var REG_JSDM = /^http:\/\/jsdm\.com\/[^/]+\/[^/]+\/[^/]+/i;
+var REG_CODEPEN = /^https?:\/\/codepen\.io\/([^/]+)\/[^/]+\/([^/]+)/i;
 var REG_AT_TEXT = /(.?)@([a-z\d]+)\b/ig;
 var REG_AT_LINK = /\[@[^]]+]\([^)]+\)/;
 var REG_AT_LINK_TEXT = /^@[a-z\d]+$/i;
@@ -429,6 +430,10 @@ exports.mdRender = function (source, options) {
             return _buildJSDM(href);
         }
 
+        if (REG_CODEPEN.test(href)) {
+            return _buildCodePen(href);
+        }
+
         // 其他的使用传入对象处理
         return _buildLink(href, title, text, true, !options.favicon);
     };
@@ -598,7 +603,7 @@ function _buildJSDM(href) {
     }
 
     return '<iframe src="http://jsdm.com/' + user + '/embed/' + id + '' +
-        '?height=300&theme-id=0&default-tab=result&slug-hash=' + id + '" ' +
+        '?height=350&theme-id=0&default-tab=result&slug-hash=' + id + '" ' +
         'class="codedemo-jsdm"></iframe>';
 }
 
@@ -609,16 +614,23 @@ function _buildJSDM(href) {
  * @returns {string}
  * @private
  */
-var REG_CODE_PEN = /codepen\.io\/([^/]+)\/[^/]+\/([^/]+)/i;
 function _buildCodePen(href) {
-    var matches = href.match(REG_CODE_PEN) || ['', '', ''];
+    var matches = href.match(REG_CODEPEN) || ['', '', ''];
+    var user = matches[1];
+    var id = matches[2];
+
+    if (!user || !id) {
+        return '';
+    }
+
     // http://codepen.io/ClearDesign/pen/oXeBOp
     // http://codepen.io/ClearDesign/full/oXeBOp
     // //codepen.io/ClearDesign/embed/oXeBOp?
-    // height=324&theme-id=15483&slug-hash=oXeBOp
+    // height=350&theme-id=15483&slug-hash=oXeBOp
     // &default-tab=result&user=ClearDesign
 
-    return '';
+    return '<iframe src="//codepen.io/' + user + '/embed/' + id +
+        '?height=350&theme-id=0&slug-hash=' + id + '&default-tab=result&user=' + user + '" class="codedemo-codepen"></iframe>';
 }
 
 
