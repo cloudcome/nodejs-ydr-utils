@@ -77,7 +77,7 @@ var REG_JSDM = /^http:\/\/jsdm\.com\/[^/]+\/[^/]+\/[^/]+/i;
 var REG_CODEPEN = /^https?:\/\/codepen\.io\/([^/]+)\/[^/]+\/([^/]+)/i;
 var REG_AT_TEXT = /(.?)@([a-z\d_.-]+)\b/ig;
 var REG_AT_LINK = /\[@[^]]+]\([^)]+\)/;
-var REG_AT_LINK_TEXT = /^@[a-z\d]+$/i;
+var REG_AT_LINK_TEXT = /^@[a-z\d_.-]+$/i;
 
 //var filterDefaults = {
 //    /**
