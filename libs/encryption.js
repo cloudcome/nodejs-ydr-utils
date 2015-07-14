@@ -23,8 +23,14 @@ var typeis = require('./typeis.js');
  * // => "202cb962ac59075b964b07152d234b70"
  */
 exports.md5 = function (data) {
+    if (typeis.undefined(data) || typeis.null(data)) {
+        data = '';
+    } else if (typeis.boolean(data) || typeis.number(data)) {
+        data = String(data);
+    }
+
     try {
-        return crypto.createHash('md5').update(String(data)).digest('hex');
+        return crypto.createHash('md5').update(data).digest('hex');
     } catch (err) {
         return '';
     }

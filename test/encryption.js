@@ -1,8 +1,11 @@
 'use strict';
 
+var path = require('path');
+var file = path.join(__dirname, './im.jpg');
 var encryption = require('../').encryption;
+var dato = require('../').dato;
 //
-//console.log(encryption.md5('123'));
+console.log(encryption.md5());
 //console.log(encryption.sha1('123', 'abc'));
 //
 //var r = encryption.encode('123', 'abc');
@@ -17,3 +20,7 @@ var encryption = require('../').encryption;
 //console.log(p2);
 //console.log(encryption.password('123', p1));
 //console.log(encryption.password('1234', p2));
+
+dato.repeat(100, function (index) {
+    console.log(index, encryption.etag(file));
+});
