@@ -11,7 +11,7 @@ var dato = require('./dato.js');
 var number = require('./number.js');
 var klass = require('./class.js');
 var typeis = require('./typeis.js');
-var urlParser = require('url');
+var urlHelper = require('url');
 var howdo = require('howdo');
 var path = require('path');
 var fse = require('fs-extra');
@@ -80,7 +80,7 @@ var Favicon = klass.extends(Emitter).create({
         howdo
             .task(the._getFaviconFromDefaults.bind(the))
             .task(the._getFaviconFromLocal.bind(the))
-            .task(the._getFaviconFromPage.bind(the))
+            .task(the._getFaviconFromHomePage.bind(the))
             .task(the._getFaviconFromRootDirection.bind(the))
             .task(the._saveFaviconFromURL.bind(the))
             .task(the._updateCache.bind(the))
@@ -108,7 +108,7 @@ var Favicon = klass.extends(Emitter).create({
         the.url = (REG_HTTP.test(the.url) ? '' : 'http://') + the.url;
 
         if (the.url.length < 256 && typeis.url(this.url)) {
-            the._url = urlParser.parse(the.url);
+            the._url = urlHelper.parse(the.url);
 
             if (!REG_HOSTNAME.test(the._url.hostname)) {
                 the.url = null;
@@ -171,18 +171,20 @@ var Favicon = klass.extends(Emitter).create({
 
 
     /**
-     * 从页面中获取 favicon
+     * 从首页面中获取 favicon
      * @param next
      * @private
      */
-    _getFaviconFromPage: function (next) {
+    _getFaviconFromHomePage: function (next) {
         var the = this;
 
         if (the.faviconFile || the.faviconURL) {
             return next();
         }
 
-        request.get(the.url, function (err, body) {
+        var homeURL = the._url.protocol + '//' + the._url.host;
+
+        request.get(homeURL, function (err, body) {
             if (err) {
                 return next();
             }
@@ -445,13 +447,13 @@ Favicon.updateDefaultConfigs = function () {
  * @private
  */
 Favicon.joinURL = function (from, to) {
-    var parseTo = urlParser.parse(to);
+    var parseTo = urlHelper.parse(to);
 
     if (parseTo.protocol && parseTo.hostname) {
         return to;
     }
 
-    var parse = urlParser.parse(from);
+    var parse = urlHelper.parse(from);
     var domain = (parse.protocol || 'http:') + '//' + (parse.hostname || '0');
 
     if (REG_THIS_PROTOCOL.test(to)) {
