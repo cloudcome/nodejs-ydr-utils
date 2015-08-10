@@ -384,7 +384,12 @@ var Template = klass.create({
      */
     _parseExp: function (str, pre) {
         var the = this;
-        var matches = str.trim().match(REG_VAR);
+
+        str = str.trim();
+
+        var unEscape = str[0] === '=';
+        str = unEscape ? str.substr(1) : str;
+        var matches = str.match(REG_VAR);
         var filters;
 
         if (!matches) {
@@ -396,7 +401,8 @@ var Template = klass.create({
         // name || "123"
         if (matches[3] && matches[3].slice(0, 2) === '||') {
             //return ret + '?' + matches[2] + ':' + matches[3].slice(2) + ')';
-            exp = '(typeof(' + exp + ')!=="undefined"&&!!' + exp + ')?' + exp + ':' + matches[3].slice(2);
+            //exp = '(typeof(' + exp + ')!=="undefined"&&!!' + exp + ')?' + exp + ':' + matches[3].slice(2);
+            exp = matches[2] + matches[3];
         } else if (matches[3] && matches[3].slice(0, 1) === '|') {
             filters = matches[3].split('|');
             filters.shift();
@@ -410,21 +416,17 @@ var Template = klass.create({
                 }
 
                 name = matches[1];
-
                 the._useFilters[name] = false;
-
                 args = exp + (matches[3] ? ',' + matches[3] : '');
                 exp = 'this.filters.' + name + '(' + args + ')';
             });
         }
 
-        var isEscape = matches[1] !== '=';
-
         if (pre) {
             return exp;
         }
 
-        return (isEscape ? 'this.escape(' : '(') + exp + ')';
+        return (unEscape ?  '(': 'this.escape(') + exp + ')';
     },
 
 
