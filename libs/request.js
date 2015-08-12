@@ -14,6 +14,7 @@ var qs = require('querystring');
 var typeis = require('./typeis.js');
 var dato = require('./dato.js');
 var number = require('./number.js');
+var random = require('./random.js');
 var zlib = require('zlib');
 var browserHeaders = {
     'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
@@ -27,11 +28,11 @@ var defaults = {
     // 响应编码
     encoding: 'utf8',
     // 是否在接收到 30x 后自动跳转
-    isRedirectOnHeadWhen30x: true,
+    redirect30x: true,
     // 是否回调 stream
     isCallbackStream: false,
     // 最大 30x 跳转次数
-    max30xRedirectTimes: 10,
+    redirectTimes: 10,
     // 头信息
     headers: {},
     // form 表单，优先级1，form-data 模块的实例
@@ -113,9 +114,9 @@ exports.setBrowserHeaders = function (options) {
  * 远程请求
  * @param options
  * @param options.url {String} 请求地址
- * @param [options.isRedirectOnHeadWhen30x=true] {Boolean} head 请求时出现 30x 是否跳转
+ * @param [options.redirect30x=true] {Boolean} head 请求时出现 30x 是否跳转
  * @param [options.isCallbackStream=false] {Boolean} 是否回调 stream
- * @param [options.max30xRedirectTimes=10] {Number} 30x 最大跳转次数
+ * @param [options.redirectTimes=10] {Number} 30x 最大跳转次数
  * @param [options.method="GET"] {String} 请求方法
  * @param [options.headers=null] {Object} 请求头
  * @param [options.encoding="utf8"] {String} 响应处理编码，可选 utf8/binary
@@ -133,7 +134,7 @@ function _remote(options, callback) {
 
     // ！！！这里千万不要深度复制！！！
     options = dato.extend(false, {}, defaults, options);
-    options.max30xRedirectTimes = number.parseInt(options.max30xRedirectTimes, 10);
+    options.redirectTimes = number.parseInt(options.redirectTimes, 10);
     callback = typeis.function(callback) ? callback : noop;
 
     var querystring = '';
@@ -157,7 +158,7 @@ function _remote(options, callback) {
         req = _request(options, function (err, bodyORheadersORstream, res) {
             var context = this;
 
-            if (!options.isRedirectOnHeadWhen30x && options.method === 'head' || err) {
+            if (!options.redirect30x && options.method === 'head' || err) {
                 clearTimeout(timeid);
                 return callback.call(context, err, bodyORheadersORstream, res);
             }
@@ -168,9 +169,9 @@ function _remote(options, callback) {
                 int30x++;
             }
 
-            if (is30x && int30x > options.max30xRedirectTimes) {
+            if (is30x && int30x > options.redirectTimes) {
                 clearTimeout(timeid);
-                return callback.call(context, new Error('30x redirect times over ' + options.max30xRedirectTimes));
+                return callback.call(context, new Error('30x redirect times over ' + options.redirectTimes));
             }
 
             if (is30x) {
@@ -290,7 +291,8 @@ function _request(options, callback) {
     dato.extend(requestOptions.headers, browserHeaders, options.headers);
 
     var context = {
-        options: requestOptions
+        options: requestOptions,
+        id: random.guid()
     };
     var req = _http.request(requestOptions, function (res) {
         var bufferList = [];
