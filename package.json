@@ -1,6 +1,6 @@
 {
   "name": "ydr-utils",
-  "version": "22.39.0",
+  "version": "22.40.0",
   "private": false,
   "description": "utils for ydr.me",
   "scripts": {},
@@ -59,7 +59,7 @@
   "dependencies": {
     "busboy": "^0.2.9",
     "fs-extra": "^0.18.0",
-    "howdo": "^1.1.5",
+    "howdo": "^2.0.2",
     "imagesize": "^1.0.0",
     "marked": "^0.3.3",
     "promiseify": "^0.2.0",
