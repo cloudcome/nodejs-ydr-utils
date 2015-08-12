@@ -30,7 +30,7 @@ var defaults = {
     // 是否在接收到 30x 后自动跳转
     redirect30x: true,
     // 是否回调 stream
-    isCallbackStream: false,
+    callbackStream: false,
     // 最大 30x 跳转次数
     redirectTimes: 10,
     // 头信息
@@ -43,8 +43,6 @@ var defaults = {
     body: null,
     // 超时时间：15 秒
     timeout: 15000,
-    // 是否自动解压 gzip 压缩
-    autoGunzip: true,
     // 是否模拟浏览器
     simulateBrowser: true
 };
@@ -85,7 +83,7 @@ methods.forEach(function (method) {
  * 下载资源
  * @param options {String|Object}
  * @param [options.method="get"] {String}
- * @param [options.isCallbackStream=true] {Boolean}
+ * @param [options.callbackStream=true] {Boolean}
  * @param callback {Function}
  */
 exports.down = function (options, callback) {
@@ -96,7 +94,7 @@ exports.down = function (options, callback) {
     }
 
     options.method = 'get';
-    options.isCallbackStream = true;
+    options.callbackStream = true;
     _remote(options, callback);
 };
 
@@ -113,18 +111,6 @@ exports.setBrowserHeaders = function (options) {
 /**
  * 远程请求
  * @param options
- * @param options.url {String} 请求地址
- * @param [options.redirect30x=true] {Boolean} head 请求时出现 30x 是否跳转
- * @param [options.isCallbackStream=false] {Boolean} 是否回调 stream
- * @param [options.redirectTimes=10] {Number} 30x 最大跳转次数
- * @param [options.method="GET"] {String} 请求方法
- * @param [options.headers=null] {Object} 请求头
- * @param [options.encoding="utf8"] {String} 响应处理编码，可选 utf8/binary
- * @param [options.form=null] {String|Stream|Object} POST/PUT 写入数据
- * @param [options.file=null] {String|Stream|Object} POST/PUT 写入数据
- * @param [options.body=null] {String|Stream|Object} POST/PUT 写入数据
- * @param [options.timeout=15000] {Number} 超时时间
- * @param [options.query=null] {Object} querystring
  * @param callback
  * @private
  */
@@ -207,14 +193,6 @@ function _remote(options, callback) {
 /**
  * 远程请求
  * @param options
- * @param options.url {String} 请求地址
- * @param [options.method="GET"] {String} 请求方法
- * @param [options.headers=null] {Object} 请求头
- * @param [options.encoding="utf8"] {String} 响应处理编码，可选 utf8/binary
- * @param [options.isCallbackStream=false] {Boolean} 是否回调 stream
- * @param [options.form=null] {String|Stream|Object} POST/PUT 写入数据
- * @param [options.file=null] {String|Stream|Object} POST/PUT 写入数据
- * @param [options.body=null] {String|Stream|Object} POST/PUT 写入数据
  * @param callback
  * @private
  */
@@ -288,7 +266,12 @@ function _request(options, callback) {
         referer: options.url,
         referrer: options.url
     };
-    dato.extend(requestOptions.headers, browserHeaders, options.headers);
+
+    if (options.simulateBrowser) {
+        dato.extend(requestOptions.headers, browserHeaders);
+    }
+
+    dato.extend(requestOptions.headers, options.headers);
 
     var context = {
         options: requestOptions,
@@ -306,7 +289,7 @@ function _request(options, callback) {
 
         var isGzip = res.headers['content-encoding'] === 'gzip';
         var onreceive = function (stream) {
-            if (options.isCallbackStream) {
+            if (options.callbackStream) {
                 callback.call(context, null, stream, res);
             } else {
                 stream.setEncoding(options.encoding);
