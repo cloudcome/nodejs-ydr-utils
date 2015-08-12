@@ -9,7 +9,7 @@
 'use strict';
 
 var udf = 'undefined';
-var REG_URL = /^https?:\/\/([a-z\d-]+\.)+[a-z]{2,5}(:\d{1,})?(\/|\/[\w#!:.?+=&%@!\-\/]+)?$/i;
+var REG_URL = /^https?:\/\/([a-z\d-]+\.)+[a-z]{2,5}(:[1-9]\d{0,4})?(\/|\/[\w#!:.?+=&%@!\-\/]+)?$/i;
 var REG_EMAIL = /^\w+[-+.\w]*@([a-z\d-]+\.)+[a-z]{2,5}$/i;
 var REG_MOMGODB_ID = /^[\da-z]{24}$/;
 var REG_INVALID = /invalid/i;
@@ -184,6 +184,16 @@ typeis.emptyObject = function (obj) {
 
 
 /**
+ * 判断是否为 undefine 或 null
+ * @param obj
+ * @returns {Boolean}
+ */
+typeis.empty = function (obj) {
+    return typeof obj === udf || typeis.null(obj);
+};
+
+
+/**
  * 判断是否为 URL 格式
  * @param string
  * @returns {Boolean}
@@ -258,14 +268,14 @@ typeis.mongoId = function (anything) {
 
 
 /**
- * 判断对象是否为空
- * @param  {*}  任何对象
+ * 判断对象是否为空,null/undefined/""
+ * @param  any {*} 任何对象
  * @return {Boolean}
  * @version 1.0
  * 2014年5月27日21:33:04
  */
 typeis.emptyData = function (any) {
-    return any === undefined || any === null || any === '';
+    return typeis.empty(any) || any === '';
 };
 
 

@@ -38,7 +38,7 @@ module.exports = function (status, message) {
     var err = new Error(message);
 
     try {
-        Error.captureStackTrace(err, module.exports)
+        Error.captureStackTrace(err, module.exports);
     } catch (err) {
         // ignore
     }
