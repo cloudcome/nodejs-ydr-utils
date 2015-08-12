@@ -226,9 +226,7 @@ function _request(options, callback) {
         requestOptions.method !== 'HEAD';
     var stat;
 
-    if (form && typeis.function(form.getHeaders)) {
-        options.headers = form.getHeaders(options.headers);
-    } else if (canSend && bodyLength === undefined) {
+    if (canSend && bodyLength === undefined) {
         if (file) {
             form = null;
             try {
@@ -272,6 +270,11 @@ function _request(options, callback) {
     }
 
     dato.extend(requestOptions.headers, options.headers);
+
+    // form 时重写 content-type
+    if (form && typeis.function(form.getHeaders)) {
+        requestOptions.headers = form.getHeaders(requestOptions.headers);
+    }
 
     var context = {
         options: requestOptions,
