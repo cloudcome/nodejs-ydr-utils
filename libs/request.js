@@ -273,6 +273,7 @@ function _request(options, callback) {
 
     // form 时重写 content-type
     if (form && typeis.function(form.getHeaders)) {
+        delete(requestOptions.headers['content-type']);
         requestOptions.headers = form.getHeaders(requestOptions.headers);
     }
 
