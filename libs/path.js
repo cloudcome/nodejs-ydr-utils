@@ -50,6 +50,7 @@ dato.each(extendList, function (index, pro) {
 
 
 var REG_PATH = path.sep === '/' ? /\\/g : /\//g;
+var REG_WIN_PATH = /\\/g;
 
 /**
  * 转换为系统路径
@@ -59,6 +60,17 @@ var REG_PATH = path.sep === '/' ? /\\/g : /\//g;
 exports.toSystem = function (p) {
     return String(p).replace(REG_PATH, path.sep);
 };
+
+
+/**
+ * 转换为 URI 路径
+ * @param p {String} 路径
+ * @returns {string}
+ */
+exports.toURI = function (p) {
+    return String(p).replace(REG_WIN_PATH, '/');
+};
+
 
 
 /**
