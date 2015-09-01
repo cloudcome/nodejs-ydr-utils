@@ -29,6 +29,8 @@
     "log",
     "mime",
     "number",
+    "path",
+    "qiniu",
     "random",
     "request",
     "string",
