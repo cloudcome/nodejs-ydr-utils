@@ -7,6 +7,9 @@
 
 'use strict';
 
-var fs = require('fs');
+var path = require('../libs/path.js');
 
+console.log(path.join('\\a\\b', '../d/f'));
+console.log(path.relative('\\a\\b', '../d/f'));
+console.log(path.sep);
 
