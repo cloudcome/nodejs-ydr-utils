@@ -11,7 +11,7 @@
 var dato = require('./dato.js');
 var random = require('./random.js');
 var crypto = require('crypto');
-var configs = {
+var defaults = {
     accessKey: '',
     secretKey: '',
     bucket: '',
@@ -26,41 +26,41 @@ var REG_END = /\/$/;
 
 /**
  * 生成上传 key 和上传凭证
- * @param [config] {Object} 配置
- * @param [config.host="/"] {String} 仓库
- * @param [config.bucket=""] {String} 仓库
- * @param [config.accessKey=""] {String} access_key
- * @param [config.secretKey=""] {String} secret_key
- * @param [config.dirname="/"] {String} 上传目录
- * @param [config.filename] {String} 上传文件名，否则随机生成
- * @param [config.expires] {Number} 凭证有效期，默认 10 分钟，单位分钟
- * @param [config.mimeLimit="image/*"] {String} 上传文件限制类型
+ * @param [configs] {Object} 配置
+ * @param [configs.host="/"] {String} 仓库
+ * @param [configs.bucket=""] {String} 仓库
+ * @param [configs.accessKey=""] {String} access_key
+ * @param [configs.secretKey=""] {String} secret_key
+ * @param [configs.dirname="/"] {String} 上传目录
+ * @param [configs.filename] {String} 上传文件名，否则随机生成
+ * @param [configs.expires] {Number} 凭证有效期，默认 10 分钟，单位分钟
+ * @param [configs.mimeLimit="image/*"] {String} 上传文件限制类型
  * @returns {{key: *, token: string}}
  */
-exports.generateKeyAndToken = function (config) {
-    config = config || {};
+exports.generateKeyAndToken = function (configs) {
+    configs = dato.extend({}, defaults, configs);
 
-    if (config.dirname && config.dirname.length > 1) {
-        config.dirname = REG_END.test(config.dirname) ? config.dirname : config.dirname + '/';
+    if (configs.dirname && configs.dirname.length > 1) {
+        configs.dirname = REG_END.test(configs.dirname) ? configs.dirname : configs.dirname + '/';
     } else {
-        config.dirname = '';
+        configs.dirname = '';
     }
 
     if (configs.host.slice(-1) === '/') {
         configs.host = configs.host.slice(0, -1);
     }
 
-    var key = config.dirname + (config.filename || random.guid());
+    var key = configs.dirname + (configs.filename || random.guid());
     var tenMinutes = 10 * 60;
 
     // 文件名
-    config.dirname = String(config.dirname).trim();
+    configs.dirname = String(configs.dirname).trim();
 
     var encoded = urlsafeBase64Encode(JSON.stringify({
         scope: configs.bucket + ':' + key,
         // 有效期
-        deadline: (config.expires || tenMinutes) + Math.floor(Date.now() / 1000),
-        mimeLimit: config.mimeLimit
+        deadline: (configs.expires || tenMinutes) + Math.floor(Date.now() / 1000),
+        mimeLimit: configs.mimeLimit
     }));
     var encoded_signed = base64ToUrlSafe(hmacSha1(encoded, configs.secretKey));
 
