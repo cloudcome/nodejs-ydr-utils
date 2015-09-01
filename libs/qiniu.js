@@ -18,10 +18,10 @@ var configs = {
     host: '/',
     dirname: '/',
     filename: null,
-    expires: 10
+    expires: 10,
+    mimeLimit: 'image/*'
 };
 var REG_END = /\/$/;
-
 
 
 /**
