@@ -314,7 +314,8 @@ exports.mdRender = function (source, options) {
         // 是否解析 at
         at: true,
         // 是否 heading 加上链接
-        headingLink: false
+        headingLink: false,
+        headingClass: 'heading'
     };
 
     options = dato.extend(defaults, options);
@@ -451,7 +452,7 @@ exports.mdRender = function (source, options) {
         //var href = encryption.md5(text.trim());
 
         var id = 'heading-' + level + '-' + index;
-        var html = '<h' + level + ' id="' + id + '">';
+        var html = '<h' + level + ' id="' + id + '" class="' + options.headingClass + '">';
 
         html += options.headingLink ? '<a href="#' + id + '">' : '';
         html += text;
