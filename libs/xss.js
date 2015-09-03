@@ -309,8 +309,12 @@ exports.mdIntroduction = function (source, maxLength) {
 exports.mdRender = function (source, options) {
     var markedRender = new marked.Renderer();
     var defaults = {
+        // 是否提取链接的 favicon
         favicon: true,
-        at: true
+        // 是否解析 at
+        at: true,
+        // 是否 heading 加上链接
+        headingLink: false
     };
 
     options = dato.extend(defaults, options);
@@ -446,8 +450,13 @@ exports.mdRender = function (source, options) {
     markedRender.heading = function (text, level) {
         //var href = encryption.md5(text.trim());
 
-        var html = '<h' + level + ' id="heading-' + level + '-' + index + '">' +
-            text + '</h' + level + '>';
+        var id = 'heading-' + level + '-' + index;
+        var html = '<h' + level + ' id="' + id + '">';
+
+        html += options.headingLink ? '<a href="#' + id + '">' : '';
+        html += text;
+        html += options.headingLink ? '</a>' : '';
+        html += '</h' + level + '>';
 
         index++;
 
