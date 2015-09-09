@@ -81,6 +81,7 @@ var Favicon = klass.extends(Emitter).create({
             .task(the._getFaviconFromDefaults.bind(the))
             .task(the._getFaviconFromLocal.bind(the))
             .task(the._getFaviconFromHomePage.bind(the))
+            .task(the._getFaviconFromThisPage.bind(the))
             .task(the._getFaviconFromRootDirection.bind(the))
             .task(the._saveFaviconFromURL.bind(the))
             .task(the._updateCache.bind(the))
@@ -182,24 +183,59 @@ var Favicon = klass.extends(Emitter).create({
             return next();
         }
 
-        var homeURL = the._url.protocol + '//' + the._url.host;
+        return the._getFaviconFromPage(the._url.protocol + '//' + the._url.host, function (url) {
+            the.faviconURL = url;
+            next();
+        });
+    },
 
-        request.get(homeURL, function (err, body) {
+    /**
+     * 从当前页面中获取 favicon
+     * @param next
+     * @private
+     */
+    _getFaviconFromThisPage: function (next) {
+        var the = this;
+
+        if (the.faviconFile || the.faviconURL) {
+            return next();
+        }
+
+        return the._getFaviconFromPage(the._oURL, function (url) {
+            the.faviconURL = url;
+            next();
+        });
+    },
+
+
+    /**
+     * 从页面上读取 favicon
+     * @param url
+     * @param callback
+     * @returns {*}
+     * @private
+     */
+    _getFaviconFromPage: function (url, callback) {
+        var the = this;
+
+        request.get(url, function (err, body) {
             if (err) {
-                return next();
+                return callback();
             }
 
             var href = this.options.href;
 
-            the.faviconURL = the._parseFaviconURLFromBody(body);
+            var attrURL = the._parseFaviconURLFromBody(body);
 
-            if (!the.faviconURL) {
-                return next();
+            if (!attrURL) {
+                return callback();
             }
 
-            the.faviconURL = REG_HTTP.test(the.faviconURL) ? the.faviconURL : Favicon.joinURL(href, the.faviconURL);
+            var url = REG_HTTP.test(attrURL) ? attrURL : Favicon.joinURL(href, attrURL);
 
-            next();
+            the._parseFaviconURLByHead(url, function (url) {
+                callback(url);
+            });
         });
     },
 
@@ -332,12 +368,12 @@ var Favicon = klass.extends(Emitter).create({
             var contentLength = number.parseInt(headers['content-length'], 0);
             var contentType = headers['content-type'];
 
-            if (res.statusCode === 200 && contentLength >= 20) {
+            if (res.statusCode === 200 && contentLength > 20) {
                 the.faviconURL = href;
                 return callback(href);
             }
 
-            if (REG_FAVICON_TYPE.test(href)) {
+            if (REG_FAVICON_TYPE.test(contentType)) {
                 return callback(href);
             }
 

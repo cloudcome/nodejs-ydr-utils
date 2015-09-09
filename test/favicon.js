@@ -8,7 +8,7 @@ var configs = {
 Favicon.config(configs);
 Favicon.buildDefaultConfigs();
 
-var favicon = new Favicon('http://www.paintcodeapp.com/news/iphone-6-screens-demystified');
+var favicon = new Favicon('http://www.css88.com/jqapi-1.9/');
 
 //var u = Favicon.joinURL('http://gruntjs.com/getting-started','../img/favicon.ico');
 //console.log(u);
