@@ -138,7 +138,7 @@ function _remote(options, callback) {
     }
 
     options.url += querystring;
-    options.query = null;
+    //options.query = null;
 
     var request = function () {
         req = _request(options, function (err, bodyORheadersORstream, res) {
