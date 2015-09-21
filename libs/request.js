@@ -277,8 +277,9 @@ function _request(options, callback) {
         requestOptions.headers = form.getHeaders(requestOptions.headers);
     }
 
+    options.headers = requestOptions.headers;
     var context = {
-        options: requestOptions,
+        options: options,
         id: random.guid()
     };
     var req = _http.request(requestOptions, function (res) {
