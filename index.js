@@ -53,6 +53,8 @@ module.exports = {
     translate: require('./libs/translate.js'),
     // 数据类型
     typeis: require('./libs/typeis.js'),
+    // ua解析
+    ua: require('./libs/ua.js'),
     // 数据验证
     Validator: require('./libs/validator.js'),
     // 数据类型
