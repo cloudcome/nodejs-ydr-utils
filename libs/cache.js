@@ -115,7 +115,7 @@ exports.set = function (key, val, expires, isOverride, callback) {
  * @returns {*|undefined} 返回值
  */
 exports.get = function (key, dftVal) {
-    return cache[key] && cache[key].val || dftVal;
+    return cache[key] ? cache[key].val : dftVal;
 };
 
 
