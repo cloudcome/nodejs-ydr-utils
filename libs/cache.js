@@ -169,12 +169,12 @@ exports.length = length;
 exports.increase = function (key, num) {
     var cached = exports.get(key);
 
-    num = number.parseFloat(num, 0);
+    num = number.parseInt(num, 1);
 
     if (typeis.undefined(cached)) {
         cached = num;
     } else {
-        cached = number.parseFloat(cached, 0) + num;
+        cached = number.parseInt(cached, 0) + num;
     }
 
     exports.set(key, cached);
