@@ -7,6 +7,7 @@
 
 'use strict';
 
+
 module.exports = function (parent, key, val) {
     Object.defineProperty(parent, key, {
         // 是否可被修改、不能被删除
