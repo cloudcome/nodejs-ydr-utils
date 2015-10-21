@@ -1,7 +1,8 @@
 /*!
- * 文件描述
+ * 定义错误
  * @author ydr.me
  * @create 2015-05-09 15:03
+ * @update 2015年10月12日22:22:54
  */
 
 
@@ -10,43 +11,72 @@
 
 var httpStatus = require('./http-status.js');
 var allocation = require('./allocation.js');
+var dato = require('./dato.js');
 var typeis = require('./typeis.js');
+
+var errorId = 0;
+var configs = {
+    //1001: {
+    //    status: 500,
+    //    type: 'mongond error',
+    //    message: 'invalid mongodb id'
+    //}
+};
+
+
+/**
+ * 定义错误
+ * @param errorCode {Number|String|Object} 错误序号
+ * @param [errorMeta] {Object} 错误属性
+ */
+exports.config = function (errorCode, errorMeta) {
+    var args = allocation.args(arguments);
+    var errorMap = {};
+
+    if (args.length === 2) {
+        if (typeis.string(args[1])) {
+            errorMeta = {
+                message: args[1]
+            };
+        }
+
+        errorMap[args[0]] = errorMeta;
+    } else {
+        errorMap = args[0];
+    }
+
+    dato.each(errorMap, function (code, meta) {
+        meta.message = meta.message || httpStatus.get(meta.status || 500);
+    });
+    dato.extend(configs, errorMap);
+
+    return exports;
+};
 
 
 /**
  * 自定义错误
- * @param [status=500] {Number} HTTP 错误码
- * @param [message=500] {String} 错误消息
+ * @param code {Number} 错误号
  * @returns {Error}
  */
-module.exports = function (status, message) {
-    var args = allocation.args(arguments);
-    var _status = 500;
+exports.create = function (code) {
+    var meta = configs[code];
 
-    args.forEach(function (arg) {
-        switch (typeis(arg)) {
-            case 'number':
-                _status = arg;
-                break;
+    if (!meta) {
+        throw 'can not found `' + code + '` error meta';
+    }
 
-            case 'string':
-                message = arg;
-                break;
-        }
-    });
-
-    var err = new Error(message);
+    var err = new Error(meta.message);
 
     try {
-        Error.captureStackTrace(err, module.exports);
+        Error.captureStackTrace(err, exports.create);
     } catch (err) {
         // ignore
     }
 
-    err.status = err.code = _status;
-    err.message = message || httpStatus.get(_status);
-    err.type = err.name = _status < 500 ? 'clientError' : 'serverError';
-    err.timestamp = Date.now();
+    dato.extend(err, meta);
+    err.time = new Date();
+    err.id = errorId++;
 
     return err;
 };

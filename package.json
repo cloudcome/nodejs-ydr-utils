@@ -1,6 +1,6 @@
 {
   "name": "ydr-utils",
-  "version": "26.1.0",
+  "version": "26.4.0",
   "private": false,
   "description": "utils for ydr.me",
   "scripts": {},
@@ -53,7 +53,7 @@
   "homepage": "https://github.com/cloudcome/nodejs-ydr-utils",
   "repository": {
     "type": "git",
-    "url": "https://github.com/cloudcome/nodejs-ydr-utils"
+    "url": "git+https://github.com/cloudcome/nodejs-ydr-utils.git"
   },
   "bugs": {
     "url": "https://github.com/cloudcome/nodejs-ydr-utils/issues"
@@ -68,5 +68,28 @@
     "xml2js": "^0.4.6"
   },
   "devDependencies": {},
-  "licenses": "MIT"
+  "licenses": "MIT",
+  "gitHead": "a176bfd38799857b5c7b8bc377467fd30c4ea132",
+  "_id": "ydr-utils@26.4.0",
+  "_shasum": "1aeba5e5af94cf8c063a0247855e175fae0a1634",
+  "_from": "ydr-utils@*",
+  "_npmVersion": "2.7.4",
+  "_nodeVersion": "0.12.2",
+  "_npmUser": {
+    "name": "cloudcome",
+    "email": "cloudcome@163.com"
+  },
+  "dist": {
+    "shasum": "1aeba5e5af94cf8c063a0247855e175fae0a1634",
+    "tarball": "http://registry.npmjs.org/ydr-utils/-/ydr-utils-26.4.0.tgz"
+  },
+  "maintainers": [
+    {
+      "name": "cloudcome",
+      "email": "cloudcome@163.com"
+    }
+  ],
+  "directories": {},
+  "_resolved": "https://registry.npmjs.org/ydr-utils/-/ydr-utils-26.4.0.tgz",
+  "readme": "ERROR: No README data found!"
 }
