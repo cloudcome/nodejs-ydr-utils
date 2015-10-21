@@ -1,7 +1,8 @@
-/*!
+/**
  * 远程请求
  * @author ydr.me
  * @create 2014-11-22 23:11
+ * @update 2015-10-22 01:07:39
  */
 
 'use strict';
