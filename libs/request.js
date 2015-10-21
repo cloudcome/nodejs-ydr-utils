@@ -176,17 +176,19 @@ function _remote(options, callback) {
 
     request();
 
-    var timeid = setTimeout(function () {
-        if (req) {
-            req.abort();
-        }
+    if (typeis.number(options.timeout) && options.timeout > 0) {
+        var timeid = setTimeout(function () {
+            if (req) {
+                req.abort();
+            }
 
-        options.href = options.url;
-        callback.call({
-            options: options
-        }, new Error('request timeout'));
-        callback = noop;
-    }, options.timeout);
+            options.href = options.url;
+            callback.call({
+                options: options
+            }, new Error('request timeout'));
+            callback = noop;
+        }, options.timeout);
+    }
 }
 
 
