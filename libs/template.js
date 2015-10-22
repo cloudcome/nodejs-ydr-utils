@@ -27,7 +27,6 @@ var REG_IF = /^((else\s+)?if)\s+(.*)$/;
 var REH_LIST = /^list\s+([^,]*)\s+as\s+([^,]*)(\s*,\s*([^,]*))?$/;
 var REG_ELSE_IF = /^else\s+if\s/;
 var REG_HASH = /^#/;
-var REG_INCLUDE = /\{\{\s*?include (.*?)\s*?}}/g;
 var REG_IGNORE = /\{\{ignore}}([\s\S]*?)\{\{\/ignore}}/ig;
 var regLines = [{
     'n': /\n/g,
@@ -426,7 +425,7 @@ var Template = klass.create({
             return exp;
         }
 
-        return (unEscape ?  '(': 'this.escape(') + exp + ')';
+        return (unEscape ? '(' : 'this.escape(') + exp + ')';
     },
 
 
@@ -608,19 +607,25 @@ Template.getFilter = function (name) {
 /*===========================================================================================*/
 /*======================================【NODEJS】============================================*/
 /*===========================================================================================*/
+var REG_INCLUDE = /\{\{\s*?include (.*?)\s*?}}/g;
+var REG_ABSLOUTE = /^\//;
+var REG_QUOTE = /^["']|["']$/g;
 /**
  * 编译之前做的事情
+ * @param expressConfigs {Object} express 配置
  * @param file {String} 当前模板所在的路径
  * @param template {String} 当前模板内容
  * @private
  */
-function _preCompile(file, template) {
+function _preCompile(expressConfigs, file, template) {
     var relativeDir = path.dirname(file);
 
     return template.replace(REG_INCLUDE, function ($0, includeName) {
-        includeName = includeName.trim();
+        includeName = includeName.trim().replace(REG_QUOTE, '');
 
-        var includeFile = path.join(relativeDir, includeName);
+        var includeFile = REG_ABSLOUTE.test(includeName) ?
+            path.join(expressConfigs.root, includeName) :
+            path.join(relativeDir, includeName);
 
         if (configs.cache && includeMap[includeFile]) {
             return includeMap[includeFile];
@@ -657,6 +662,16 @@ Template.__express = function (file, data, callback) {
     var tpl;
     var args = arguments;
 
+    // this:
+    //{
+    //    defaultEngine: 'html',
+    //    ext: '.html',
+    //    name: 'front/index.html',
+    //    root: '~/.views/',
+    //    engine: [Function],
+    //    path: '~/.views/front/index.html'
+    // }
+
     if (typeis.function(args[1])) {
         callback = args[1];
         data = {};
@@ -669,7 +684,7 @@ Template.__express = function (file, data, callback) {
     } else {
         try {
             template = fs.readFileSync(file, 'utf8');
-            template = _preCompile(file, template);
+            template = _preCompile(this, file, template);
         } catch (err) {
             return callback(err);
         }
