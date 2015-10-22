@@ -56,7 +56,7 @@ var REG_BREAK_LINE = /[\n\r]/g;
 var configs = {
     eventLength: 20,
     eventAlign: 'right',
-    arrow: ' ➤ '
+    arrow: ' => '
 };
 
 
