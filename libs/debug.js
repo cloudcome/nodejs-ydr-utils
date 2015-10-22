@@ -117,7 +117,7 @@ var debug = function (type, event, msg) {
             msg = alignMsg(eventLength, msg, colors.bold.yellow);
             break;
 
-        case 'info':
+        case 'success':
             msg = alignMsg(eventLength, msg, colors.bold.green);
             break;
 
@@ -167,8 +167,8 @@ module.exports.primary = function (event, message) {
  * @param event
  * @param message
  */
-module.exports.info = function (event, message) {
-    debug('info', event, message);
+module.exports.info = module.exports.success = function (event, message) {
+    debug('success', event, message);
 };
 
 
