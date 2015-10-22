@@ -15,6 +15,7 @@
 
 var dato = require('./dato.js');
 var typeis = require('./typeis.js');
+
 var win = typeof global !== 'undefined' ? global : window;
 var escapeHTMLMap = {
     '&amp;': /&/g,
@@ -39,6 +40,7 @@ var REG_SEPARATOR = /[-_ ]([a-z])/g;
 var REG_HUMP = /[A-Z]/g;
 var REG_STAR = /\\\*/g;
 var REG_NOT_UTF16_SINGLE = /[^\x00-\xff]{2}/g;
+var REG_DOUBLE = /[^\x00-\xff]/g;
 
 
 /**
@@ -308,5 +310,14 @@ exports.length = function (str) {
 };
 
 
-
+/**
+ * 将特殊字符转成 unicode 编码
+ * @param str {String}
+ * @returns {string}
+ */
+exports.toUnicode = function (str) {
+    return str.replace(REG_DOUBLE, function ($0) {
+        return '\\u' + $0.charCodeAt(0).toString(16);
+    });
+};
 
