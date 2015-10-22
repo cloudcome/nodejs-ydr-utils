@@ -10,8 +10,8 @@
 
 var colors = require('colors/safe.js');
 
-var dato = require('ydr-utils').dato;
-var string = require('ydr-utils').string;
+var dato = require('./dato.js');
+var string = require('./string.js');
 
 // set theme
 var map = {
@@ -38,12 +38,6 @@ var map = {
     bgWhite: 'bgWhite'
 };
 
-/**
- * 输出消息
- * @param {String} event 事件
- * @param {String} message 消息
- * @param {String} type 类型，默认为muted
- */
 
 
 /**
