@@ -617,8 +617,9 @@ Template.getFilter = function (name) {
 function _preCompile(file, template) {
     var relativeDir = path.dirname(file);
 
-    return template.replace(REG_INCLUDE, function ($0, $1) {
-        var includeName = $1.trim();
+    return template.replace(REG_INCLUDE, function ($0, includeName) {
+        includeName = includeName.trim();
+
         var includeFile = path.join(relativeDir, includeName);
 
         if (configs.cache && includeMap[includeFile]) {
