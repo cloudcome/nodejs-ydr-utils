@@ -52,20 +52,40 @@ var string = require('./string.js');
 //console.log(colors.trap('trap'));
 //console.log(colors.random('random'));
 
+var REG_BREAK_LINE = /[\n\r]/g;
 var configs = {
     eventLength: 20,
-    eventAlign: 'right'
+    eventAlign: 'right',
+    arrow: ' ➤ '
 };
 
 
 /**
  * 对齐消息
- * @param msg
  * @param alignLength
+ * @param msg
+ * @param colorWrapper
  * @returns {*}
  */
-var alignMsg = function (msg, alignLength) {
+var alignMsg = function (alignLength, msg, colorWrapper) {
+    var msg2 = '';
+    var space = '\n';
 
+    dato.repeat(alignLength + configs.arrow.length, function () {
+        space += ' ';
+    });
+
+    var messageList = String(msg).split(REG_BREAK_LINE);
+
+    messageList.forEach(function (msg, index) {
+        if (index) {
+            msg2 += space + colorWrapper(msg);
+        } else {
+            msg2 += colorWrapper(msg);
+        }
+    });
+
+    return msg2;
 };
 
 
@@ -76,32 +96,33 @@ var alignMsg = function (msg, alignLength) {
  * @param msg
  */
 var debug = function (type, event, msg) {
-    var arrow = colors.blue.bold(' ➜ ');
-
+    var arrow = colors.blue.bold(configs.arrow);
     event = configs.eventAlign === 'left' ?
         string.padRight(event, configs.eventLength, '') :
         string.padLeft(event, configs.eventLength, '');
+
     var eventLength = event.length;
+
     event = colors.bold.cyan(event);
     switch (type) {
         case 'error':
-            msg = colors.bold.red(msg);
+            msg = alignMsg(eventLength, msg, colors.bold.red);
             break;
 
         case 'primary':
-            msg = colors.bold.magenta(msg);
+            msg = alignMsg(eventLength, msg, colors.bold.magenta);
             break;
 
         case 'warn':
-            msg = colors.yellow(msg);
+            msg = alignMsg(eventLength, msg, colors.bold.yellow);
             break;
 
         case 'info':
-            msg = colors.green(msg);
+            msg = alignMsg(eventLength, msg, colors.bold.green);
             break;
 
         default :
-            msg = colors.white(msg);
+            msg = alignMsg(eventLength, msg, colors.bold.white);
             break;
     }
 
