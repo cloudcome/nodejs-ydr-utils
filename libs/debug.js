@@ -94,10 +94,17 @@ var alignMsg = function (alignLength, msg, colorWrapper) {
  * @param type
  * @param event
  * @param msg
+ * @param [alignInverse] {Boolean} 对齐反转
  */
-var debug = function (type, event, msg) {
+var debug = function (type, event, msg, alignInverse) {
     var arrow = colors.blue.bold(configs.arrow);
-    event = configs.eventAlign === 'left' ?
+    var eventAlign = configs.eventAlign;
+
+    if (alignInverse) {
+        eventAlign = eventAlign === 'left' ? 'right' : 'left';
+    }
+
+    event = eventAlign === 'left' ?
         string.padRight(event, configs.eventLength, '') :
         string.padLeft(event, configs.eventLength, '');
 
@@ -144,51 +151,56 @@ module.exports.config = function (_configs) {
 
 /**
  * 打印错误日志
- * @param event
- * @param message
+ * @param event {String} 事件名称
+ * @param message {String} 事件内容
+ * @param [alignInverse] {Boolean} 对齐反转
  */
-module.exports.error = module.exports.danger = function (event, message) {
-    debug('error', event, message);
+module.exports.error = module.exports.danger = function (event, message, alignInverse) {
+    debug('error', event, message, alignInverse);
 };
 
 
 /**
  * 打印主要日志
- * @param event
- * @param message
+ * @param event {String} 事件名称
+ * @param message {String} 事件内容
+ * @param [alignInverse] {Boolean} 对齐反转
  */
-module.exports.primary = function (event, message) {
-    debug('primary', event, message);
+module.exports.primary = function (event, message, alignInverse) {
+    debug('primary', event, message, alignInverse);
 };
 
 
 /**
- * 打印信息日志
- * @param event
- * @param message
+ * 打印成功日志
+ * @param event {String} 事件名称
+ * @param message {String} 事件内容
+ * @param [alignInverse] {Boolean} 对齐反转
  */
-module.exports.info = module.exports.success = function (event, message) {
-    debug('success', event, message);
+module.exports.info = module.exports.success = function (event, message, alignInverse) {
+    debug('success', event, message, alignInverse);
 };
 
 
 /**
  * 打印警告日志
- * @param event
- * @param message
+ * @param event {String} 事件名称
+ * @param message {String} 事件内容
+ * @param [alignInverse] {Boolean} 对齐反转
  */
-module.exports.warn = module.exports.warning = function (event, message) {
-    debug('warn', event, message);
+module.exports.warn = module.exports.warning = function (event, message, alignInverse) {
+    debug('warn', event, message, alignInverse);
 };
 
 
 /**
  * 打印普通日志
- * @param event
- * @param message
+ * @param event {String} 事件名称
+ * @param message {String} 事件内容
+ * @param [alignInverse] {Boolean} 对齐反转
  */
-module.exports.normal = module.exports.secondary = function (event, message) {
-    debug('normal', event, message);
+module.exports.normal = module.exports.secondary = function (event, message, alignInverse) {
+    debug('normal', event, message, alignInverse);
 };
 
 
