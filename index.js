@@ -23,6 +23,8 @@ module.exports = {
     date: require('./libs/date.js'),
     // 数据出口
     dato: require('./libs/dato.js'),
+    // 命令行日志
+    debug: require('./libs/debug.js'),
     // 加密
     encryption: require('./libs/encryption.js'),
     // 自定义错误
@@ -31,7 +33,7 @@ module.exports = {
     favicon: require('./libs/favicon.js'),
     // HTTP status
     httpStatus: require('./libs/http-status.js'),
-    // log
+    // 应用日志
     log: require('./libs/log.js'),
     // MIME
     mime: require('./libs/mime.js'),
