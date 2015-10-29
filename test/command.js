@@ -13,7 +13,8 @@ var debug = require('../libs/debug.js');
 command.alias('g', 'global');
 command.alias({
     u: 'username',
-    p: 'password'
+    p: 'password',
+    h: 'help'
 });
 
 command.if('install', function (arg) {
@@ -30,9 +31,17 @@ command.if('install', function (arg) {
     if (arg.global) {
         debug.success('global', 'true');
     }
-}).else(function () {
+}).if('help', function () {
+    debug.warn('help', '呵呵呵');
+}).else(function (cmd, args) {
+    if(args.help){
+        return command.exec('help');
+    }
+
     debug.error('error', 'I don\'t know!');
 });
 
-command.parse(process.argv);
+var ret = command.parse(process.argv);
+
+console.log(JSON.stringify(ret, null, 4));
 

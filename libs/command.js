@@ -21,7 +21,9 @@ var aliasConfigs = {};
 var commanFunctionMap = {};
 
 // 无法识别的命令回调
-var elseFunction = null;
+var elseFunction = function () {
+    // noop
+};
 
 /**
  * 解析命令行参数
@@ -68,9 +70,8 @@ exports.parse = function (argv) {
         }
     });
 
-    //return result;
-    if (result.command && commanFunctionMap[result.command]) {
-        commanFunctionMap[result.command].call(result, result.args);
+    if (!exports.exec(result.command, result.args, result)) {
+        elseFunction.call(result, result.command, result.args);
     }
 
     return result;
@@ -119,5 +120,27 @@ exports.else = function (callback) {
     }
 
     return exports;
+};
+
+
+/**
+ * 手动执行某条命令
+ * @param command {String} 命令名称
+ * @param [args] {Object} 参数
+ * @param [context] {Object} 上下文
+ * @return {Object}
+ */
+exports.exec = function (command, args, context) {
+    if (command && commanFunctionMap[command]) {
+        args = args || {};
+        context = context || {
+                command: command,
+                args: args
+            };
+        commanFunctionMap[command].call(context, args);
+        return true;
+    }
+
+    return false;
 };
 
