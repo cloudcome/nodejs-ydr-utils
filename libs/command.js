@@ -1,5 +1,5 @@
 /**
- * 命令行分析器
+ * 命令行执行器
  * @author ydr.me
  * @create 2015-10-29 15:29
  */
@@ -8,11 +8,27 @@
 'use strict';
 
 var dato = require('./dato.js');
+var allocation = require('./allocation.js');
+var typeis = require('./typeis.js');
 
 var REG_LONG_ARG = /^--/;
 var REG_SHORT_ARG = /^-/;
 
-module.exports = function (argv) {
+// 别名配置
+var aliasConfigs = {};
+
+// 命令函数 map
+var commanFunctionMap = {};
+
+// 无法识别的命令回调
+var elseFunction = null;
+
+/**
+ * 解析命令行参数
+ * @param argv
+ * @returns {{node: String, cwd: String, input: string, command: String, args: {}}}
+ */
+exports.parse = function (argv) {
     var result = {
         node: argv.shift(),
         cwd: argv.shift(),
@@ -29,24 +45,79 @@ module.exports = function (argv) {
             return;
         }
 
+        var relArg = null;
+
         if (REG_LONG_ARG.test(arg)) {
             lastArg = arg.slice(2);
-            result.args[lastArg] = true;
+            relArg = aliasConfigs[lastArg] || lastArg;
+            result.args[relArg] = true;
         } else if (REG_SHORT_ARG.test(arg)) {
             lastArg = arg.slice(1);
             dato.repeat(lastArg.length, function (index) {
                 var shortArg = lastArg[index];
-                result.args[shortArg] = true;
+
+                relArg = aliasConfigs[shortArg] || shortArg;
+                result.args[relArg] = true;
             });
         } else if (lastArg) {
-            result.args[lastArg] = arg;
+            relArg = aliasConfigs[lastArg] || lastArg;
+            result.args[relArg] = arg;
             lastArg = null;
         } else {
             result.command = arg;
         }
     });
 
+    //return result;
+    if (result.command && commanFunctionMap[result.command]) {
+        commanFunctionMap[result.command].call(result, result.args);
+    }
+
     return result;
 };
 
+
+/**
+ * 设置命令行参数别名
+ * @returns {*}
+ */
+exports.alias = function () {
+    return allocation.getset({
+        get: function (key) {
+            return aliasConfigs[key];
+        },
+        set: function (key, val) {
+            aliasConfigs[key] = val;
+        }
+    }, arguments);
+};
+
+
+/**
+ * 匹配命令
+ * @param command {String} 命令
+ * @param callback {Function} 回调
+ * @returns {Object}
+ */
+exports.if = function (command, callback) {
+    if (typeis.function(callback)) {
+        commanFunctionMap[command] = callback;
+    }
+
+    return exports;
+};
+
+
+/**
+ * 未匹配的命令
+ * @param callback {Function} 回调
+ * @returns {Object}
+ */
+exports.else = function (callback) {
+    if (typeis.function(callback)) {
+        elseFunction = callback;
+    }
+
+    return exports;
+};
 

@@ -8,7 +8,31 @@
 'use strict';
 
 var command = require('../libs/command.js');
-var ret = command(process.argv);
+var debug = require('../libs/debug.js');
 
-console.log(JSON.stringify(ret, null, 4));
+command.alias('g', 'global');
+command.alias({
+    u: 'username',
+    p: 'password'
+});
+
+command.if('install', function (arg) {
+    debug.success('install', 'YES');
+
+    if (arg.username) {
+        debug.success('username', arg.username);
+    }
+
+    if (arg.password) {
+        debug.success('password', arg.password);
+    }
+
+    if (arg.global) {
+        debug.success('global', 'true');
+    }
+}).else(function () {
+    debug.error('error', 'I don\'t know!');
+});
+
+command.parse(process.argv);
 
