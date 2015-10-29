@@ -4,7 +4,7 @@
   "private": false,
   "description": "utils for ydr.me",
   "scripts": {
-    "test": "mocha -c --recursive --ui bdd test"
+    "test": "mocha -c --recursive --ui bdd test -t 0"
   },
   "preferGlobal": false,
   "bin": {},

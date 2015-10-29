@@ -9,7 +9,7 @@
 
 var error = require('../libs/error.js');
 
-var err = error(401, 'hheh');
+var err = error.create(401);
 
 console.log(err.status);
 console.log(err.type);
