@@ -67,11 +67,11 @@
   },
   "dependencies": {
     "colors": "^1.1.2",
-    "fs-extra": "^0.18.0",
+    "fs-extra": "^0.26.0",
     "howdo": "^2.0.2",
     "marked": "^0.3.3",
     "promiseify": "^0.2.0"
   },
   "devDependencies": {},
-  "licenses": "MIT"
+  "license": "MIT"
 }
