@@ -39,6 +39,8 @@ module.exports = {
     log: require('./libs/log.js'),
     // MIME
     mime: require('./libs/mime.js'),
+    // npm
+    npm: require('./libs/npm.js'),
     // MIME
     number: require('./libs/number.js'),
     // path
