@@ -3,7 +3,9 @@
   "version": "28.1.0",
   "private": false,
   "description": "utils for ydr.me",
-  "scripts": {},
+  "scripts": {
+    "test": "mocha -c --recursive --ui bdd test"
+  },
   "preferGlobal": false,
   "bin": {},
   "main": "index.js",
