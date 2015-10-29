@@ -21,6 +21,3 @@ console.log(encryption.md5());
 //console.log(encryption.password('123', p1));
 //console.log(encryption.password('1234', p2));
 
-dato.repeat(100, function (index) {
-    console.log(index, encryption.etag(file));
-});
