@@ -13,6 +13,8 @@ var typeis = require('./typeis.js');
 
 var REG_LONG_ARG = /^--/;
 var REG_SHORT_ARG = /^-/;
+var NODE_EXEC_PATH = process.execPath;
+var CWD = process.cwd();
 
 // 别名配置
 var aliasConfigs = {};
@@ -134,6 +136,8 @@ exports.exec = function (command, args, context) {
     if (command && commanFunctionMap[command]) {
         args = args || {};
         context = context || {
+                node: NODE_EXEC_PATH,
+                cwd: CWD,
                 command: command,
                 args: args
             };
