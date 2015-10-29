@@ -15,6 +15,8 @@ module.exports = {
     cache: require('./libs/cache.js'),
     // 类
     class: require('./libs/class.js'),
+    // 命令行
+    command: require('./libs/command.js'),
     // 定义常量
     constant: require('./libs/constant.js'),
     // csrf
