@@ -9,22 +9,27 @@
 
 var klass = require('./class.js');
 var typeis = require('./typeis.js');
+var dato = require('./dato.js');
 var allocation = require('./allocation.js');
 var Emitter = require('events');
 var howdo = require('howdo');
 
 /*====================================
-var md = new Middleware();
+ var md = new Middleware();
 
-md.use(fn1);
-md.use(fn2);
+ md.use(fn1);
+ md.use(fn2);
 
-md.exec(args,..., callback);
-====================================*/
+ md.exec(args,..., callback);
+ ====================================*/
 
-
+var defaults = {
+    // 是否为异步模式
+    async: true
+};
 var Middleware = klass.extends(Emitter).create({
-    constructor: function () {
+    constructor: function (options) {
+        this._options = dato.extend({}, defaults, options);
         this._middlewareStack = [];
     },
 
@@ -38,14 +43,22 @@ var Middleware = klass.extends(Emitter).create({
         }
     },
 
+    exec: function (/*arguments*/) {
+        if (this._options.async) {
+            return this._execAsync.apply(this, arguments);
+        } else {
+            return this._execSync(arguments[0]);
+        }
+    },
+
     /**
-     * 执行中间件
+     * 异步执行中间件
      * @example
      * md.exec(a, b, fn);
      * // 其中 a、b 为参数
      * // fn 为回调
      */
-    exec: function (/*arguments*/) {
+    _execAsync: function (/*arguments*/) {
         var args = allocation.args(arguments);
         var callback = args.pop();
 
@@ -71,7 +84,28 @@ var Middleware = klass.extends(Emitter).create({
             args.shift();
             callback.apply(global, args);
         });
+
+        return this;
+    },
+
+    /**
+     * 同步执行中间件
+     * @param arg
+     * @returns {*}
+     * @private
+     */
+    _execSync: function (arg) {
+        dato.each(this._middlewareStack, function (index, middleware) {
+            try {
+                arg = middleware(arg);
+            } catch (err) {
+                this.emit('error', err);
+            }
+        });
+
+        return arg;
     }
 });
 
+Middleware.defaults = defaults;
 module.exports = Middleware;
