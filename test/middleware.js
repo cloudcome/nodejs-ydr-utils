@@ -12,7 +12,7 @@ var assert = require('assert');
 var Middleware = require('../libs/middleware.js');
 
 describe('utils/middleware.js', function () {
-    it('e', function (done) {
+    it('async', function (done) {
         var md = new Middleware();
 
         md.use(function (file, options, next) {
@@ -32,6 +32,31 @@ describe('utils/middleware.js', function () {
             assert.equal(options.code, '123');
             done();
         });
+    });
+
+    it('sync', function () {
+        var md = new Middleware({
+            async: false
+        });
+
+        md.use(function (options) {
+            options.code += '2';
+
+            return options;
+        });
+
+        md.use(function (options) {
+            options.code += '3';
+
+            return options;
+        });
+
+        var options = md.exec({
+            code: '1'
+        });
+
+        console.log(options);
+        assert.equal(options.code, '123');
     });
 });
 
