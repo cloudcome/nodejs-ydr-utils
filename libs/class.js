@@ -1,11 +1,44 @@
 /**
- * 类的继承与创建
+ * 类的创建与继承
  * @author ydr.me
- * @create 2014-11-22 15:00
+ * @create 2014-10-04 15:09
  */
 
-'use strict';
+/*===============================
+ // 【以前】
+ // 创建一个类
+ var A = function(){};
+ A.prototype.abc = '123';
 
+ // 继承一个类
+ var B = function(){
+ A.apply(this, arguments);
+ };
+
+ B.prototype = new A();
+ B.prototype.def = '456';
+
+ // ===>
+
+ //【现在】
+ var A = klass.create({
+ constructor: function(){},
+ abc: '123'
+ });
+ var B = klass.extends(A).create({
+ constructor: function(){},
+ def: '456'
+ });
+ ===============================*/
+
+
+/**
+ * 类方法
+ * @module class
+ * @requires dato
+ * @requires typeis
+ */
+'use strict';
 
 var dato = require('./dato.js');
 var typeis = require('./typeis.js');
@@ -37,22 +70,13 @@ var typeis = require('./typeis.js');
  */
 var inherit = function (constructor, superConstructor, isCopyStatic) {
     constructor.super_ = superConstructor;
-    //var F = function () {
-    //    // ignore
-    //};
-    //F.prototype = new superConstructor();
-    //constructor.prototype = new F;
-    constructor.prototype = Object.create(superConstructor.prototype, {
-        constructor: {
-            value: constructor,
-            // 是否可被枚举
-            enumerable: true,
-            // 是否可被重写
-            writable: true,
-            // 是否可被修改
-            configurable: true
-        }
-    });
+
+    if (Object.setPrototypeOf) {
+        // https://github.com/nodejs/node/blob/master/lib/util.js#L764
+        Object.setPrototypeOf(constructor.prototype, superConstructor.prototype);
+    } else {
+        constructor.prototype = Object.create(superConstructor.prototype);
+    }
 
     if (isCopyStatic) {
         dato.extend(true, constructor, superConstructor);
@@ -158,7 +182,7 @@ Class.prototype = {
  * @param isInheritStatic
  * @returns {Class}
  */
-exports.extends = function (superConstructor, isInheritStatic) {
+exports.extends = exports.inherit = function (superConstructor, isInheritStatic) {
     return new Class(null, superConstructor, isInheritStatic);
 };
 
