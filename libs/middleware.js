@@ -20,7 +20,7 @@ md.use(fn1);
 md.use(fn2);
 
 md.exec(args,..., callback);
- ====================================*/
+====================================*/
 
 
 var Middleware = klass.extends(Emitter).create({
