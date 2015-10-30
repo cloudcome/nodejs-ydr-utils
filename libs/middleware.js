@@ -59,10 +59,11 @@ var Middleware = klass.extends(Emitter).create({
      * // fn 为回调
      */
     _execAsync: function (/*arguments*/) {
+        var the = this;
         var args = allocation.args(arguments);
         var callback = args.pop();
 
-        howdo.each(this._middlewareStack, function (index, middleware, next) {
+        howdo.each(the._middlewareStack, function (index, middleware, next) {
             if (index) {
                 args.shift();
             }
@@ -76,7 +77,7 @@ var Middleware = klass.extends(Emitter).create({
             try {
                 middleware.apply(global, args);
             } catch (err) {
-                this.emit('error', err);
+                the.emit('error', err);
             }
         }).follow(function (err) {
             var args = allocation.args(arguments);
@@ -85,7 +86,7 @@ var Middleware = klass.extends(Emitter).create({
             callback.apply(global, args);
         });
 
-        return this;
+        return the;
     },
 
     /**
@@ -95,11 +96,13 @@ var Middleware = klass.extends(Emitter).create({
      * @private
      */
     _execSync: function (arg) {
-        dato.each(this._middlewareStack, function (index, middleware) {
+        var the = this;
+
+        dato.each(the._middlewareStack, function (index, middleware) {
             try {
                 arg = middleware(arg);
             } catch (err) {
-                this.emit('error', err);
+                the.emit('error', err);
             }
         });
 

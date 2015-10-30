@@ -42,13 +42,17 @@ describe('utils/middleware.js', function () {
         md.use(function (options) {
             options.code += '2';
 
-            return options;
+            return options1;
         });
 
         md.use(function (options) {
             options.code += '3';
 
             return options;
+        });
+
+        md.on('error', function (err) {
+            console.error(err);
         });
 
         var options = md.exec({
