@@ -37,6 +37,8 @@ module.exports = {
     httpStatus: require('./libs/http-status.js'),
     // 应用日志
     log: require('./libs/log.js'),
+    // 中间件
+    Middleware: require('./libs/middleware.js'),
     // MIME
     mime: require('./libs/mime.js'),
     // npm
