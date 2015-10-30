@@ -25,11 +25,14 @@ var howdo = require('howdo');
 
 var defaults = {
     // 是否为异步模式
-    async: true
+    async: true,
+    // 上下文
+    context: null
 };
 var Middleware = klass.extends(Emitter).create({
     constructor: function (options) {
         this._options = dato.extend({}, defaults, options);
+        this._options.context = this._options.context || this;
         this._middlewareStack = [];
     },
 
@@ -43,6 +46,18 @@ var Middleware = klass.extends(Emitter).create({
         }
     },
 
+    /**
+     * 绑定中间件上下文
+     * @param context
+     */
+    bindContext: function (context) {
+        this._options.context = context;
+    },
+
+    /**
+     * 执行中间件
+     * @returns {*}
+     */
     exec: function (/*arguments*/) {
         if (this._options.async) {
             return this._execAsync.apply(this, arguments);
@@ -75,7 +90,7 @@ var Middleware = klass.extends(Emitter).create({
             });
 
             try {
-                middleware.apply(global, args);
+                middleware.apply(the._options.context, args);
             } catch (err) {
                 the.emit('error', err);
             }
@@ -83,7 +98,7 @@ var Middleware = klass.extends(Emitter).create({
             var args = allocation.args(arguments);
 
             args.shift();
-            callback.apply(global, args);
+            callback.apply(the._options.context, args);
         });
 
         return the;
@@ -100,8 +115,9 @@ var Middleware = klass.extends(Emitter).create({
 
         dato.each(the._middlewareStack, function (index, middleware) {
             try {
-                arg = middleware(arg);
+                arg = middleware.call(the._options.context, arg);
             } catch (err) {
+                err.middlewareName = middleware.middlewareName || middleware.name;
                 the.emit('error', err);
             }
         });
