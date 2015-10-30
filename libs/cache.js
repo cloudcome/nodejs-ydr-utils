@@ -11,7 +11,7 @@ var dato = require('./dato.js');
 var number = require('./number.js');
 var typeis = require('./typeis.js');
 var cache = Object.create(null);
-var length = 0;
+var cacheLength = 0;
 var configs = {
     debug: true
 };
@@ -87,7 +87,7 @@ exports.set = function (key, val, expires, isOverride, callback) {
             console.log('[cache] ', 'first', 'set', key, 'as', val);
         }
 
-        length++;
+        cacheLength++;
     }
 
     if (_callback !== noop) {
@@ -127,7 +127,7 @@ exports.remove = function (key) {
     var cached = cache[key];
 
     if (cached) {
-        length--;
+        cacheLength--;
     }
 
     clearTimeout(cached.timeid);
@@ -158,7 +158,7 @@ exports.keys = function () {
  * 缓存缓存键
  * @returns {Number}
  */
-exports.length = length;
+exports.length = cacheLength;
 
 
 /**
