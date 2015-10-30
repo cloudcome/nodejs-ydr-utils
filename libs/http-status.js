@@ -1,4 +1,4 @@
-/*!
+/**
  * HTTP status
  * @author ydr.me
  * @create 2014-11-21 09:58
@@ -6,8 +6,12 @@
 
 'use strict';
 
+var http = require('http');
 
-var httpStatusMap = require('./../data/http-status.json');
+var dato = require('./dato.js');
+
+
+var httpStatusMap = dato.extend({}, http.STATUS_CODES);
 
 
 /**

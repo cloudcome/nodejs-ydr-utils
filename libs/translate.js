@@ -1,4 +1,4 @@
-/*!
+/**
  * translate
  * @author ydr.me
  * @create 2014-12-16 21:46

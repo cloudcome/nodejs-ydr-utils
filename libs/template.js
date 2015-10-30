@@ -1,4 +1,4 @@
-/*!
+/**
  * ydr-template
  * @author ydr.me
  * @create 2014-12-04 16:47

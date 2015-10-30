@@ -1,4 +1,4 @@
-/*!
+/**
  * path
  * @author ydr.me
  * @create 2015-09-01 19:36

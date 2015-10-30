@@ -1,4 +1,4 @@
-/*!
+/**
  * date.js
  * @author ydr.me
  * @create 2014-09-28 13:54

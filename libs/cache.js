@@ -1,4 +1,4 @@
-/*!
+/**
  * cache
  * @author ydr.me
  * @create 2015-05-01 20:42
