@@ -132,8 +132,8 @@ exports.parse = function (argv) {
         }
     });
 
-    if (!exports.exec(result.command, result.args, result)) {
-        elseFunction.call(result, result.command, result.args);
+    if (!exports.exec(result.command, result.args, result.names, result)) {
+        elseFunction.call(result, result.command, result.args, result.names);
     }
 
     return result;
@@ -173,19 +173,21 @@ exports.else = function (callback) {
  * 手动执行某条命令
  * @param command {String} 命令名称
  * @param [args] {Object} 参数
+ * @param [names] {Object} 参数
  * @param [context] {Object} 上下文
  * @return {Object}
  */
-exports.exec = function (command, args, context) {
+exports.exec = function (command, args, names, context) {
     if (command && commanFunctionMap[command]) {
         args = args || {};
         context = context || {
                 node: NODE_EXEC_PATH,
                 cwd: CWD,
                 command: command,
-                args: args
+                args: args,
+                names: names
             };
-        commanFunctionMap[command].call(context, args);
+        commanFunctionMap[command].call(context, args, names);
         return true;
     }
 
