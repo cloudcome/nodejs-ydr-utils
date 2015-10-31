@@ -11,10 +11,16 @@ var command = require('../libs/command.js');
 var debug = require('../libs/debug.js');
 
 command.alias('g', 'global');
+command.alias('s', 'save');
 command.alias({
     u: 'username',
     p: 'password',
     h: 'help'
+});
+
+command.type({
+    global: Boolean,
+    save: Boolean
 });
 
 command.if('install', function (arg) {

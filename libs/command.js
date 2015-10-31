@@ -19,6 +19,9 @@ var CWD = process.cwd();
 // 别名配置
 var aliasConfigs = {};
 
+// 参数类型
+var typeConfigs = {};
+
 // 命令函数 map
 var commanFunctionMap = {};
 
@@ -26,6 +29,39 @@ var commanFunctionMap = {};
 var elseFunction = function () {
     // noop
 };
+
+
+/**
+ * 设置、获取命令行参数别名
+ * @returns {*}
+ */
+exports.alias = function () {
+    return allocation.getset({
+        get: function (key) {
+            return aliasConfigs[key];
+        },
+        set: function (key, val) {
+            aliasConfigs[key] = val;
+        }
+    }, arguments);
+};
+
+
+/**
+ * 设置、获取参数类型
+ * @returns {*}
+ */
+exports.type = function () {
+    return allocation.getset({
+        get: function (key) {
+            return typeConfigs[key];
+        },
+        set: function (key, val) {
+            typeConfigs[key] = val;
+        }
+    }, arguments);
+};
+
 
 /**
  * 解析命令行参数
@@ -38,9 +74,11 @@ exports.parse = function (argv) {
         cwd: argv.shift(),
         input: argv.join(' '),
         command: null,
-        args: {}
+        args: {},
+        names: []
     };
     var lastArg = null;
+    var nameMap = {};
 
     dato.each(argv, function (index, arg) {
         arg = arg.trim();
@@ -51,24 +89,46 @@ exports.parse = function (argv) {
 
         var relArg = null;
 
+        // --
         if (REG_LONG_ARG.test(arg)) {
-            lastArg = arg.slice(2);
-            relArg = aliasConfigs[lastArg] || lastArg;
-            result.args[relArg] = true;
-        } else if (REG_SHORT_ARG.test(arg)) {
-            lastArg = arg.slice(1);
-            dato.repeat(lastArg.length, function (index) {
-                var shortArg = lastArg[index];
+            relArg = arg.slice(2);
 
-                relArg = aliasConfigs[shortArg] || shortArg;
-                result.args[relArg] = true;
+            if (typeConfigs[relArg] !== Boolean) {
+                lastArg = relArg;
+            }
+
+            relArg = aliasConfigs[relArg] || relArg;
+            result.args[relArg] = true;
+        }
+        // -
+        else if (REG_SHORT_ARG.test(arg)) {
+            relArg = arg.slice(1);
+
+            dato.repeat(relArg.length, function (index) {
+                var shortArg = relArg[index];
+                var longArg = aliasConfigs[shortArg] || shortArg;
+
+                if (typeConfigs[longArg] !== Boolean) {
+                    lastArg = longArg;
+                }
+
+                result.args[longArg] = true;
             });
-        } else if (lastArg) {
+        }
+        // arg
+        else if (lastArg) {
             relArg = aliasConfigs[lastArg] || lastArg;
             result.args[relArg] = arg;
             lastArg = null;
-        } else {
+        }
+        // command
+        else if (!result.command) {
             result.command = arg;
+        }
+        // name
+        else if (!nameMap[arg]) {
+            nameMap[arg] = true;
+            result.names.push(arg);
         }
     });
 
@@ -77,22 +137,6 @@ exports.parse = function (argv) {
     }
 
     return result;
-};
-
-
-/**
- * 设置命令行参数别名
- * @returns {*}
- */
-exports.alias = function () {
-    return allocation.getset({
-        get: function (key) {
-            return aliasConfigs[key];
-        },
-        set: function (key, val) {
-            aliasConfigs[key] = val;
-        }
-    }, arguments);
 };
 
 
