@@ -333,8 +333,7 @@ exports.gravatar = function (email, options) {
     email = email.toLowerCase();
 
     if (!options.origin) {
-        options.origin = 'http://gravatar.duoshuo.com/avatar/';
-        //options.origin = 's.gravatar.com/avatar/';
+        options.origin = 'http://cn.gravatar.com/avatar/';
     }
 
     options.origin += encryption.md5(email) + '?';
