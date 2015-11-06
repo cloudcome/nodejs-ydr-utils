@@ -18,7 +18,7 @@ var defaults = {
     host: '/',
     dirname: '/',
     filename: null,
-    expires: 10,
+    expires: 10 * 60 * 1000,
     mimeLimit: 'image/*'
 };
 var REG_END = /\/$/;
@@ -33,7 +33,7 @@ var REG_END = /\/$/;
  * @param [configs.secretKey=""] {String} secret_key
  * @param [configs.dirname="/"] {String} 上传目录
  * @param [configs.filename] {String} 上传文件名，否则随机生成
- * @param [configs.expires] {Number} 凭证有效期，默认 10 分钟，单位分钟
+ * @param [configs.expires] {Number} 凭证有效期，默认 10 分钟，单位毫秒
  * @param [configs.mimeLimit="image/*"] {String} 上传文件限制类型
  * @returns {{key: *, token: string}}
  */
@@ -51,7 +51,6 @@ exports.generateKeyAndToken = function (configs) {
     }
 
     var key = configs.dirname + (configs.filename || random.guid());
-    var tenMinutes = 10 * 60;
 
     // 文件名
     configs.dirname = String(configs.dirname).trim();
@@ -59,7 +58,7 @@ exports.generateKeyAndToken = function (configs) {
     var encoded = urlsafeBase64Encode(JSON.stringify({
         scope: configs.bucket + ':' + key,
         // 有效期
-        deadline: (configs.expires || tenMinutes) + Math.floor(Date.now() / 1000),
+        deadline: Math.floor((configs.expires + Date.now()) / 1000),
         mimeLimit: configs.mimeLimit
     }));
     var encoded_signed = base64ToUrlSafe(hmacSha1(encoded, configs.secretKey));
