@@ -9,7 +9,21 @@
 
 var path = require('../libs/path.js');
 
-console.log(path.join('\\a\\b', '../d/f'));
-console.log(path.relative('\\a\\b', '../d/f'));
-console.log(path.sep);
+describe('libs/path', function () {
+    console.log(path.join('\\a\\b', '../d/f'));
+    console.log(path.relative('\\a\\b', '../d/f'));
+    console.log(path.sep);
+
+    it('glob', function () {
+        var files = path.glob([
+            '*.js',
+            '*.js'
+        ], {
+            srcDirname: __dirname
+        });
+
+        console.log(files);
+    });
+});
+
 

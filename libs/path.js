@@ -8,8 +8,12 @@
 'use strict';
 
 var path = require('path');
+var glob = require('glob');
+
 var dato = require('./dato.js');
+var typeis = require('./typeis.js');
 var allocation = require('./allocation.js');
+
 //path.__defineGetter__      path.__defineSetter__      path.__lookupGetter__      path.__lookupSetter__      path.__proto__             path.constructor
 //path.hasOwnProperty        path.isPrototypeOf         path.propertyIsEnumerable  path.toLocaleString        path.toString              path.valueOf
 //path._makeLong             path.basename              path.delimiter             path.dirname               path.extname               path.format
@@ -72,7 +76,6 @@ exports.toURI = function (p) {
 };
 
 
-
 /**
  * 路径合并
  * @param from {String} 路径
@@ -106,4 +109,53 @@ exports.relative = function (from, to/*arguments*/) {
     return path.relative.apply(path, args);
 };
 
+
+var globDefaults = {
+    glob: [],
+    srcDirname: __dirname,
+    globOptions: {
+        dot: false,
+        nodir: true
+    },
+    progress: null
+};
+/**
+ * glob 分析
+ * @param globArray {String|Array} 规则字符串或数组
+ * @param options {Object} 配置
+ * @param options.srcDirname {String} 原始目录
+ * @param options.globOptions {Object} glob 配置
+ * @param options.progress {Function} 过程回调
+ * @returns {Array}
+ */
+exports.glob = function (globArray, options) {
+    var files = [];
+    var map = {};
+
+    options = dato.extend(true, {}, globDefaults, options);
+    globArray = typeis.array(globArray) ? globArray : [globArray];
+
+    dato.each(globArray, function (indexGlob, p) {
+        var p2 = path.join(options.srcDirname, p);
+        var _files = glob.sync(p2, options.globOptions);
+        var _files2 = [];
+
+        dato.each(_files, function (index, file) {
+            if (!map[file]) {
+                map[file] = true;
+                _files2.push(file);
+            }
+        });
+
+        if (typeis.function(options.progress)) {
+            dato.each(_files2, function (indexFile, file) {
+                options.progress(indexGlob, indexFile, file);
+            });
+        }
+
+        files = files.concat(_files2);
+    });
+
+    return files;
+};
 
