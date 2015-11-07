@@ -103,7 +103,7 @@ exports.relative = function (from, to/*arguments*/) {
     var args = allocation.args(arguments);
 
     args = args.map(function (p) {
-        return exports.toSystem(p);
+        return exports.toURI(p);
     });
 
     return path.relative.apply(path, args);
