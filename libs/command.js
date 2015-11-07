@@ -10,6 +10,7 @@
 var dato = require('./dato.js');
 var allocation = require('./allocation.js');
 var typeis = require('./typeis.js');
+var path = require('./path.js');
 
 var REG_LONG_ARG = /^--/;
 var REG_SHORT_ARG = /^-/;
@@ -194,3 +195,28 @@ exports.exec = function (command, args, names, context) {
     return false;
 };
 
+
+/**
+ * 解析 原始目录
+ * @param args {Object} 参数
+ * @param [dirnameKey] {String} 目录键名
+ * @returns {string}
+ */
+exports.dirname = function (args, dirnameKey) {
+    dirnameKey = dirnameKey || 'dirname';
+
+    var CWD = process.cwd();
+    var srcDirname = '';
+
+    if (args.dirname) {
+        if (path.isAbsolute(args[dirnameKey])) {
+            srcDirname = args[dirnameKey];
+        } else {
+            srcDirname = path.join(CWD, args[dirnameKey]);
+        }
+    } else {
+        srcDirname = CWD;
+    }
+
+    return srcDirname;
+};
