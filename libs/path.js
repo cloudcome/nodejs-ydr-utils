@@ -85,11 +85,7 @@ exports.toURI = function (p) {
 exports.join = function (from, to/*arguments*/) {
     var args = allocation.args(arguments);
 
-    args = args.map(function (p) {
-        return exports.toURI(p);
-    });
-
-    return path.join.apply(path, args);
+    return exports.toURI(path.join.apply(path, args));
 };
 
 
@@ -102,11 +98,7 @@ exports.join = function (from, to/*arguments*/) {
 exports.relative = function (from, to/*arguments*/) {
     var args = allocation.args(arguments);
 
-    args = args.map(function (p) {
-        return exports.toURI(p);
-    });
-
-    return path.relative.apply(path, args);
+    return exports.toURI(path.relative.apply(path, args));
 };
 
 
