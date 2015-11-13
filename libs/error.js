@@ -56,10 +56,15 @@ exports.config = function (errorCode, errorMeta) {
 
 /**
  * 自定义错误
- * @param code {Number} 错误号
+ * @param code {Number|Object} 错误号
+ * @param [code.code] {Number} 错误号
  * @returns {Error}
  */
 exports.create = function (code) {
+    if (typeis(code) === 'object') {
+        code = code.code;
+    }
+
     var meta = configs[code];
 
     if (!meta) {
