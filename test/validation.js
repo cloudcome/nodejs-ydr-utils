@@ -21,6 +21,7 @@ describe('libs/validation.js', function () {
         email: '邮箱',
         select: '数组'
     });
+    v.addRule('name', 'trim', true);
     v.addRule('name', 'required', true);
     v.addRule('name', 'minLength', 4);
     v.addRule('name', 'maxLength', 8);
@@ -33,17 +34,17 @@ describe('libs/validation.js', function () {
 
     it('e', function (done) {
         var data = {
-            name: '11111',
+            name: '    ',
             age: 22,
             url: 'http://abc.com/',
             email: '1@1.cc',
             select: [
-                '1','2','3'
+                '1', '2', '3'
             ]
         };
         v.validateAll(data, function (err, path) {
             if (err) {
-                console.log('验证错误：', path, err.message);
+                console.log('验证错误：', '【' + path + '】', err.message);
             }
 
             assert.equal(!!err, false);

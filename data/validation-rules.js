@@ -15,6 +15,14 @@ var lang = require('./validation-lang.js');
 var REG_NUMBERIC = /^-?[\d.]+$/;
 
 module.exports = function (Validation) {
+    Validation.addRule('trim', function (val, done) {
+        if(typeis(val) === 'string' || typeis(val) === 'number'){
+            this.data[this.path] = String(val).trim();
+        }
+
+        done();
+    });
+
     Validation.addRule('type', function (val, done, param0) {
         var the = this;
         var path = the.path;
