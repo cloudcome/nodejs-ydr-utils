@@ -440,6 +440,6 @@ Validation.getRule = function (name) {
     return name ? validationMap[name] : validationMap;
 };
 
-require('./validation-rules.js')(Validation);
+require('../data/validation-rules.js')(Validation);
 Validation.defaults = defaults;
 module.exports = Validation;
