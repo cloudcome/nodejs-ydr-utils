@@ -260,6 +260,89 @@ var Validation = klass.extends(Emitter).create({
 
 
     /**
+     * 执行部分验证
+     * @param data {Object} 待验证的数据
+     * @param [callback] {Function} 验证回调
+     * @returns {Validation}
+     */
+    validateSome: function (data, callback) {
+        var the = this;
+        var options = the._options;
+        var path = '';
+
+        if (the._isValidating) {
+            return the;
+        }
+
+        the._isValidating = true;
+        the.data = data;
+        /**
+         * 部分验证之前
+         * @event beforeValidateSome
+         */
+        the.emit('beforeValidateSome');
+        var errorLength = 0;
+        var firstInvlidError = null;
+        var firstInvlidPath = null;
+
+        howdo
+        // 遍历验证顺序
+            .each(the._validateList, function (i, item, next) {
+                if(!(item.path in data)){
+                    return next();
+                }
+
+                the._validateOne(path = item.path, item.rules, function (err) {
+                    if (err) {
+                        if (!firstInvlidPath) {
+                            firstInvlidError = err;
+                            firstInvlidPath = item.path;
+                        }
+
+                        errorLength++;
+                    }
+
+                    // 有错误 && 失败不断开
+                    if (err && !options.breakOnInvalid) {
+                        err = null;
+                    }
+
+                    next(err);
+                });
+            })
+            .follow(function (err) {
+                the._isValidating = false;
+
+                if (errorLength) {
+                    /**
+                     * 验证失败
+                     * @param error {Object} 错误对象
+                     * @param path {String} 字段
+                     * @event error
+                     */
+                    the.emit('error', firstInvlidError, firstInvlidPath);
+                } else {
+                    /**
+                     * 验证成功
+                     * @event success
+                     */
+                    the.emit('success');
+                }
+
+                /**
+                 * 全部验证之后
+                 * @event aftervalidateall
+                 */
+                the.emit('afterValidateSome');
+
+                callback.call(the, firstInvlidError, firstInvlidPath);
+            });
+
+        return the;
+    },
+
+
+    /**
      * 执行全部验证
      * @param data {Object} 待验证的数据
      * @param [callback] {Function} 验证回调
