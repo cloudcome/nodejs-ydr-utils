@@ -1,6 +1,6 @@
 {
   "name": "ydr-utils",
-  "version": "30.13.0",
+  "version": "34.0.0",
   "private": false,
   "description": "utils for ydr.me",
   "scripts": {

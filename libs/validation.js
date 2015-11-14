@@ -39,15 +39,10 @@ var defaults = {
     // false: 返回错误对象组成的数组
     // 浏览器端，默认为 false
     // 服务器端，默认为 true
-    breakOnInvalid: typeis.window(window) ? false : true,
+    breakOnInvalid: typeof window === 'undefined',
     defaultMsg: '${1}不合法'
 };
-var Validation = klass.extend(Emitter).create({
-    /**
-     * constructor
-     * @extends Emitter
-     * @param options
-     */
+var Validation = klass.extends(Emitter).create({
     constructor: function (options) {
         var the = this;
 
@@ -64,12 +59,19 @@ var Validation = klass.extend(Emitter).create({
     /**
      * 为路径设置别名
      * @param path {String} 字段
-     * @param alias {String} 别名
+     * @param [alias] {String} 别名
      * @returns {Validation}
      */
     setAlias: function (path, alias) {
-        this._aliasMap[path] = alias;
-        return this;
+        var the = this;
+
+        if (typeis(path) === 'object') {
+            dato.extend(the._aliasMap, path);
+            return the;
+        }
+
+        the._aliasMap[path] = alias;
+        return the;
     },
 
 
@@ -112,7 +114,7 @@ var Validation = klass.extend(Emitter).create({
         var params = args.slice(2);
         var index = the._validateIndexMap[path];
 
-        if (typeis.isUndefined(index)) {
+        if (typeis.undefined(index)) {
             index = the._validateIndexMap[path] = the._validateList.length;
             the._validateList.push({
                 path: path,
@@ -120,7 +122,7 @@ var Validation = klass.extend(Emitter).create({
             });
         }
 
-        if (typeis.isString(nameOrfn)) {
+        if (typeis.string(nameOrfn)) {
             var name = nameOrfn;
 
             if (!validationMap[name]) {
@@ -132,7 +134,7 @@ var Validation = klass.extend(Emitter).create({
                 params: params,
                 fn: validationMap[name]
             });
-        } else if (typeis.isFunction(nameOrfn)) {
+        } else if (typeis.function(nameOrfn)) {
             the._validateList[index].rules.push({
                 name: namespace + alienIndex++,
                 params: params,
@@ -248,7 +250,7 @@ var Validation = klass.extend(Emitter).create({
              */
             the.emit('aftervalidateone', path);
 
-            if (typeis.isFunction(callback)) {
+            if (typeis.function(callback)) {
                 callback.call(the, !err);
             }
         });
@@ -329,7 +331,7 @@ var Validation = klass.extend(Emitter).create({
                  */
                 the.emit('aftervalidateall');
 
-                callback.call(the, !errorLength);
+                callback.call(the, firstInvlidError, firstInvlidPath);
             });
 
         return the;
@@ -366,7 +368,7 @@ var Validation = klass.extend(Emitter).create({
                 rule.fn.apply(the, args);
             })
             .follow()
-            .done(function () {
+            .try(function () {
                 /**
                  * 验证成功
                  * @event valid
@@ -381,11 +383,11 @@ var Validation = klass.extend(Emitter).create({
                  */
                 the.emit('aftervalidate', path);
 
-                if (typeis.isFunction(callback)) {
+                if (typeis.function(callback)) {
                     callback.call(the, null);
                 }
             })
-            .fail(function (err) {
+            .catch(function (err) {
                 var overrideMsg = the._msgMap[path] && the._msgMap[path][currentRule.name];
                 var args = [overrideMsg || err || options.defaultMsg, the.getAlias(path) || path];
 
@@ -407,7 +409,7 @@ var Validation = klass.extend(Emitter).create({
                  */
                 the.emit('aftervalidate', path);
 
-                if (typeis.isFunction(callback)) {
+                if (typeis.function(callback)) {
                     callback.call(the, err);
                 }
             });
@@ -438,6 +440,6 @@ Validation.getRule = function (name) {
     return name ? validationMap[name] : validationMap;
 };
 
-
+require('./validation-rules.js')(Validation);
 Validation.defaults = defaults;
 module.exports = Validation;
