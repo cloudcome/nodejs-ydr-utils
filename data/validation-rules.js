@@ -35,6 +35,9 @@ module.exports = function (Validation) {
         }
 
         switch (param0) {
+            case 'array':
+                return done(typeis(val) === 'array' ? null : string.assign(lang.get('type', 'array'), alias, param0));
+
             case 'number':
                 return done(/^-?\d+$/.test(val) ? null : string.assign(lang.get('type', 'number'), alias, param0));
 
