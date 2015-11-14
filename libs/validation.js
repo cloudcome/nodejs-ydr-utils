@@ -15,7 +15,7 @@ var dato = require('./dato.js');
 var typeis = require('./typeis.js');
 var allocation = require('./allocation.js');
 var string = require('./string.js');
-var Emitter = require('events');
+var Emitter = require('./emitter.js');
 
 
 /**

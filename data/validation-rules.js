@@ -7,9 +7,9 @@
 
 'use strict';
 
-var typeis = require('./typeis.js');
-var number = require('./number.js');
-var string = require('./string.js');
+var typeis = require('../libs/typeis.js');
+var number = require('../libs/number.js');
+var string = require('../libs/string.js');
 var lang = require('./validation-lang.js');
 
 var REG_NUMBERIC = /^-?[\d.]+$/;
@@ -28,30 +28,29 @@ module.exports = function (Validation) {
 
         switch (param0) {
             case 'number':
-                //return done(/^-?\d+$/.test(val) ? null : '${path}必须是数值格式');
                 return done(/^-?\d+$/.test(val) ? null : string.assign(lang.get('type', 'number'), alias, param0));
 
             case 'integer':
                 val = val.replace(/^-/, '');
-                //return done(/^[1-9]*\d$/.test(val) ? null : '${path}必须是整数');
                 return done(/^(0|[1-9]\d*)$/.test(val) ? null : string.assign(lang.get('type', 'integer'), alias, param0));
 
             case 'mobile':
-                //return done(/^1\d{10}$/.test(val) ? null : '${path}必须是手机号');
                 return done(/^1\d{10}$/.test(val) ? null : string.assign(lang.get('type', 'mobile'), alias, param0));
 
             case 'email':
-                //return done(typeis.email(val) ? null : '${path}必须是邮箱');
                 return done(typeis.email(val) ? null : string.assign(lang.get('type', 'email'), alias, param0));
 
             case 'url':
-                //return done(typeis.url(val) ? null : '${path}必须是 url 地址');
                 return done(typeis.url(val) ? null : string.assign(lang.get('type', 'url'), alias, param0));
         }
     });
 
 
-    Validation.addRule('required', function (val, done) {
+    Validation.addRule('required', function (val, done, param0) {
+        if (!param0) {
+            return done();
+        }
+
         var isMultiple = _isMultiple(val);
         var boolean = typeis(val) === 'file' ? true :
         (isMultiple ? val : (val || '')).length > 0;
@@ -70,23 +69,22 @@ module.exports = function (Validation) {
         return function (val, done, param0) {
             param0 = number.parseInt(param0);
 
+            var requiredParams = this.getRuleParams(this.path, 'required');
+            var required = requiredParams ? requiredParams[0] : true;
             var isMultiple = _isMultiple(val);
             var length = (isMultiple ? val : (val || '')).length;
             var boolean = type === 0 ? length >= param0 : length <= param0;
 
-            //done(boolean ? null : '${path}' +
-            //    (isMultiple ? typeMap[type][0] + '选择' + param0 + '项' : '不能' + typeMap[type][1] + param0 + '个字符')
-            //);
+            // 未填 && 可选
+            if (!length && !required) {
+                return done();
+            }
 
             if (isMultiple) {
                 done(boolean ? null : lang.get(typeMap[type], 'select'));
             } else {
                 done(boolean ? null : lang.get(typeMap[type], 'input'));
             }
-
-            //done(boolean ? null : '${path}' +
-            //    (isMultiple ? typeMap[type][0] + '选择' + param0 + '项' : '不能' + typeMap[type][1] + param0 + '个字符')
-            //);
         };
     };
 
@@ -126,8 +124,6 @@ module.exports = function (Validation) {
 
     Validation.addRule('min', _createNumber(0));
     Validation.addRule('max', _createNumber(1));
-
-
     Validation.addRule('step', function (val, done, param0) {
         val = val || '';
 
@@ -153,6 +149,32 @@ module.exports = function (Validation) {
 
         done((val - min) % param0 ? '${1}递增步进值必须是' + param0 + '，最小值为' + min : null);
     });
+
+    var _createSelect = function (type) {
+        return function (val, done, param0) {
+            if (!param0) {
+                return done();
+            }
+
+            if (typeis(val) !== 'array') {
+                return done('${1}必须为数组格式');
+            }
+
+            var length = val.length;
+
+            // most
+            if (type) {
+                done(length > param0 ? lang.get('most') : null);
+            }
+            // least
+            else {
+                done(length < param0 ? lang.get('least') : null);
+            }
+        };
+    };
+
+    Validation.addRule('least', _createSelect(0));
+    Validation.addRule('most', _createSelect(1));
 };
 
 
