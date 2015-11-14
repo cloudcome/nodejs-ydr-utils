@@ -15,8 +15,8 @@ var lang = require('./validation-lang.js');
 var REG_NUMBERIC = /^-?[\d.]+$/;
 
 module.exports = function (Validation) {
-    Validation.addRule('trim', function (val, done) {
-        if(typeis(val) === 'string' || typeis(val) === 'number'){
+    Validation.addRule('trim', function (val, done, param0) {
+        if ((typeis(val) === 'string' || typeis(val) === 'number') && param0) {
             this.data[this.path] = String(val).trim();
         }
 
