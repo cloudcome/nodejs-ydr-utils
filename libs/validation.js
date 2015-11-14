@@ -238,17 +238,17 @@ var Validation = klass.extends(Emitter).create({
 
         /**
          * 单个验证之前
-         * @event beforevalidateone
+         * @event beforeValidateOne
          * @param path {String} 字段
          */
-        the.emit('beforevalidateone', path);
+        the.emit('beforeValidateOne', path);
         the._validateOne(path, rules, function (err) {
             /**
              * 单个验证之后
-             * @event aftervalidateone
+             * @event afterValidateOne
              * @param path {String} 字段
              */
-            the.emit('aftervalidateone', path);
+            the.emit('afterValidateOne', path);
 
             if (typeis.function(callback)) {
                 callback.call(the, !err);
@@ -361,9 +361,9 @@ var Validation = klass.extends(Emitter).create({
         the.data = data;
         /**
          * 全部验证之前
-         * @event beforevalidateall
+         * @event beforeValidateAll
          */
-        the.emit('beforevalidateall');
+        the.emit('beforeValidateAll');
         var errorLength = 0;
         var firstInvlidError = null;
         var firstInvlidPath = null;
@@ -410,9 +410,9 @@ var Validation = klass.extends(Emitter).create({
 
                 /**
                  * 全部验证之后
-                 * @event aftervalidateall
+                 * @event afterValidateAll
                  */
-                the.emit('aftervalidateall');
+                the.emit('afterValidateAll');
 
                 callback.call(the, firstInvlidError, firstInvlidPath);
             });
@@ -434,10 +434,10 @@ var Validation = klass.extends(Emitter).create({
 
         /**
          * 验证之前
-         * @event beforevalidate
+         * @event beforeValidate
          * @param path {String} 字段
          */
-        the.emit('beforevalidate', path);
+        the.emit('beforeValidate', path);
         var currentRule;
         howdo
         // 遍历验证规则
@@ -461,10 +461,10 @@ var Validation = klass.extends(Emitter).create({
 
                 /**
                  * 验证之后
-                 * @event aftervalidate
+                 * @event afterValidate
                  * @param path {String} 字段
                  */
-                the.emit('aftervalidate', path);
+                the.emit('afterValidate', path);
 
                 if (typeis.function(callback)) {
                     callback.call(the, null);
@@ -487,10 +487,10 @@ var Validation = klass.extends(Emitter).create({
 
                 /**
                  * 验证之后
-                 * @event aftervalidate
+                 * @event afterValidate
                  * @param path {String} 字段
                  */
-                the.emit('aftervalidate', path);
+                the.emit('afterValidate', path);
 
                 if (typeis.function(callback)) {
                     callback.call(the, err);
