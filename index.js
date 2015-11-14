@@ -27,6 +27,8 @@ module.exports = {
     dato: require('./libs/dato.js'),
     // 命令行日志
     debug: require('./libs/debug.js'),
+    // 命令行日志
+    Emitter: require('./libs/emitter.js'),
     // 加密
     encryption: require('./libs/encryption.js'),
     // 自定义错误
@@ -64,7 +66,7 @@ module.exports = {
     // ua解析
     ua: require('./libs/ua.js'),
     // 数据验证
-    Validator: require('./libs/validator.js'),
+    Validation: require('./libs/validation.js'),
     // 数据类型
     xss: require('./libs/xss.js')
 };
