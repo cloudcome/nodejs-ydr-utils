@@ -16,8 +16,9 @@ var REG_NUMBERIC = /^-?[\d.]+$/;
 
 module.exports = function (Validation) {
     Validation.addRule('trim', function (val, done, param0) {
-        if ((typeis(val) === 'string' || typeis(val) === 'number') && param0) {
-            this.data[this.path] = String(val).trim();
+        if (param0) {
+            this.data[this.path] = typeis(val) === 'string' || typeis(val) === 'number' ?
+                String(val).trim() : '';
         }
 
         done();
@@ -27,6 +28,7 @@ module.exports = function (Validation) {
         var the = this;
         var path = the.path;
         var isRequired = the.getRuleParams(path, 'required');
+        isRequired = isRequired ? isRequired[0] : true;
         var alias = the.getAlias(path) || path;
 
         // 非必填并且是空值
