@@ -251,7 +251,7 @@ var Validation = klass.extends(Emitter).create({
             the.emit('afterValidateOne', path);
 
             if (typeis.function(callback)) {
-                callback.call(the, !err);
+                callback.call(the, err);
             }
         });
 
