@@ -29,6 +29,8 @@
     "dato",
     "debug",
     "crypto",
+    "event",
+    "emitter",
     "encryption",
     "error",
     "favicon",
