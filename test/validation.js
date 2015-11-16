@@ -34,19 +34,21 @@ describe('libs/validation.js', function () {
 
     it('e', function (done) {
         var data = {
-            name: '    ',
+            name: '呵呵呵呵',
             age: 22,
             url: 'http://abc.com/',
             email: '1@1.cc',
             select: [
                 '1', '2', '3'
-            ]
+            ],
+            visible: true
         };
         v.validateAll(data, function (err, path) {
             if (err) {
                 console.log('验证错误：', '【' + path + '】', err.message);
             }
 
+            console.log(arguments);
             assert.equal(!!err, false);
             done();
         });
