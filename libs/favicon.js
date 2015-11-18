@@ -48,7 +48,10 @@ var configs = {
     equalMap: {
         '163.com': /^(.+\.)*163\.com$/,
         'google.com': /^(.+\.)*google\.com$/,
-        'baidu.com': /^(.+\.)*baidu\.com$/
+        'baidu.com': /^(.+\.)*baidu\.com$/,
+        'taobao.com': /^(.+\.)*taobao\.com$/,
+        'alipay.com': /^(.+\.)*alipay\.com$/,
+        'tmall.com': /^(.+\.)*tmall\.com$/
     }
 };
 var defaultConfigs = {};
@@ -264,10 +267,7 @@ var Favicon = klass.extends(Emitter).create({
     _getFaviconFromPage: function (url, callback) {
         var the = this;
 
-        request.get({
-            url: url,
-            timeout: -1
-        }, function (err, body) {
+        request.get(url, function (err, body) {
             if (err) {
                 return callback();
             }
@@ -341,10 +341,7 @@ var Favicon = klass.extends(Emitter).create({
             return next();
         }
 
-        request.down({
-            url: the.faviconURL,
-            timeout: -1
-        }, function (err, stream, res) {
+        request.down(the.faviconURL, function (err, stream, res) {
             if (err) {
                 the.emit('error', 'download error: ' + this.options.href);
                 return next();

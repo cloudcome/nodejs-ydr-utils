@@ -123,7 +123,6 @@ function _remote(options, callback) {
 
     // ！！！这里千万不要深度复制！！！
     options = dato.extend(false, {}, defaults, options);
-    options.cookie = '';
     options.redirectTimes = number.parseInt(options.redirectTimes, 10);
     callback = typeis.function(callback) ? callback : noop;
 
@@ -157,11 +156,13 @@ function _remote(options, callback) {
 
             if (is30x) {
                 if (options.redirectWithCookie) {
-                    if (options.cookie) {
-                        options.cookie = ';' + options.cookie;
+                    if (options.headers.cookie) {
+                        options.headers.cookie = ';' + options.headers.cookie;
+                    } else {
+                        options.headers.cookie = '';
                     }
 
-                    options.cookie += qs.stringify(res.headers['set-cookie'], ';', '=');
+                    options.headers.cookie += qs.stringify(res.headers['set-cookie'], ';', '=');
                 }
 
                 int30x++;
@@ -301,6 +302,9 @@ function _request(options, callback) {
         options: options,
         id: random.guid()
     };
+    console.log('\n\n==================================================================================');
+    console.log(requestOptions);
+    console.log('=======================================================================================\n\n');
     var req = _http.request(requestOptions, function (res) {
         var bufferList = [];
         var binarys = '';
