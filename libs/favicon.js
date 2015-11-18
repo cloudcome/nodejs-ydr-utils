@@ -56,6 +56,12 @@ var Favicon = klass.extends(Emitter).create({
             the.emit('error', err);
         }
 
+        try {
+            fse.ensureFileSync(configs.configsFilePath);
+        } catch (err) {
+            the.emit('error', err);
+        }
+
         url = the._fixURL(url);
         the._oURL = url;
         the.url = url;
@@ -211,6 +217,8 @@ var Favicon = klass.extends(Emitter).create({
 
         the._homeURL = the._url.protocol + '//' + the._url.host;
         return the._getFaviconFromPage(the._homeURL, function (url) {
+            console.log('the._homeURL', the._homeURL);
+            console.log('_getFaviconFromPage', url);
             the.faviconURL = url;
             next();
         });
