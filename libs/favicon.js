@@ -49,12 +49,12 @@ var configs = {
     minContentLength: 21,
     // 相等 map
     equalMap: {
-        '163.com': /^(.+\.)*163\.com$/,
-        'google.com': /^(.+\.)*google\.com$/,
-        'baidu.com': /^(.+\.)*baidu\.com$/,
-        'taobao.com': /^(.+\.)*taobao\.com$/,
-        'alipay.com': /^(.+\.)*alipay\.com$/,
-        'tmall.com': /^(.+\.)*tmall\.com$/
+        '163.com': /^([^.]+\.)*163\.com$/,
+        'google.com': /^([^.]+\.)*google\.com(\.[^.]+)*$/,
+        'baidu.com': /^([^.]+\.)*baidu\.com$/,
+        'taobao.com': /^([^.]+\.)*taobao\.com$/,
+        'alipay.com': /^([^.]+\.)*alipay\.com$/,
+        'tmall.com': /^([^.]+\.)*tmall\.com$/
     }
 };
 var defaultConfigs = {};
