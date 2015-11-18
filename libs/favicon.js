@@ -219,7 +219,13 @@ var Favicon = klass.extends(Emitter).create({
     _getFaviconFromPage: function (url, callback) {
         var the = this;
 
-        request.get(url, function (err, body) {
+        console.log('-----------------------------');
+        console.log(url);
+        console.log('-----------------------------');
+        request.get({
+            url: url,
+            timeout: -1
+        }, function (err, body) {
             if (err) {
                 return callback();
             }
@@ -299,7 +305,10 @@ var Favicon = klass.extends(Emitter).create({
                 return next();
             }
 
-            request.down(url, function (err, stream, res) {
+            request.down({
+                url: url,
+                timeout: -1
+            }, function (err, stream, res) {
                 if (err) {
                     the.emit('error', 'download error: ' + this.options.href);
                     return next();

@@ -8,7 +8,7 @@ var configs = {
 Favicon.config(configs);
 Favicon.buildDefaultConfigs();
 
-var favicon = new Favicon('baidu.com');
+var favicon = new Favicon('aiboshuo.com');
 
 //var u = Favicon.joinURL('http://gruntjs.com/getting-started','../img/favicon.ico');
 //console.log(u);

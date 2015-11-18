@@ -8,7 +8,7 @@
 'use strict';
 
 var fs = require('fs');
-var url = require('url');
+var urlHelper = require('url');
 var http = require('http');
 var https = require('https');
 var qs = require('querystring');
@@ -162,11 +162,16 @@ function _remote(options, callback) {
             }
 
             if (is30x) {
-                var domain = this.options.protocol + '//' + this.options.hostname;
+                var urlRet = urlHelper.parse(options.url);
+                var domain = urlRet.protocol + '//' + urlRet.hostname;
                 var urlto = res.headers.location;
 
                 urlto = (REG_HTTP.test(urlto) ? '' : domain) + urlto;
                 options.url = urlto;
+                delete(options.headers.host);
+                delete(options.headers.origin);
+                delete(options.headers.referer);
+                delete(options.headers.referre);
                 request();
             } else {
                 clearTimeout(timeid);
@@ -204,7 +209,7 @@ function _request(options, callback) {
         return callback(new Error('request url must be a string'));
     }
 
-    var requestOptions = url.parse(options.url);
+    var requestOptions = urlHelper.parse(options.url);
     var _http = requestOptions.protocol === 'https:' ? https : http;
     var form = options.form;
     var file = options.file;
