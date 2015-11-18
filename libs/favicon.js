@@ -32,6 +32,7 @@ var REG_PATH_RELATIVE = /^(\.{1,2})\//;
 var REG_PATH_END = /\/[^/]+?\/$/;
 var REG_FAVICON_TYPE = /^image\/x-icon$/i;
 var REG_BASE_64 = /^data:image.*?;base64,/i;
+var REG_IMAGE_TYPE = /\.(png|jpeg|jpg|gif|ico|bmp)$/i;
 var noop = function () {
     //
 };
@@ -231,9 +232,7 @@ var Favicon = klass.extends(Emitter).create({
 
             var url = REG_HTTP.test(attrURL) ? attrURL : Favicon.joinURL(this.options.url, attrURL);
 
-            the._parseFaviconURLByHead(url, function (url) {
-                callback(url);
-            });
+            the._parseFaviconURLByHead(url, callback);
         });
     },
 
@@ -269,11 +268,7 @@ var Favicon = klass.extends(Emitter).create({
     _saveFaviconFromURL: function (next) {
         var the = this;
 
-        if (the.faviconFile) {
-            return next();
-        }
-
-        if (!the.faviconURL) {
+        if (the.faviconFile || !the.faviconURL) {
             return next();
         }
 
@@ -312,9 +307,21 @@ var Favicon = klass.extends(Emitter).create({
 
                 var filePath = path.join(configs.saveDirection, the._url.hostname + configs.extname);
 
+                try {
+                    fse.ensureFileSync(filePath);
+                } catch (err) {
+                    // ignore
+                }
+
                 stream
                     .pipe(fse.createWriteStream(filePath))
                     .on('error', function () {
+                        try {
+                            fse.removeSync(filePath);
+                        } catch (err) {
+                            // ignore
+                        }
+
                         the.emit('erorr', err);
                         next();
                     })
@@ -356,7 +363,7 @@ var Favicon = klass.extends(Emitter).create({
         var the = this;
 
         request.head(url, function (err, headers, res) {
-            var href = this.options.href;
+            var href = this.options.url;
 
             if (err) {
                 the.emit('error', err);
@@ -404,8 +411,8 @@ var Favicon = klass.extends(Emitter).create({
 
         var find = null;
 
-        // 倒序查找
-        dato.each(links.reverse(), function (index, link) {
+        // 顺序查找
+        dato.each(links, function (index, link) {
             var rel = the._getAttr(link, 'rel');
             var type = the._getAttr(link, 'type');
             var href = the._getAttr(link, 'href');
@@ -413,7 +420,10 @@ var Favicon = klass.extends(Emitter).create({
             //var sizes = the._getAttr(link, 'sizes');
 
             // <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
-            if (REG_REL_ICON.test(rel) || rel === 'icon' || REG_TYPE_ICON.test(type)) {
+            var cond1 = REG_REL_ICON.test(rel) || rel === 'icon' || REG_TYPE_ICON.test(type);
+            var cond2 = REG_BASE_64.test(href) || REG_IMAGE_TYPE.test(href);
+
+            if (cond1 && cond2) {
                 find = href;
                 return false;
             }
