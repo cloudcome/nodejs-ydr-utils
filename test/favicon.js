@@ -19,5 +19,5 @@ favicon.get(function () {
     console.log('file:', this.faviconFile);
     console.log('url:', this.faviconURL);
 }).on('error', function (err) {
-    console.log('err:', err);
+    console.log(err.stack);
 });

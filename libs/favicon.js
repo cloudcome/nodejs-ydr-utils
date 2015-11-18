@@ -43,7 +43,13 @@ var configs = {
     // 默认的 favicon 配置文件
     configsFilePath: '',
     // favicon 文件保存目录
-    saveDirection: ''
+    saveDirection: '',
+    // 相等 map
+    equalMap: {
+        '163.com': /^(.+\.)*163\.com$/,
+        'google.com': /^(.+\.)*google\.com$/,
+        'baidu.com': /^(.+\.)*baidu\.com$/
+    }
 };
 var defaultConfigs = {};
 var Favicon = klass.extends(Emitter).create({
@@ -146,6 +152,14 @@ var Favicon = klass.extends(Emitter).create({
             if (!REG_HOSTNAME.test(the._url.hostname)) {
                 the.url = null;
             }
+
+            dato.each(configs.equalMap, function (equalHostname, regexp) {
+                if (regexp.test(the._url.hostname)) {
+                    the._url = the._url.protocol + '//' + equalHostname;
+                    console.log('safeURL',the._url);
+                    return false;
+                }
+            });
         } else {
             the.url = null;
         }
