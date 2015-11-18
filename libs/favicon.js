@@ -51,12 +51,32 @@ var Favicon = klass.extends(Emitter).create({
     constructor: function (url, isUpdate) {
         var the = this;
 
+        url = the._fixURL(url);
         the._oURL = url;
         the.url = url;
         the._isUpdate = Boolean(isUpdate);
         the.faviconURL = null;
         the.faviconFile = null;
     },
+
+
+    /**
+     * 修正 URL
+     * @param url
+     * @returns {XML|string|void|*}
+     * @private
+     */
+    _fixURL: function (url) {
+        url = url.replace(REG_THIS_PROTOCOL, '');
+
+        if (!REG_HTTP.test(url)) {
+            url = 'http://' + url;
+        }
+
+        return url;
+    },
+
+
     /**
      * 获取 favicon 的信息
      * @param callback
@@ -184,7 +204,8 @@ var Favicon = klass.extends(Emitter).create({
             return next();
         }
 
-        return the._getFaviconFromPage(the._url.protocol + '//' + the._url.host, function (url) {
+        the._homeURL = the._url.protocol + '//' + the._url.host;
+        return the._getFaviconFromPage(the._homeURL, function (url) {
             the.faviconURL = url;
             next();
         });
@@ -198,7 +219,7 @@ var Favicon = klass.extends(Emitter).create({
     _getFaviconFromThisPage: function (next) {
         var the = this;
 
-        if (the.faviconFile || the.faviconURL) {
+        if (the.faviconFile || the.faviconURL || the._homeURL === the._oURL) {
             return next();
         }
 
@@ -219,9 +240,6 @@ var Favicon = klass.extends(Emitter).create({
     _getFaviconFromPage: function (url, callback) {
         var the = this;
 
-        console.log('-----------------------------');
-        console.log(url);
-        console.log('-----------------------------');
         request.get({
             url: url,
             timeout: -1
