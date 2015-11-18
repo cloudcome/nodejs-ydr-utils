@@ -428,8 +428,6 @@ var Favicon = klass.extends(Emitter).create({
             var contentLength = number.parseInt(headers['content-length'], 0);
             var contentType = headers['content-type'];
 
-            //console.log(href, contentLength, contentType, res.statusCode);
-
             if (REG_FAVICON_TYPE.test(contentType) && res.statusCode === 200 && contentLength > configs.minContentLength) {
                 return callback(href);
             }
@@ -493,8 +491,6 @@ var Favicon = klass.extends(Emitter).create({
             var cond1 = REG_REL_ICON.test(rel) || rel === 'icon' || REG_TYPE_ICON.test(type);
             var cond2 = REG_BASE_64.test(href) || REG_IMAGE_TYPE.test(href);
 
-            //console.log(cond1, cond2, rel, type, href);
-
             if (cond1 && cond2) {
                 find = href;
                 return false;
@@ -550,7 +546,6 @@ Favicon.updateDefaultConfigs = function () {
             encoding: 'utf8'
         });
     } catch (err) {
-        //console.log(err)
         // ignore
     }
 };

@@ -302,9 +302,6 @@ function _request(options, callback) {
         options: options,
         id: random.guid()
     };
-    //console.log('\n\n==================================================================================');
-    //console.log(requestOptions);
-    //console.log('=======================================================================================\n\n');
     var req = _http.request(requestOptions, function (res) {
         var bufferList = [];
         var binarys = '';
