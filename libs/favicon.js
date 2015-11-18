@@ -155,8 +155,8 @@ var Favicon = klass.extends(Emitter).create({
 
             dato.each(configs.equalMap, function (equalHostname, regexp) {
                 if (regexp.test(the._url.hostname)) {
-                    the._url = the._url.protocol + '//' + equalHostname;
-                    console.log('safeURL',the._url);
+                    the.url = the._url.protocol + '//' + equalHostname;
+                    the._url = urlHelper.parse(the.url);
                     return false;
                 }
             });

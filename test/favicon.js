@@ -8,7 +8,7 @@ var configs = {
 Favicon.config(configs);
 Favicon.buildDefaultConfigs();
 
-var url =  process.argv[2] || 'baidu.com';
+var url =  process.argv[2] || 'malaclc.tmall.com';
 var favicon = new Favicon(url);
 
 //var u = Favicon.joinURL('http://gruntjs.com/getting-started','../img/favicon.ico');

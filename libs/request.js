@@ -30,6 +30,8 @@ var defaults = {
     encoding: 'utf8',
     // 是否在接收到 30x 后自动跳转
     redirect30x: true,
+    // 是否跳转携带 cookie
+    redirectWithCookie: true,
     // 是否回调 stream
     callbackStream: false,
     // 最大 30x 跳转次数
@@ -121,6 +123,7 @@ function _remote(options, callback) {
 
     // ！！！这里千万不要深度复制！！！
     options = dato.extend(false, {}, defaults, options);
+    options.cookie = '';
     options.redirectTimes = number.parseInt(options.redirectTimes, 10);
     callback = typeis.function(callback) ? callback : noop;
 
@@ -153,6 +156,14 @@ function _remote(options, callback) {
             var is30x = res.statusCode === 301 || res.statusCode === 302;
 
             if (is30x) {
+                if (options.redirectWithCookie) {
+                    if (options.cookie) {
+                        options.cookie = ';' + options.cookie;
+                    }
+
+                    options.cookie += qs.stringify(res.headers['set-cookie'], ';', '=');
+                }
+
                 int30x++;
             }
 
