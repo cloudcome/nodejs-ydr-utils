@@ -44,6 +44,8 @@ var configs = {
     configsFilePath: '',
     // favicon 文件保存目录
     saveDirection: '',
+    // 内容最小长度
+    minContentLength: 21,
     // 相等 map
     equalMap: {
         '163.com': /^(.+\.)*163\.com$/,
@@ -342,8 +344,8 @@ var Favicon = klass.extends(Emitter).create({
         }
 
         request.down(the.faviconURL, function (err, stream, res) {
-            if (err) {
-                the.emit('error', 'download error: ' + this.options.href);
+            if (err || res.statusCode !== 200) {
+                the.emit('eror', new Error('download error: ' + this.options.href));
                 return next();
             }
 
@@ -356,6 +358,10 @@ var Favicon = klass.extends(Emitter).create({
                     next();
                 })
                 .on('close', function () {
+                    the.faviconFile = filePath;
+                    next();
+                })
+                .on('end', function () {
                     the.faviconFile = filePath;
                     next();
                 });
@@ -405,7 +411,7 @@ var Favicon = klass.extends(Emitter).create({
 
             console.log(href, contentLength, contentType, res.statusCode);
 
-            if (REG_FAVICON_TYPE.test(contentType) && res.statusCode === 200 && contentLength > 20) {
+            if (REG_FAVICON_TYPE.test(contentType) && res.statusCode === 200 && contentLength > configs.minContentLength) {
                 return callback(href);
             }
 
@@ -413,7 +419,7 @@ var Favicon = klass.extends(Emitter).create({
                 the.emit('error', new Error(href + ' status code is ' + res.statusCode));
             }
 
-            if (contentLength < 20) {
+            if (contentLength <= configs.minContentLength) {
                 the.emit('error', new Error(href + ' content-length is ' + contentLength));
             }
 
