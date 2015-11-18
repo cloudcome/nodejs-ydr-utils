@@ -35,7 +35,7 @@ var defaults = {
     // 是否回调 stream
     callbackStream: false,
     // 最大 30x 跳转次数
-    redirectTimes: 10,
+    maxRedirectTimes: 10,
     // 头信息
     headers: {},
     // form 表单，优先级1，form-data 模块的实例
@@ -118,12 +118,12 @@ exports.setBrowserHeaders = function (options) {
  * @private
  */
 function _remote(options, callback) {
-    var int30x = 0;
+    var redirect30xTimes = 0;
     var req;
 
     // ！！！这里千万不要深度复制！！！
     options = dato.extend(false, {}, defaults, options);
-    options.redirectTimes = number.parseInt(options.redirectTimes, 10);
+    options.maxRedirectTimes = number.parseInt(options.maxRedirectTimes, 10);
     callback = typeis.function(callback) ? callback : noop;
 
     var querystring = '';
@@ -165,12 +165,12 @@ function _remote(options, callback) {
                     options.headers.cookie += qs.stringify(res.headers['set-cookie'], ';', '=');
                 }
 
-                int30x++;
+                redirect30xTimes++;
             }
 
-            if (is30x && int30x > options.redirectTimes) {
+            if (is30x && redirect30xTimes > options.maxRedirectTimes) {
                 clearTimeout(timeid);
-                return callback.call(context, new Error('30x redirect times over ' + options.redirectTimes));
+                return callback.call(context, new Error('30x redirect times over ' + options.maxRedirectTimes));
             }
 
             if (is30x) {
@@ -183,7 +183,7 @@ function _remote(options, callback) {
                 delete(options.headers.host);
                 delete(options.headers.origin);
                 delete(options.headers.referer);
-                delete(options.headers.referre);
+                delete(options.headers.referrer);
                 request();
             } else {
                 clearTimeout(timeid);
@@ -302,9 +302,9 @@ function _request(options, callback) {
         options: options,
         id: random.guid()
     };
-    console.log('\n\n==================================================================================');
-    console.log(requestOptions);
-    console.log('=======================================================================================\n\n');
+    //console.log('\n\n==================================================================================');
+    //console.log(requestOptions);
+    //console.log('=======================================================================================\n\n');
     var req = _http.request(requestOptions, function (res) {
         var bufferList = [];
         var binarys = '';
