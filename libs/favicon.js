@@ -559,20 +559,24 @@ Favicon.updateDefaultConfigs = function () {
  * @private
  */
 Favicon.joinURL = function (from, to) {
-    var parseTo = urlHelper.parse(to);
+    if (from === to) {
+        to = './';
+    }
 
-    if (parseTo.protocol && parseTo.hostname) {
+    var retTo = urlHelper.parse(to);
+
+    if (retTo.protocol && retTo.hostname) {
         return to;
     }
 
-    var parse = urlHelper.parse(from);
-    var domain = (parse.protocol || 'http:') + '//' + (parse.hostname || '0');
+    var retFrom = urlHelper.parse(from);
+    var domain = (retFrom.protocol || 'http:') + '//' + (retFrom.hostname || '');
 
     if (REG_THIS_PROTOCOL.test(to)) {
-        return parse.protocol + to;
+        return retFrom.protocol + to;
     }
 
-    from = domain + (parse.pathname || '/').replace(REG_URL_SUFFIX, '/');
+    from = domain + (retFrom.pathname || '/').replace(REG_URL_SUFFIX, '/');
 
     if (!to || REG_PATH_ABSOLUTE.test(to)) {
         return domain + to;
