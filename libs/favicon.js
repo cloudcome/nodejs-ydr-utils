@@ -19,6 +19,7 @@ var typeis = require('./typeis.js');
 var Emitter = require('./emitter.js');
 
 var REG_LINK = /<link[^<>]*?>/ig;
+var REG_META = /<meta[^<>]*?>/ig;
 var REG_REL_ICON = /\s\bicon\b/i;
 var REG_TYPE_ICON = /\s-icon\b/i;
 var REG_HTTP = /^(http|ftp)s?:\/\//i;
@@ -76,6 +77,7 @@ var Favicon = klass.extends(Emitter).create({
         url = the._fixURL(url);
         the._oURL = url;
         the.url = url;
+        the._hostnameList = [];
         the._isUpdate = Boolean(isUpdate);
         the.faviconURL = null;
         the.faviconFile = null;
@@ -165,6 +167,8 @@ var Favicon = klass.extends(Emitter).create({
                     return false;
                 }
             });
+
+            the._hostnameList.push(the._url.hostname);
         } else {
             the.url = null;
         }
@@ -274,13 +278,19 @@ var Favicon = klass.extends(Emitter).create({
                 return callback();
             }
 
-            var attrURL = the._parseFaviconURLFromBody(body);
+            var attrRet = the._parseFaviconURLFromBody(body);
 
-            if (!attrURL) {
+            if (attrRet.refresh) {
+                the.url = attrRet.refresh;
+                the._safeURL();
+                return the._getFaviconFromPage(attrRet.refresh, callback);
+            }
+
+            if (!attrRet.favicon) {
                 return callback();
             }
 
-            var url = Favicon.joinURL(this.options.url, attrURL);
+            var url = Favicon.joinURL(this.options.url, attrRet.favicon);
 
             the._parseFaviconURLByHead(url, callback);
         });
@@ -349,7 +359,22 @@ var Favicon = klass.extends(Emitter).create({
                 return next();
             }
 
+
             var filePath = path.join(configs.saveDirection, the._url.hostname + configs.extname);
+            var onend = function () {
+                the.faviconFile = filePath;
+                // 推出最后一个
+                the._hostnameList.pop();
+                dato.each(the._hostnameList, function (index, hostname) {
+                    var copyFilePath = path.join(configs.saveDirection, hostname + configs.extname);
+                    try {
+                        fse.copySync(filePath, copyFilePath);
+                    } catch (err) {
+                        // ignore
+                    }
+                });
+                next();
+            };
 
             stream
                 .pipe(fse.createWriteStream(filePath))
@@ -357,14 +382,8 @@ var Favicon = klass.extends(Emitter).create({
                     the.emit('erorr', err);
                     next();
                 })
-                .on('close', function () {
-                    the.faviconFile = filePath;
-                    next();
-                })
-                .on('end', function () {
-                    the.faviconFile = filePath;
-                    next();
-                });
+                .on('close', onend)
+                .on('end', onend);
         });
     },
 
@@ -431,15 +450,33 @@ var Favicon = klass.extends(Emitter).create({
     /**
      * 获取资源里的 link 标签
      * @param body
-     * @returns {null|String}
+     * @returns {Object}
      * @private
      */
     _parseFaviconURLFromBody: function (body) {
         var the = this;
+        var metas = body.match(REG_META);
+        var findRefreshURL = null;
+
+        dato.each(metas, function (index, meta) {
+            var httpEquiv = the._getAttr(meta, 'http-equiv');
+            var content = the._getAttr(meta, 'content');
+            var contentURL = (content.match(/url=(.*)/) || ['', ''])[1];
+
+            if (httpEquiv === 'refresh' && contentURL) {
+                findRefreshURL = contentURL;
+                return false;
+            }
+        });
+
+        if (findRefreshURL) {
+            return {refresh: findRefreshURL};
+        }
+
         var links = body.match(REG_LINK);
 
         if (!links) {
-            return null;
+            return {};
         }
 
         var find = null;
@@ -464,7 +501,7 @@ var Favicon = klass.extends(Emitter).create({
             }
         });
 
-        return find;
+        return {favicon: find};
     },
 
 
