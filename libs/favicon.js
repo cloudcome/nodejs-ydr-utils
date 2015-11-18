@@ -6,20 +6,19 @@
 
 'use strict';
 
+var urlHelper = require('url');
+var howdo = require('howdo');
+var path = require('path');
+var fse = require('fs-extra');
+
 var request = require('./request.js');
 var dato = require('./dato.js');
 var number = require('./number.js');
 var klass = require('./class.js');
 var typeis = require('./typeis.js');
-var urlHelper = require('url');
-var howdo = require('howdo');
-var path = require('path');
-var fse = require('fs-extra');
-var Emitter = require('events').EventEmitter;
+var Emitter = require('./emitter.js');
+
 var REG_LINK = /<link[^<>]*?>/ig;
-//var REG_REL = /\brel\s*?=\s*?['"]([^'"]*?)['"]/i;
-//var REG_TYPE = /\btype\s*?=\s*?['"]([^'"]*?)['"]/i;
-//var REG_HREF = /\bhref\s*?=\s*?['"]([^'"]*?)['"]/i;
 var REG_REL_ICON = /\s\bicon\b/i;
 var REG_TYPE_ICON = /\s-icon\b/i;
 var REG_HTTP = /^(http|ftp)s?:\/\//i;
@@ -50,6 +49,12 @@ var defaultConfigs = {};
 var Favicon = klass.extends(Emitter).create({
     constructor: function (url, isUpdate) {
         var the = this;
+
+        try {
+            fse.ensureDirSync(configs.saveDirection);
+        } catch (err) {
+            the.emit('error', err);
+        }
 
         url = the._fixURL(url);
         the._oURL = url;
@@ -233,11 +238,11 @@ var Favicon = klass.extends(Emitter).create({
     /**
      * 从页面上读取 favicon
      * @param url
-     * @param callback
+     * @param next
      * @returns {*}
      * @private
      */
-    _getFaviconFromPage: function (url, callback) {
+    _getFaviconFromPage: function (url, next) {
         var the = this;
 
         request.get({
@@ -245,18 +250,21 @@ var Favicon = klass.extends(Emitter).create({
             timeout: -1
         }, function (err, body) {
             if (err) {
-                return callback();
+                return next();
             }
 
             var attrURL = the._parseFaviconURLFromBody(body);
 
             if (!attrURL) {
-                return callback();
+                return next();
             }
 
-            var url = REG_HTTP.test(attrURL) ? attrURL : Favicon.joinURL(this.options.url, attrURL);
+            var url = Favicon.joinURL(this.options.url, attrURL);
 
-            the._parseFaviconURLByHead(url, callback);
+            the._parseFaviconURLByHead(url, function (url) {
+                the.faviconURL = url;
+                next();
+            });
         });
     },
 
@@ -334,21 +342,9 @@ var Favicon = klass.extends(Emitter).create({
 
                 var filePath = path.join(configs.saveDirection, the._url.hostname + configs.extname);
 
-                try {
-                    fse.ensureFileSync(filePath);
-                } catch (err) {
-                    // ignore
-                }
-
                 stream
                     .pipe(fse.createWriteStream(filePath))
                     .on('error', function () {
-                        try {
-                            fse.removeSync(filePath);
-                        } catch (err) {
-                            // ignore
-                        }
-
                         the.emit('erorr', err);
                         next();
                     })
@@ -400,12 +396,7 @@ var Favicon = klass.extends(Emitter).create({
             var contentLength = number.parseInt(headers['content-length'], 0);
             var contentType = headers['content-type'];
 
-            if (res.statusCode === 200 && contentLength > 20) {
-                the.faviconURL = href;
-                return callback(href);
-            }
-
-            if (REG_FAVICON_TYPE.test(contentType)) {
+            if (REG_FAVICON_TYPE.test(contentType) && res.statusCode === 200 && contentLength > 20) {
                 return callback(href);
             }
 
