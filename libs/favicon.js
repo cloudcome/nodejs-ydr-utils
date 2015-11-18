@@ -29,7 +29,7 @@ var REG_PATH_ABSOLUTE = /^\//;
 var REG_THIS_PROTOCOL = /^\/\//;
 var REG_PATH_RELATIVE = /^(\.{1,2})\//;
 var REG_PATH_END = /\/[^/]+?\/$/;
-var REG_FAVICON_TYPE = /^image\/x-icon$/i;
+var REG_FAVICON_TYPE = /^image\/(vnd.microsoft.icon|x-icon|png|jpg|jpeg|gif)$/i;
 var REG_BASE_64 = /^data:image.*?;base64,/i;
 var REG_IMAGE_TYPE = /\.(png|jpeg|jpg|gif|ico|bmp)$/i;
 var noop = function () {
@@ -168,7 +168,6 @@ var Favicon = klass.extends(Emitter).create({
 
         if (defaultConfigs[the._url.hostname]) {
             the.faviconFile = configs.defaultFaviconFilePath;
-
             return next();
         }
 
@@ -217,8 +216,6 @@ var Favicon = klass.extends(Emitter).create({
 
         the._homeURL = the._url.protocol + '//' + the._url.host;
         return the._getFaviconFromPage(the._homeURL, function (url) {
-            console.log('the._homeURL', the._homeURL);
-            console.log('_getFaviconFromPage', url);
             the.faviconURL = url;
             next();
         });
@@ -246,11 +243,11 @@ var Favicon = klass.extends(Emitter).create({
     /**
      * 从页面上读取 favicon
      * @param url
-     * @param next
+     * @param callback
      * @returns {*}
      * @private
      */
-    _getFaviconFromPage: function (url, next) {
+    _getFaviconFromPage: function (url, callback) {
         var the = this;
 
         request.get({
@@ -258,21 +255,18 @@ var Favicon = klass.extends(Emitter).create({
             timeout: -1
         }, function (err, body) {
             if (err) {
-                return next();
+                return callback();
             }
 
             var attrURL = the._parseFaviconURLFromBody(body);
 
             if (!attrURL) {
-                return next();
+                return callback();
             }
 
             var url = Favicon.joinURL(this.options.url, attrURL);
 
-            the._parseFaviconURLByHead(url, function (url) {
-                the.faviconURL = url;
-                next();
-            });
+            the._parseFaviconURLByHead(url, callback);
         });
     },
 
@@ -315,7 +309,6 @@ var Favicon = klass.extends(Emitter).create({
         // data:image/vnd.microsoft.icon;base64,....
         if (REG_BASE_64.test(the.faviconURL)) {
             var file = path.join(configs.saveDirection, the._url.hostname + configs.extname);
-            console.log('base64:', the.faviconURL.replace(REG_BASE_64, ''));
 
             try {
                 fse.outputFileSync(file, the.faviconURL.replace(REG_BASE_64, ''), 'base64');
@@ -334,33 +327,27 @@ var Favicon = klass.extends(Emitter).create({
             return next();
         }
 
-        the._parseFaviconURLByHead(the.faviconURL, function (url) {
-            if (!url) {
+        request.down({
+            url: the.faviconURL,
+            timeout: -1
+        }, function (err, stream, res) {
+            if (err) {
+                the.emit('error', 'download error: ' + this.options.href);
                 return next();
             }
 
-            request.down({
-                url: url,
-                timeout: -1
-            }, function (err, stream, res) {
-                if (err) {
-                    the.emit('error', 'download error: ' + this.options.href);
-                    return next();
-                }
+            var filePath = path.join(configs.saveDirection, the._url.hostname + configs.extname);
 
-                var filePath = path.join(configs.saveDirection, the._url.hostname + configs.extname);
-
-                stream
-                    .pipe(fse.createWriteStream(filePath))
-                    .on('error', function () {
-                        the.emit('erorr', err);
-                        next();
-                    })
-                    .on('close', function () {
-                        the.faviconFile = filePath;
-                        next();
-                    });
-            });
+            stream
+                .pipe(fse.createWriteStream(filePath))
+                .on('error', function () {
+                    the.emit('erorr', err);
+                    next();
+                })
+                .on('close', function () {
+                    the.faviconFile = filePath;
+                    next();
+                });
         });
     },
 
@@ -372,6 +359,7 @@ var Favicon = klass.extends(Emitter).create({
      */
     _updateCache: function (next) {
         var the = this;
+
 
         if (the.faviconFile) {
             return next();
@@ -403,6 +391,8 @@ var Favicon = klass.extends(Emitter).create({
 
             var contentLength = number.parseInt(headers['content-length'], 0);
             var contentType = headers['content-type'];
+
+            console.log(href, contentLength, contentType, res.statusCode);
 
             if (REG_FAVICON_TYPE.test(contentType) && res.statusCode === 200 && contentLength > 20) {
                 return callback(href);
@@ -449,6 +439,8 @@ var Favicon = klass.extends(Emitter).create({
             var cond1 = REG_REL_ICON.test(rel) || rel === 'icon' || REG_TYPE_ICON.test(type);
             var cond2 = REG_BASE_64.test(href) || REG_IMAGE_TYPE.test(href);
 
+            console.log(cond1, cond2, rel, type, href);
+
             if (cond1 && cond2) {
                 find = href;
                 return false;
@@ -488,7 +480,7 @@ Favicon.config = function (options) {
  */
 Favicon.buildDefaultConfigs = function () {
     try {
-        defaultConfigs = fse.readJSONFileSync(configs.configsFilePath, 'utf8') || {};
+        defaultConfigs = fse.readJSONSync(configs.configsFilePath, 'utf8') || {};
     } catch (err) {
         // ignore
     }
@@ -500,10 +492,11 @@ Favicon.buildDefaultConfigs = function () {
  */
 Favicon.updateDefaultConfigs = function () {
     try {
-        fse.writeJSONFileSync(configs.configsFilePath, defaultConfigs, {
+        fse.writeJSONSync(configs.configsFilePath, defaultConfigs, {
             encoding: 'utf8'
         });
     } catch (err) {
+        console.log(err)
         // ignore
     }
 };
