@@ -223,15 +223,13 @@ var Favicon = klass.extends(Emitter).create({
                 return callback();
             }
 
-            var href = this.options.href;
-
             var attrURL = the._parseFaviconURLFromBody(body);
 
             if (!attrURL) {
                 return callback();
             }
 
-            var url = REG_HTTP.test(attrURL) ? attrURL : Favicon.joinURL(href, attrURL);
+            var url = REG_HTTP.test(attrURL) ? attrURL : Favicon.joinURL(this.options.url, attrURL);
 
             the._parseFaviconURLByHead(url, function (url) {
                 callback(url);
