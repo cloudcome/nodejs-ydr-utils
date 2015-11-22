@@ -475,7 +475,7 @@ var Validation = klass.extends(Emitter).create({
                 var args = [overrideMsg || err || options.defaultMsg, the.getAlias(path) || path];
 
                 args = args.concat(currentRule.params);
-                err = new Error(string.assign.apply(string, args));
+                err = new TypeError(string.assign.apply(string, args));
 
                 /**
                  * 验证失败
