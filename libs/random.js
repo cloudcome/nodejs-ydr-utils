@@ -9,6 +9,7 @@
 var dato = require('./dato.js');
 var number = require('./number.js');
 var string = require('./string.js');
+var allocation = require('./allocation.js');
 var regExist = /[aA0]/g;
 var dictionaryMap = {
     a: 'abcdefghijklmnopqrstuvwxyz',
@@ -100,46 +101,55 @@ exports.string = function (length, dictionary) {
 /////////////////////////////////////////////////////////////////////////////////
 
 
-/**
- * 根据当前时间戳生成指定长度不重复的26位纯数字字符串
- * 数字之间有大小之分，因此可以用来排序
- * 精确正整数在 -2^53 - 2^53 之间，即 −9007199254740992 - 9007199254740992（长度16）
- * 因此为了精确比较，需要控制数据在16位以内，即长度小于16
- * 所以，此处的比较，需要将字符串分成2部分，分别是13位 + 13位
- * 比较两个字符串数值大小使用 dato.than(long1, long2, '>');
- * @param [isTimeStamp=false] 是否时间戳形式
- * @param [isSafe=false] 是否安全格式
- * @returns {String}
- */
 var guidIndex = 0;
 var lastGuidTime = 0;
-exports.guid = function (isTimeStamp, isSafe) {
+
+/**
+ * 最小 16 位长度的随机不重复字符串
+ * @param [isTimeStamp=false] 是否时间戳形式
+ * @param [maxLength=16] 最大长度
+ * @returns {String}
+ */
+exports.guid = function (isTimeStamp, maxLength) {
     var a = [];
     var d = new Date();
     var ret = '';
-    var safeLength = 16;
-    var allLength = 26;
+    var now = d.getTime();
+    var args = allocation.args(arguments);
+    var suffix = '';
 
-    var timeStamp = d.getTime();
+    switch (args.length) {
+        case 0:
+            isTimeStamp = false;
+            maxLength = 16;
+            break;
+
+        case 1:
+            // guid(isTimeStamp);
+            if (typeof args[0] === 'boolean') {
+                maxLength = 16;
+            }
+            // guid(maxLength);
+            else {
+                isTimeStamp = false;
+                maxLength = args[0];
+            }
+            break;
+    }
+
+    maxLength = Math.max(maxLength, 16);
 
     if (isTimeStamp) {
-        if (timeStamp !== lastGuidTime) {
-            lastGuidTime = timeStamp;
+        if (now !== lastGuidTime) {
+            lastGuidTime = now;
             guidIndex = 0;
         }
 
-        timeStamp = String(timeStamp);
-        var timeStampLength = timeStamp.length;
-        var suffix = '';
-
-        if (isSafe) {
-            suffix = string.padLeft(guidIndex++, safeLength - timeStampLength, '0');
-            ret = timeStamp + suffix;
-        } else {
-            suffix = process.hrtime()[1];
-            suffix = string.padLeft(suffix, allLength - timeStampLength, '0');
-            ret = timeStamp + suffix;
-        }
+        now = String(now);
+        var timeStampLength = now.length;
+        suffix = number.to62(guidIndex++);
+        suffix = string.padLeft(suffix, maxLength - timeStampLength, '0');
+        ret = now + suffix;
     } else {
         // 4
         var Y = string.padLeft(d.getFullYear(), 4, '0');
@@ -165,21 +175,16 @@ exports.guid = function (isTimeStamp, isSafe) {
         a.push(I);
         a.push(S);
 
-        if (isSafe) {
-            var dateTime = a.join('');
+        var dateTime = a.join('');
 
-            if (dateTime !== lastGuidTime) {
-                lastGuidTime = dateTime;
-                guidIndex = 0;
-            }
-
-            a.push(string.padLeft(guidIndex++, safeLength - 14, '0'));
-        } else {
-            a.push(C);
-            a.push(N);
-            // 4+2+2+2+2+2+3+9 = 26
+        if (dateTime !== lastGuidTime) {
+            lastGuidTime = dateTime;
+            guidIndex = 0;
         }
 
+        suffix = number.to62(guidIndex++);
+        suffix = string.padLeft(suffix, maxLength - 14, '0');
+        a.push(suffix);
         ret = a.join('');
     }
 

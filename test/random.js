@@ -26,7 +26,7 @@ var random = require('../libs/random.js');
 
 var i = 300;
 while (i--){
-    console.log(random.guid(false, true));
+    console.log(random.guid(true));
 }
 
 
