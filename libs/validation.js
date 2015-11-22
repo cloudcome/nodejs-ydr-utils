@@ -140,7 +140,8 @@ var Validation = klass.extends(Emitter).create({
             the._validateList[index].rules.push({
                 name: namespace + alienIndex++,
                 params: params,
-                fn: nameOrfn
+                fn: nameOrfn,
+                id: random.guid()
             });
         }
 

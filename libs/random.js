@@ -16,6 +16,9 @@ var dictionaryMap = {
     A: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
     0: '0123456789'
 };
+var guidIndex = 0;
+var lastGuidTime = 0;
+
 
 /**
  * 随机数字
@@ -94,20 +97,10 @@ exports.string = function (length, dictionary) {
 };
 
 
-/////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////[ ONLY NODEJS ]////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////
-
-
-var guidIndex = 0;
-var lastGuidTime = 0;
-
 /**
- * 最小 16 位长度的随机不重复字符串
+ * 最短 18 位长度的随机不重复字符串
  * @param [isTimeStamp=false] 是否时间戳形式
- * @param [maxLength=16] 最大长度
+ * @param [maxLength=20] 最大长度
  * @returns {String}
  */
 exports.guid = function (isTimeStamp, maxLength) {
@@ -117,17 +110,18 @@ exports.guid = function (isTimeStamp, maxLength) {
     var now = d.getTime();
     var args = allocation.args(arguments);
     var suffix = '';
+    var minLength = 16;
 
     switch (args.length) {
         case 0:
             isTimeStamp = false;
-            maxLength = 16;
+            maxLength = minLength;
             break;
 
         case 1:
             // guid(isTimeStamp);
             if (typeof args[0] === 'boolean') {
-                maxLength = 16;
+                maxLength = minLength;
             }
             // guid(maxLength);
             else {
@@ -137,7 +131,7 @@ exports.guid = function (isTimeStamp, maxLength) {
             break;
     }
 
-    maxLength = Math.max(maxLength, 16);
+    maxLength = Math.max(maxLength, minLength);
 
     if (isTimeStamp) {
         if (now !== lastGuidTime) {
@@ -163,10 +157,10 @@ exports.guid = function (isTimeStamp, maxLength) {
         var I = string.padLeft(d.getMinutes(), 2, '0');
         // 2
         var S = string.padLeft(d.getSeconds(), 2, '0');
-        // 3
-        var C = string.padLeft(d.getMilliseconds(), 3, '0');
-        // 9
-        var N = string.padLeft(process.hrtime()[1], 9, '0');
+        //// 3
+        //var C = string.padLeft(d.getMilliseconds(), 3, '0');
+        //// 9
+        //var N = string.padLeft(process.hrtime()[1], 9, '0');
 
         a.push(Y);
         a.push(M);
