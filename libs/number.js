@@ -13,8 +13,16 @@
 'use strict';
 
 var typeis = require('./typeis.js');
+var dato = require('./dato.js');
+
 var REG_FORMAT = /(\d)(?=(\d{3})+$)/g;
 var abbrSuffix = 'kmbt';
+var str62 = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+var map62 = {};
+
+dato.repeat(62, function (index) {
+    map62[str62[index]] = index;
+});
 
 /**
  * 整数化
@@ -104,14 +112,48 @@ exports.abbr = function (num, fixedLength) {
 };
 
 
+/**
+ * 获取六十一进制数值
+ * @param number10
+ * @returns {String}
+ */
+exports.to62 = function (number10) {
+    var ret = [];
+
+    var _cal = function () {
+        var y = number10 % 62;
+
+        number10 = exports.parseInt(number10 / 62);
+        ret.unshift(str62[y]);
+
+        if (number10) {
+            _cal();
+        }
+    };
+
+    _cal();
+    return ret.join('');
+};
 
 
+/**
+ * 六十二进制转换为十进制
+ * @param number62
+ * @returns {number}
+ */
+exports.from62 = function (number62) {
+    var ret = 0;
+    var len = number62.length;
 
+    dato.repeat(len, function (index) {
+        var pos62 = number62[index];
+        var pos10 = map62[pos62];
 
+        ret += pos10 * Math.pow(62, len - index - 1);
+    });
 
-
-
-
+    return ret;
+};
 
 
 
