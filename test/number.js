@@ -9,7 +9,7 @@
 
 var number = require('../libs/number.js');
 
-var number62 = number.to62(3843);
+var number62 = number.to62(1000000);
 var number10 = number.from62(number62);
 
 console.log(number62);
