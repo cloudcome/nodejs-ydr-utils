@@ -479,6 +479,7 @@ var Validation = klass.extends(Emitter).create({
 
                 args = args.concat(currentRule.params);
                 err = new TypeError(string.assign.apply(string, args));
+                err.id = currentRule.id;
 
                 /**
                  * 验证失败
