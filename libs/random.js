@@ -108,45 +108,81 @@ exports.string = function (length, dictionary) {
  * 所以，此处的比较，需要将字符串分成2部分，分别是13位 + 13位
  * 比较两个字符串数值大小使用 dato.than(long1, long2, '>');
  * @param [isTimeStamp=false] 是否时间戳形式
+ * @param [isSafe=false] 是否安全格式
  * @returns {String}
  */
-exports.guid = function (isTimeStamp) {
+var guidIndex = 0;
+var lastGuidTime = 0;
+exports.guid = function (isTimeStamp, isSafe) {
     var a = [];
     var d = new Date();
+    var ret = '';
+    var safeLength = 16;
+    var allLength = 26;
+
+    var timeStamp = d.getTime();
 
     if (isTimeStamp) {
-        // 13 + 13
-        var t = '' + d.getTime();
-        return t + string.padLeft(process.hrtime()[1], 26 - t.length, '0');
+        if (timeStamp !== lastGuidTime) {
+            lastGuidTime = timeStamp;
+            guidIndex = 0;
+        }
+
+        timeStamp = String(timeStamp);
+        var timeStampLength = timeStamp.length;
+        var suffix = '';
+
+        if (isSafe) {
+            suffix = string.padLeft(guidIndex++, safeLength - timeStampLength, '0');
+            ret = timeStamp + suffix;
+        } else {
+            suffix = process.hrtime()[1];
+            suffix = string.padLeft(suffix, allLength - timeStampLength, '0');
+            ret = timeStamp + suffix;
+        }
+    } else {
+        // 4
+        var Y = string.padLeft(d.getFullYear(), 4, '0');
+        // 2
+        var M = string.padLeft(d.getMonth() + 1, 2, '0');
+        // 2
+        var D = string.padLeft(d.getDate(), 2, '0');
+        // 2
+        var H = string.padLeft(d.getHours(), 2, '0');
+        // 2
+        var I = string.padLeft(d.getMinutes(), 2, '0');
+        // 2
+        var S = string.padLeft(d.getSeconds(), 2, '0');
+        // 3
+        var C = string.padLeft(d.getMilliseconds(), 3, '0');
+        // 9
+        var N = string.padLeft(process.hrtime()[1], 9, '0');
+
+        a.push(Y);
+        a.push(M);
+        a.push(D);
+        a.push(H);
+        a.push(I);
+        a.push(S);
+
+        if (isSafe) {
+            var dateTime = a.join('');
+
+            if (dateTime !== lastGuidTime) {
+                lastGuidTime = dateTime;
+                guidIndex = 0;
+            }
+
+            a.push(string.padLeft(guidIndex++, safeLength - 14, '0'));
+        } else {
+            a.push(C);
+            a.push(N);
+            // 4+2+2+2+2+2+3+9 = 26
+        }
+
+        ret = a.join('');
     }
 
-    // 4
-    var Y = string.padLeft(d.getFullYear(), 4, '0');
-    // 2
-    var M = string.padLeft(d.getMonth() + 1, 2, '0');
-    // 2
-    var D = string.padLeft(d.getDate(), 2, '0');
-    // 2
-    var H = string.padLeft(d.getHours(), 2, '0');
-    // 2
-    var I = string.padLeft(d.getMinutes(), 2, '0');
-    // 2
-    var S = string.padLeft(d.getSeconds(), 2, '0');
-    // 3
-    var C = string.padLeft(d.getMilliseconds(), 3, '0');
-    // 9
-    var N = string.padLeft(process.hrtime()[1], 9, '0');
-
-    a.push(Y);
-    a.push(M);
-    a.push(D);
-    a.push(H);
-    a.push(I);
-    a.push(S);
-    a.push(C);
-    a.push(N);
-
-    // 4+2+2+2+2+2+3+9 = 26
-    return a.join('');
+    return ret;
 };
 

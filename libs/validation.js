@@ -16,6 +16,7 @@ var typeis = require('./typeis.js');
 var allocation = require('./allocation.js');
 var string = require('./string.js');
 var Emitter = require('./emitter.js');
+var random = require('./random.js');
 
 
 /**
@@ -132,7 +133,8 @@ var Validation = klass.extends(Emitter).create({
             the._validateList[index].rules.push({
                 name: name,
                 params: params,
-                fn: validationMap[name]
+                fn: validationMap[name],
+                id: random.guid()
             });
         } else if (typeis.function(nameOrfn)) {
             the._validateList[index].rules.push({

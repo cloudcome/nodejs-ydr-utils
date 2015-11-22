@@ -8,19 +8,25 @@
 'use strict';
 
 var random = require('../libs/random.js');
-var map = {};
+//var map = {};
 
-for (var i = 1; i < 100000; i++) {
-    var r = random.string(6, 'a0A');
+//for (var i = 1; i < 100000; i++) {
+//    var r = random.string(6, 'a0A');
+//
+//    if (map[r]) {
+//        console.log('has repeat', r, i);
+//        process.exit();
+//    }
+//
+//    map[r] = 1;
+//}
+//
+//
+//console.log('no repeat');
 
-    if (map[r]) {
-        console.log('has repeat', r, i);
-        process.exit();
-    }
-
-    map[r] = 1;
+var i = 300;
+while (i--){
+    console.log(random.guid(false, true));
 }
 
-
-console.log('no repeat');
 
