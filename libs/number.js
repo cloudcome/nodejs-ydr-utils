@@ -113,7 +113,7 @@ exports.abbr = function (num, fixedLength) {
 
 
 /**
- * 获取六十一进制数值
+ * 获取六十二进制数值
  * @param number10
  * @returns {String}
  */
