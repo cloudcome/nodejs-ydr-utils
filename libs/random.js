@@ -98,9 +98,9 @@ exports.string = function (length, dictionary) {
 
 
 /**
- * 最短 18 位长度的随机不重复字符串
+ * 最短 16 位长度的随机不重复字符串
  * @param [isTimeStamp=false] 是否时间戳形式
- * @param [maxLength=20] 最大长度
+ * @param [maxLength=16] 最大长度
  * @returns {String}
  */
 exports.guid = function (isTimeStamp, maxLength) {
