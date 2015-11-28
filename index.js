@@ -57,6 +57,8 @@ module.exports = {
     request: require('./libs/request.js'),
     // 字符串
     string: require('./libs/string.js'),
+    // 系统
+    system: require('./libs/system.js'),
     // 模板引擎
     Template: require('./libs/template.js'),
     // 翻译
