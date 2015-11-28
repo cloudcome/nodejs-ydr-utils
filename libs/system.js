@@ -12,7 +12,6 @@ var os = require('os');
 var dato = require('./dato.js');
 var osReleaseMap = require('../data/os-release.json');
 var winReleaseMap = require('../data/win-release.json');
-var localeIdMap = require('../data/locale-id.json');
 
 
 /**
@@ -78,7 +77,12 @@ function parseOS() {
         case 'win64':
         case 'win':
             return parseWin32Release(release);
+
+        case 'linux':
+            return 'Linux ' + release.match(/^(\d+\.\d+).*/)[1];
     }
+
+    return 'unknow';
 }
 
 
@@ -121,11 +125,11 @@ function parseWin32Release(release) {
  * @ref https://github.com/sindresorhus/os-locale
  * @returns {*}
  */
-function getOSlocale(){
+function getOSlocale() {
     var env = process.env;
     var locale = env.LC_ALL || env.LC_MESSAGES || env.LANG || env.LANGUAGE;
 
-    if(locale){
+    if (locale) {
         return locale.replace(/[.:].*$/, '');
     }
 
