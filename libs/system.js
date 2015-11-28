@@ -12,7 +12,6 @@ var os = require('os');
 var dato = require('./dato.js');
 
 
-
 /**
  * 获取本机局域网 IP 地址
  * @returns {*|string}
@@ -43,10 +42,21 @@ exports.localIP = function () {
 };
 
 
-
+/**
+ * 获取系统信息
+ * @returns {{cpus: *, version: string, type: *, platform, hostname: *, release: *, arch, username: *, pid: number}}
+ */
 exports.info = function () {
     return {
-
+        cpus: os.cpus().length,
+        version: process.version,
+        type: os.type(),
+        platform: os.platform(),
+        hostname: os.hostname(),
+        release: os.release(),
+        arch: os.arch(),
+        username: process.env.LOGNAME || process.env.USER,
+        pid: process.pid
     };
 };
 
