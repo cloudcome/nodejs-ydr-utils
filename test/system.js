@@ -9,6 +9,9 @@
 
 var system = require('../libs/system.js');
 
+system.remoteIP(function (err, ip) {
+    console.log(ip);
+});
 
 var info = system.info();
 

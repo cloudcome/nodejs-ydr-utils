@@ -11,6 +11,7 @@ var os = require('os');
 var childProcess = require('child_process');
 
 var dato = require('./dato.js');
+var request = require('./request.js');
 var osReleaseMap = require('../data/os-release.json');
 var winReleaseMap = require('../data/win-release.json');
 
@@ -42,6 +43,24 @@ exports.localIP = function () {
     });
 
     return scopeIP || 'localhost';
+};
+
+
+exports.remoteIP = function (callback) {
+    var REG_IP138_HTML = /<center>.*?\[(.*?)].*?<\/center>/i;
+    var dftIp = '0.0.0.0';
+
+    request.get({
+        url: 'http://1111.ip138.com/ic.asp'
+    }, function (err, body) {
+        if (err) {
+            return callback(null, dftIp);
+        }
+
+        var matches = body.match(REG_IP138_HTML) || ['', ''];
+
+        callback(null, matches[1] || dftIp);
+    });
 };
 
 
