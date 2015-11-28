@@ -8,6 +8,7 @@
 'use strict';
 
 var os = require('os');
+var childProcess = require('child_process');
 
 var dato = require('./dato.js');
 var osReleaseMap = require('../data/os-release.json');
@@ -51,7 +52,6 @@ exports.localIP = function () {
 exports.info = function () {
     return {
         cpus: os.cpus().length,
-        version: process.version,
         platform: os.platform(),
         hostname: os.hostname(),
         release: os.release(),
@@ -59,7 +59,10 @@ exports.info = function () {
         arch: os.arch(),
         username: process.env.LOGNAME || process.env.USER,
         pid: process.pid,
-        locale: getOSlocale()
+        locale: getOSlocale(),
+        node: process.version.replace(/^v/i, '').trim(),
+        npm: getNPMVersion(),
+        modules: getGlobalNodeModules()
     };
 };
 
@@ -136,3 +139,33 @@ function getOSlocale() {
     return 'unknow';
 }
 
+
+/**
+ * 同步获取 NPM 版本
+ * @returns {string}
+ */
+function getNPMVersion() {
+    return childProcess.execSync('npm --version').toString().trim();
+}
+
+
+/**
+ * 同步获取 NPM 版本
+ * @returns {Object}
+ */
+function getGlobalNodeModules() {
+    var listStr = childProcess.execSync('npm list --global --depth 0').toString();
+    var listArr = listStr.split('\n');
+    var REG = /\s([a-z\d][a-z\d_\.\-]*)@(.*)$/;
+    var ret = {};
+
+    listArr.forEach(function (item) {
+        var mathes = item.match(REG);
+
+        if (mathes) {
+            ret[mathes[1].trim()] = mathes[2].trim();
+        }
+    });
+
+    return ret;
+}
