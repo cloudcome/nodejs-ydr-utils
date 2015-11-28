@@ -51,48 +51,65 @@ exports.remoteIP = function (callback) {
     var dftIp = '0.0.0.0';
 
     howdo
+    // 从 ip138.com 处获取
         .task(function (done) {
-            request.get({
+            this.req = request.get({
                 url: 'http://1111.ip138.com/ic.asp'
             }, function (err, body) {
+                console.log('ip138', err);
                 if (err) {
                     return done(err);
                 }
 
-                var REG_HTML = /<center>.*?\[(.*?)].*?<\/center>/i;
+                var REG_HTML = /<center>.*?\[([^>]*?)].*?<\/center>/i;
                 var matches = body.match(REG_HTML);
 
-                if(!matches){
+                if (!matches) {
                     return done(new Error('empty'));
                 }
 
                 done(null, matches[1].trim());
             });
         })
+        .abort(function () {
+            console.log('abort ip138');
+            this.req.abort();
+        })
+
+        // 从 ip.qq.com 处获取
         .task(function (done) {
-            request.get({
+            this.req = request.get({
                 url: 'http://ip.qq.com/'
             }, function (err, body) {
+                console.log('qq', err);
                 if (err) {
                     return done(err);
                 }
 
-                var REG_HTML = /<span class="red">(.*?)<\/span>/i;
+                var REG_HTML = /<span class="red">([^<]*?)<\/span><\/p>/i;
                 var matches = body.match(REG_HTML);
 
-                if(!matches){
+                if (!matches) {
                     return done(new Error('empty'));
                 }
 
                 done(null, matches[1].trim());
             });
         })
+        .abort(function () {
+            console.log('abort qq');
+            this.req.abort();
+        })
+
+        // 任务结束条件
         .until(function (ip) {
             return ip !== '';
         })
-        .together(function () {
+        .together(function (err, ip) {
+            ip = ip || dftIp;
 
-        })
+            return callback(null, ip);
+        });
 };
 
 

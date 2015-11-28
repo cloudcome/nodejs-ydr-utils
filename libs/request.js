@@ -207,6 +207,8 @@ function _remote(options, callback) {
             callback = noop;
         }, options.timeout);
     }
+
+    return req;
 }
 
 
