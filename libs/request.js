@@ -77,7 +77,7 @@ methods.forEach(function (method) {
         }
 
         options.method = method;
-        _remote(options, callback);
+        return _remote(options, callback);
     };
 });
 

@@ -9,6 +9,7 @@
 
 var os = require('os');
 var childProcess = require('child_process');
+var howdo = require('howdo');
 
 var dato = require('./dato.js');
 var request = require('./request.js');
@@ -47,20 +48,51 @@ exports.localIP = function () {
 
 
 exports.remoteIP = function (callback) {
-    var REG_IP138_HTML = /<center>.*?\[(.*?)].*?<\/center>/i;
     var dftIp = '0.0.0.0';
 
-    request.get({
-        url: 'http://1111.ip138.com/ic.asp'
-    }, function (err, body) {
-        if (err) {
-            return callback(null, dftIp);
-        }
+    howdo
+        .task(function (done) {
+            request.get({
+                url: 'http://1111.ip138.com/ic.asp'
+            }, function (err, body) {
+                if (err) {
+                    return done(err);
+                }
 
-        var matches = body.match(REG_IP138_HTML) || ['', ''];
+                var REG_HTML = /<center>.*?\[(.*?)].*?<\/center>/i;
+                var matches = body.match(REG_HTML);
 
-        callback(null, matches[1] || dftIp);
-    });
+                if(!matches){
+                    return done(new Error('empty'));
+                }
+
+                done(null, matches[1].trim());
+            });
+        })
+        .task(function (done) {
+            request.get({
+                url: 'http://ip.qq.com/'
+            }, function (err, body) {
+                if (err) {
+                    return done(err);
+                }
+
+                var REG_HTML = /<span class="red">(.*?)<\/span>/i;
+                var matches = body.match(REG_HTML);
+
+                if(!matches){
+                    return done(new Error('empty'));
+                }
+
+                done(null, matches[1].trim());
+            });
+        })
+        .until(function (ip) {
+            return ip !== '';
+        })
+        .together(function () {
+
+        })
 };
 
 
