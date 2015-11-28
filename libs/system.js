@@ -10,6 +10,9 @@
 var os = require('os');
 
 var dato = require('./dato.js');
+var osReleaseMap = require('../data/os-release.json');
+var winReleaseMap = require('../data/win-release.json');
+var localeIdMap = require('../data/locale-id.json');
 
 
 /**
@@ -50,15 +53,82 @@ exports.info = function () {
     return {
         cpus: os.cpus().length,
         version: process.version,
-        type: os.type(),
         platform: os.platform(),
         hostname: os.hostname(),
         release: os.release(),
+        os: parseOS(),
         arch: os.arch(),
         username: process.env.LOGNAME || process.env.USER,
-        pid: process.pid
+        pid: process.pid,
+        locale: getOSlocale()
     };
 };
 
 
+/**
+ * 解析系统名称
+ */
+function parseOS() {
+    var release = os.release();
+    switch (os.platform()) {
+        case 'darwin':
+            return parseDarwinRelease(release);
+
+        case 'win32':
+        case 'win64':
+        case 'win':
+            return parseWin32Release(release);
+    }
+}
+
+
+/**
+ * 解析达尔文
+ * @param release
+ * @ref https://github.com/sindresorhus/osx-release
+ * @returns {*}
+ */
+function parseDarwinRelease(release) {
+    release = release.split('.')[0];
+
+    if (osReleaseMap[release]) {
+        return 'OS X ' + osReleaseMap[release];
+    }
+
+    return 'unknow';
+}
+
+
+/**
+ * 解析 win32
+ * @param release
+ * @ref https://github.com/sindresorhus/win-release
+ * @returns {*}
+ */
+function parseWin32Release(release) {
+    release = release.split('.')[0];
+
+    if (winReleaseMap[release]) {
+        return 'Windows ' + osReleaseMap[release];
+    }
+
+    return 'unknow';
+}
+
+
+/**
+ * 获取系统语言
+ * @ref https://github.com/sindresorhus/os-locale
+ * @returns {*}
+ */
+function getOSlocale(){
+    var env = process.env;
+    var locale = env.LC_ALL || env.LC_MESSAGES || env.LANG || env.LANGUAGE;
+
+    if(locale){
+        return locale.replace(/[.:].*$/, '');
+    }
+
+    return 'unknow';
+}
 
