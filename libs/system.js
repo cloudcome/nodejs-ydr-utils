@@ -47,9 +47,13 @@ exports.localIP = function () {
 };
 
 
+/**
+ * 获取本机的广域网 IP 地址
+ * @param callback
+ */
 exports.remoteIP = function (callback) {
     howdo
-        // 从 ip138.com 处获取
+    // 从 ip138.com 处获取
         .task(function (done) {
             this.req = request.get({
                 url: 'http://1111.ip138.com/ic.asp'
