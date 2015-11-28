@@ -145,16 +145,27 @@ function getOSlocale() {
  * @returns {string}
  */
 function getNPMVersion() {
-    return childProcess.execSync('npm --version').toString().trim();
+    try {
+        return childProcess.execSync('npm --version').toString().trim();
+    } catch (err) {
+        return '0.0.0';
+    }
 }
 
 
 /**
- * 同步获取 NPM 版本
+ * 同步获取全局安装的 node 模块
  * @returns {Object}
  */
 function getGlobalNodeModules() {
-    var listStr = childProcess.execSync('npm list --global --depth 0').toString();
+    var listStr;
+
+    try {
+        listStr = childProcess.execSync('npm list --global --depth 0').toString();
+    } catch (err) {
+        return {};
+    }
+
     var listArr = listStr.split('\n');
     var REG = /\s([a-z\d][a-z\d_\.\-]*)@(.*)$/;
     var ret = {};
