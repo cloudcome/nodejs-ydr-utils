@@ -48,15 +48,12 @@ exports.localIP = function () {
 
 
 exports.remoteIP = function (callback) {
-    var dftIp = '0.0.0.0';
-
     howdo
-    // 从 ip138.com 处获取
+        // 从 ip138.com 处获取
         .task(function (done) {
             this.req = request.get({
                 url: 'http://1111.ip138.com/ic.asp'
             }, function (err, body) {
-                console.log('ip138', err);
                 if (err) {
                     return done(err);
                 }
@@ -72,7 +69,6 @@ exports.remoteIP = function (callback) {
             });
         })
         .abort(function () {
-            console.log('abort ip138');
             this.req.abort();
         })
 
@@ -81,7 +77,6 @@ exports.remoteIP = function (callback) {
             this.req = request.get({
                 url: 'http://ip.qq.com/'
             }, function (err, body) {
-                console.log('qq', err);
                 if (err) {
                     return done(err);
                 }
@@ -97,7 +92,6 @@ exports.remoteIP = function (callback) {
             });
         })
         .abort(function () {
-            console.log('abort qq');
             this.req.abort();
         })
 
@@ -106,9 +100,7 @@ exports.remoteIP = function (callback) {
             return ip !== '';
         })
         .together(function (err, ip) {
-            ip = ip || dftIp;
-
-            return callback(null, ip);
+            callback(null, ip);
         });
 };
 

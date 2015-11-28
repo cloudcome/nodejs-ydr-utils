@@ -354,7 +354,6 @@ function _request(options, callback) {
     });
 
     req.on('error', callback.bind(context));
-    req.on('abort', callback.bind(context));
 
     if (canSend) {
         if (form && typeis.function(form.pipe)) {
