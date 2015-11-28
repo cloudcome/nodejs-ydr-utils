@@ -98,7 +98,7 @@ exports.down = function (options, callback) {
 
     options.method = 'get';
     options.callbackStream = true;
-    _remote(options, callback);
+    return _remote(options, callback);
 };
 
 
@@ -115,11 +115,14 @@ exports.setBrowserHeaders = function (options) {
  * 远程请求
  * @param options
  * @param callback
+ * @returns {*}
  * @private
  */
 function _remote(options, callback) {
     var redirect30xTimes = 0;
-    var req;
+    var req = {
+        abort: noop
+    };
 
     // ！！！这里千万不要深度复制！！！
     options = dato.extend(false, {}, defaults, options);
@@ -351,6 +354,7 @@ function _request(options, callback) {
     });
 
     req.on('error', callback.bind(context));
+    req.on('abort', callback.bind(context));
 
     if (canSend) {
         if (form && typeis.function(form.pipe)) {
