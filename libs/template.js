@@ -444,8 +444,8 @@ var Template = klass.create({
                     throw new Error('parse error ' + filter);
                 }
 
-                name = matches[1];
-                the._useFilters[name] = false;
+                name = matches[1].trim();
+                the._useFilters[name] = 1;
                 args = exp + (matches[3] ? ',' + matches[3] : '');
                 exp = 'this.filters.' + name + '(' + args + ')';
             });
