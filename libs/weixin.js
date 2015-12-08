@@ -190,8 +190,12 @@ var signature = function (jsapi_ticket, url) {
 };
 
 
-// 获取签名
-exports.getSignature = function (url, callback) {
+/**
+ * URL 微信 JSSDK 签名
+ * @param url
+ * @param callback
+ */
+exports.getJSSDKSignature = function (url, callback) {
     getJSApiTicket(function (err, jsAPITicket) {
         if (err) {
             return callback(err);

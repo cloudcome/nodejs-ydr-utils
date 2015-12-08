@@ -16,7 +16,7 @@ weixin.config({
     secret: '2'
 });
 
-weixin.getSignature('http://123.com', function (err, signature) {
+weixin.getJSSDKSignature('http://123.com', function (err, signature) {
     if(err){
         console.log(err.stack);
         return;
