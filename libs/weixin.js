@@ -140,7 +140,7 @@ var getJSApiTicket = function (callback) {
                     cache.set(PREFIX + API_TICKET, json.ticket, json.expires_in * 900);
                 }
 
-                next(err, accessToken, json.ticket);
+                next(err, json.ticket);
             });
         })
         .follow(callback);
@@ -157,7 +157,7 @@ var getJSApiTicket = function (callback) {
  *
  * @returns {Object}
  */
-var signature = function (accessToken, jsApiTicket, url) {
+var signature = function (jsApiTicket, url) {
     var ret = {
         jsapi_ticket: jsApiTicket,
         nonceStr: random.string(10),
@@ -178,7 +178,6 @@ var signature = function (accessToken, jsApiTicket, url) {
     var signature = encryption.sha1(str);
 
     return {
-        accessToken: accessToken,
         jsApiTicket: jsApiTicket,
         signature: signature,
         nonceStr: ret.nonceStr,
@@ -193,12 +192,12 @@ var signature = function (accessToken, jsApiTicket, url) {
  * @param callback
  */
 exports.getJSSDKSignature = function (url, callback) {
-    getJSApiTicket(function (err, accessToken, jsAPITicket) {
+    getJSApiTicket(function (err, jsAPITicket) {
         if (err) {
             return callback(err);
         }
 
-        callback(null, signature(accessToken, jsAPITicket, url));
+        callback(null, signature(jsAPITicket, url));
     });
 };
 
