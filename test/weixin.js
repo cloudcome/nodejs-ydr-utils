@@ -11,6 +11,16 @@ var weixin = require('../libs/weixin.js');
 
 
 weixin.config({
-
+    cache: false,
+    appId: '1',
+    secret: '2'
 });
 
+weixin.getSignature('http://123.com', function (err, signature) {
+    if(err){
+        console.log(err.stack);
+        return;
+    }
+
+    console.log(signature);
+});
