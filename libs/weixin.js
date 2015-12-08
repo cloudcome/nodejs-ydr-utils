@@ -14,12 +14,20 @@ var random = require('./random.js');
 var number = require('./number.js');
 var encryption = require('./encryption.js');
 var request = require('./request.js');
+var cache = require('./cache.js');
+var pkg = require('../package.json');
 
-var cache = {
-    accessToken: '',
-    jsApiTicket: ''
-};
 var REG_HASH = /#.*$/;
+var PREFIX = 'ydr-utils@' + pkg.version + '/weixin.';
+var ACCESS_TOKEN = 'accessToken';
+var API_TICKET = 'apiTicket';
+
+
+/**
+ * 解析微信返回内容
+ * @param body
+ * @returns {*[]}
+ */
 var parseWeixinBody = function (body) {
     var json = {};
 
@@ -89,12 +97,9 @@ var signature = function (jsapi_ticket, url) {
 };
 
 
-
-
-
 // 获取微信 access_token
-exports.getAccessToken = function (callback) {
-    var accessToken = cache.accessToken;
+var getAccessToken = function (callback) {
+    var accessToken = cache.get(PREFIX + ACCESS_TOKEN);
 
     if (accessToken) {
         return callback(null, accessToken);
@@ -121,31 +126,27 @@ exports.getAccessToken = function (callback) {
             return callback(err);
         }
 
-        cache.set('weixin.accessToken', json.access_token, json.expires_in * 900);
+        cache.set(PREFIX + ACCESS_TOKEN, json.access_token, json.expires_in * 900);
         callback(err, json.access_token);
     });
 };
 
 
 // 获取微信 jsapi_ticket
-exports.getJSApiTicket = function (callback) {
-    var jsApiTicket = cache.get('weixin.jsApiTicket');
-
-    var configs = cache.get('app.configs');
-
-    if(configs.env === 'local'){
-        jsApiTicket = 'sM4AOVdWfPE4DxkXGEs8VFN5g9nCXG41dRCk_StGfznKOi876HxW3qppwPHPdshTECtUo-El9HW1aFWXcw1C9w';
+var getJSApiTicket = function (callback) {
+    if (configs.jsApiTicket) {
+        return callback(null, configs.jsApiTicket);
     }
 
+    var jsApiTicket = cache.get(PREFIX + API_TICKET);
+
     if (jsApiTicket) {
-        return callback(null, jsApiTicket);
+        return callback(null, configs.jsApiTicket);
     }
 
     howdo
-        .task(exports.getAccessToken)
+        .task(getAccessToken)
         .task(function (next, accessToken) {
-            var configs = cache.get('app.configs');
-
             request.get({
                 url: 'https://api.weixin.qq.com/cgi-bin/ticket/getticket',
                 query: {
@@ -166,7 +167,7 @@ exports.getJSApiTicket = function (callback) {
                     return next(err);
                 }
 
-                cache.set('weixin.jsApiTicket', json.ticket, json.expires_in * 900);
+                cache.set(PREFIX + API_TICKET, json.ticket, json.expires_in * 900);
                 next(err, json.ticket);
             });
         })
@@ -176,7 +177,7 @@ exports.getJSApiTicket = function (callback) {
 
 // 获取签名
 exports.getSignature = function (url, callback) {
-    exports.getJSApiTicket(function (err, jsAPITicket) {
+    getJSApiTicket(function (err, jsAPITicket) {
         if (err) {
             return callback(err);
         }
