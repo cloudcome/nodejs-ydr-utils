@@ -152,14 +152,14 @@ var getJSApiTicket = function (callback) {
  * @synopsis 签名算法
  *
  * @param accessToken {String} 用于签名的 jsapi_ticket
- * @param apiTicket {String} 用于签名的 jsapi_ticket
+ * @param jsApiTicket {String} 用于签名的 jsapi_ticket
  * @param url {String} 用于签名的 url ，注意必须动态获取，不能 hardcode
  *
  * @returns {Object}
  */
-var signature = function (accessToken, apiTicket, url) {
+var signature = function (accessToken, jsApiTicket, url) {
     var ret = {
-        jsapi_ticket: apiTicket,
+        jsapi_ticket: jsApiTicket,
         nonceStr: random.string(10),
         timestamp: number.parseInt(Date.now() / 1000),
         url: url.replace(REG_HASH, '')
@@ -179,7 +179,7 @@ var signature = function (accessToken, apiTicket, url) {
 
     return {
         accessToken: accessToken,
-        apiTicket: apiTicket,
+        jsApiTicket: jsApiTicket,
         signature: signature,
         nonceStr: ret.nonceStr,
         timestamp: ret.timestamp
