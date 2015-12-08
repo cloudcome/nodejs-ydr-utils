@@ -46,7 +46,7 @@ var parseWeixinBody = function (body) {
 
 var configs = {
     cache: true,
-    appId: '',
+    appid: '',
     secret: '',
     // 指定 access_token
     accessToken: '',
@@ -75,7 +75,7 @@ var getAccessToken = function (callback) {
         url: WEIXIN_TOKEN_URL,
         query: {
             grant_type: 'client_credential',
-            appid: configs.appId,
+            appid: configs.appid || configs.appId || configs.appID,
             secret: configs.secret
         }
     }, function (err, body) {
