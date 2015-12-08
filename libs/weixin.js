@@ -134,7 +134,10 @@ var getAccessToken = function (callback) {
             return callback(err);
         }
 
-        cache.set(PREFIX + ACCESS_TOKEN, json.access_token, json.expires_in * 900);
+        if (configs.cache) {
+            cache.set(PREFIX + ACCESS_TOKEN, json.access_token, json.expires_in * 900);
+        }
+
         callback(err, json.access_token);
     });
 };
@@ -175,7 +178,10 @@ var getJSApiTicket = function (callback) {
                     return next(err);
                 }
 
-                cache.set(PREFIX + API_TICKET, json.ticket, json.expires_in * 900);
+                if (configs.cache) {
+                    cache.set(PREFIX + API_TICKET, json.ticket, json.expires_in * 900);
+                }
+
                 next(err, json.ticket);
             });
         })

@@ -69,6 +69,8 @@ module.exports = {
     ua: require('./libs/ua.js'),
     // 数据验证
     Validation: require('./libs/validation.js'),
+    // 微信
+    weixin: require('./libs/weixin.js'),
     // 数据类型
     xss: require('./libs/xss.js')
 };
