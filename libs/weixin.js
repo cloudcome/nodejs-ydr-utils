@@ -21,6 +21,8 @@ var REG_HASH = /#.*$/;
 var PREFIX = 'ydr-utils@' + pkg.version + '/weixin.';
 var ACCESS_TOKEN = 'accessToken';
 var API_TICKET = 'apiTicket';
+var WEIXIN_TOKEN_URL = 'https://api.weixin.qq.com/cgi-bin/token';
+var WEIXIN_TICKET_URL = 'https://api.weixin.qq.com/cgi-bin/ticket/getticket';
 
 
 /**
@@ -46,7 +48,9 @@ var configs = {
     cache: true,
     appId: '',
     secret: '',
-    // 指定令牌
+    // 指定 access_token
+    accessToken: '',
+    // 指定 令牌
     jsApiTicket: ''
 };
 
@@ -99,6 +103,10 @@ var signature = function (jsapi_ticket, url) {
 
 // 获取微信 access_token
 var getAccessToken = function (callback) {
+    if (configs.accessToken) {
+        return callback(null, configs.accessToken);
+    }
+
     var accessToken = cache.get(PREFIX + ACCESS_TOKEN);
 
     if (accessToken) {
@@ -106,7 +114,7 @@ var getAccessToken = function (callback) {
     }
 
     request.get({
-        url: 'https://api.weixin.qq.com/cgi-bin/token',
+        url: WEIXIN_TOKEN_URL,
         query: {
             grant_type: 'client_credential',
             appid: configs.appId,
@@ -141,14 +149,14 @@ var getJSApiTicket = function (callback) {
     var jsApiTicket = cache.get(PREFIX + API_TICKET);
 
     if (jsApiTicket) {
-        return callback(null, configs.jsApiTicket);
+        return callback(null, jsApiTicket);
     }
 
     howdo
         .task(getAccessToken)
         .task(function (next, accessToken) {
             request.get({
-                url: 'https://api.weixin.qq.com/cgi-bin/ticket/getticket',
+                url: WEIXIN_TICKET_URL,
                 query: {
                     access_token: accessToken,
                     type: 'jsapi'
