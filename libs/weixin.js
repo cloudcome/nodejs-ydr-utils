@@ -1,5 +1,5 @@
 /**
- * 文件描述
+ * weixin
  * @author ydr.me
  * @create 2015-12-08 11:08
  */
@@ -7,11 +7,18 @@
 
 'use strict';
 
+var howdo = require('howdo');
+
 var dato = require('./dato.js');
 var random = require('./random.js');
 var number = require('./number.js');
+var encryption = require('./encryption.js');
+var request = require('./request.js');
 
-var cache = {};
+var cache = {
+    accessToken: '',
+    jsApiTicket: ''
+};
 var REG_HASH = /#.*$/;
 var parseWeixinBody = function (body) {
     var json = {};
@@ -28,7 +35,11 @@ var parseWeixinBody = function (body) {
 };
 
 var configs = {
-    cache: true
+    cache: true,
+    appId: '',
+    secret: '',
+    // 指定令牌
+    jsApiTicket: ''
 };
 
 exports.config = function (options) {
@@ -77,6 +88,102 @@ var signature = function (jsapi_ticket, url) {
     };
 };
 
+
+
+
+
+// 获取微信 access_token
+exports.getAccessToken = function (callback) {
+    var accessToken = cache.accessToken;
+
+    if (accessToken) {
+        return callback(null, accessToken);
+    }
+
+    request.get({
+        url: 'https://api.weixin.qq.com/cgi-bin/token',
+        query: {
+            grant_type: 'client_credential',
+            appid: configs.appId,
+            secret: configs.secret
+        }
+    }, function (err, body) {
+        if (err) {
+            return callback(err);
+        }
+
+        var args = parseWeixinBody(body);
+        var json = args[1];
+
+        err = args[0];
+
+        if (err) {
+            return callback(err);
+        }
+
+        cache.set('weixin.accessToken', json.access_token, json.expires_in * 900);
+        callback(err, json.access_token);
+    });
+};
+
+
+// 获取微信 jsapi_ticket
+exports.getJSApiTicket = function (callback) {
+    var jsApiTicket = cache.get('weixin.jsApiTicket');
+
+    var configs = cache.get('app.configs');
+
+    if(configs.env === 'local'){
+        jsApiTicket = 'sM4AOVdWfPE4DxkXGEs8VFN5g9nCXG41dRCk_StGfznKOi876HxW3qppwPHPdshTECtUo-El9HW1aFWXcw1C9w';
+    }
+
+    if (jsApiTicket) {
+        return callback(null, jsApiTicket);
+    }
+
+    howdo
+        .task(exports.getAccessToken)
+        .task(function (next, accessToken) {
+            var configs = cache.get('app.configs');
+
+            request.get({
+                url: 'https://api.weixin.qq.com/cgi-bin/ticket/getticket',
+                query: {
+                    access_token: accessToken,
+                    type: 'jsapi'
+                }
+            }, function (err, body) {
+                if (err) {
+                    return next(err);
+                }
+
+                var args = parseWeixinBody(body);
+                var json = args[1];
+
+                err = args[0];
+
+                if (err) {
+                    return next(err);
+                }
+
+                cache.set('weixin.jsApiTicket', json.ticket, json.expires_in * 900);
+                next(err, json.ticket);
+            });
+        })
+        .follow(callback);
+};
+
+
+// 获取签名
+exports.getSignature = function (url, callback) {
+    exports.getJSApiTicket(function (err, jsAPITicket) {
+        if (err) {
+            return callback(err);
+        }
+
+        callback(null, signature(jsAPITicket, url));
+    });
+};
 
 
 
