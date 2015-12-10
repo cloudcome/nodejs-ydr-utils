@@ -7,7 +7,7 @@
 
 'use strict';
 
-require('../libs/console.js')(['warn']);
+require('../libs/console.js')();
 
 
 console.log('log 日志');
