@@ -127,26 +127,43 @@ var typeis = function (object) {
 var i = 0;
 var jud = 'string number function object undefined null nan element regexp boolean array window document global'.split(' ');
 var makeStatic = function (tp) {
+    var tp2 = tp.replace(/^\w/, function (w) {
+        return w.toUpperCase();
+    });
     /**
      * 快捷判断
      * @name typeis
      * @property string {Function}
+     * @property String {Function}
      * @property number {Function}
+     * @property Number {Function}
      * @property function {Function}
+     * @property Function {Function}
      * @property object {Function}
+     * @property Object {Function}
      * @property undefined {Function}
+     * @property Undefined {Function}
      * @property null {Function}
+     * @property Null {Function}
      * @property nan {Function}
+     * @property Nan {Function}
      * @property element {Function}
+     * @property Element {Function}
      * @property regexp {Function}
+     * @property Regexp {Function}
      * @property boolean {Function}
+     * @property Boolean {Function}
      * @property array {Function}
+     * @property Array {Function}
      * @property window {Function}
+     * @property Window {Function}
      * @property document {Function}
+     * @property Document {Function}
      * @property global {Function}
+     * @property Global {Function}
      * @returns {boolean}
      */
-    typeis[tp] = function (obj) {
+    typeis[tp] = typeis[tp2] = function (obj) {
         return typeis(obj) === tp;
     };
 };

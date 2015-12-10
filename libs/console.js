@@ -8,31 +8,42 @@
 'use strict';
 
 var allocation = require('./allocation.js');
+var dato = require('./dato.js');
 var typeis = require('./typeis.js');
+var date = require('./date.js');
 
 
-module.exports = function (whiteList, prefix) {
-    var args = allocation.args(arguments);
-    var pros = ['log', 'info', 'warn', 'error'];
-
-    if(args.length === 1){
-        if(typeof args[0] === 'string'){
-
-        }
+var pros = ['log', 'info', 'warn', 'error'];
+var defaults = {
+    whiteList: pros,
+    prefix: function () {
+        return '[' + date.format('YYYY-MM-DD HH:mm:ss:SSS') + ']';
     }
+};
 
-    whiteList = whiteList || pros;
 
+module.exports = function (options) {
+    options = dato.extend({}, defaults, options);
     var whiteMap = {};
 
-    whiteList.forEach(function (can) {
+    options.whiteList.forEach(function (can) {
         whiteMap[can] = true;
     });
 
     pros.forEach(function (pro) {
         if (whiteMap[pro]) {
             var old = global.console[pro];
+            var pro2 = pro.toUpperCase();
+
             global.console[pro] = function () {
+                var args = allocation.args(arguments);
+
+                args.unshift('[' + pro2 + ']');
+
+                if (typeis.Function(options.prefix)) {
+                    args.unshift(options.prefix());
+                }
+
                 old.apply(global.console, arguments);
             };
         } else {
