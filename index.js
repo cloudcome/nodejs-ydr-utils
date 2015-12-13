@@ -1,5 +1,5 @@
-/*!
- * util for ydr.me
+/**
+ * utils for ydr.me
  * @author ydr.me
  * @create 2014-11-16 16:10
  */
@@ -7,8 +7,8 @@
 'use strict';
 
 module.exports = {
-    //// 阿里云 OSS 上传
-    //AliOSS: require('./libs/ali-oss.js'),
+    // 阿里云 OSS 签名
+    aliOSS: require('./libs/ali-oss.js'),
     // 调用
     allocation: require('./libs/allocation.js'),
     // 调用
