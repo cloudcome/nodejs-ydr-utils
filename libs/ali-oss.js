@@ -23,6 +23,7 @@ var configs = {
     // 1年，单位 秒
     expires: 31536000,
     domain: '',
+    // 生成资源链接协议
     https: true
 };
 
