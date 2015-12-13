@@ -66,7 +66,7 @@ exports.signature = function (method, filename, headers) {
         headers = args[1];
     }
     // signature(method)
-    else if(args.length === 1){
+    else if (args.length === 1) {
         filename = random.guid();
     }
 
@@ -81,7 +81,8 @@ exports.signature = function (method, filename, headers) {
         contentType,
         date
     ];
-    var resource = '/' + path.join(configs.bucket, configs.dirname, filename);
+    var object = path.join(configs.dirname, filename);
+    var resource = '/' + path.join(configs.bucket, object);
     var signature;
     var ossHeaders = {};
 
