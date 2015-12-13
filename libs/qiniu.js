@@ -34,8 +34,8 @@ var configs = {
     // 上传目录
     dirname: '/',
     // 有效期，10分钟，单位秒
-    expires: 10 * 60 * 1000,
-    mimeLimit: 'image/*'
+    deadline: 10 * 60 * 1000,
+    mimeLimit: '*/*'
 };
 
 
@@ -72,8 +72,8 @@ exports.signature = function (filename) {
     var encoded = urlsafeBase64Encode(JSON.stringify({
         scope: configs.bucket + ':' + key,
         // 有效期
-        deadline: Math.floor((configs.expires + Date.now()) / 1000),
-        mimeLimit: configs.mimeLimit
+        deadline: Math.floor((configs.deadline + Date.now()) / 1000),
+        mimeLimit: configs.mimeLimit || '*/*'
     }));
     var encoded_signed = base64ToUrlSafe(hmacSha1(encoded, configs.secretKey));
 
