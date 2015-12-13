@@ -81,28 +81,43 @@ var REG_PROTOTOL = /^((https?|fpts?):)?\/\//;
 
 /**
  * 合并 URL
- * @param p1 {String} url1
- * @param p2 {String} url2
  * @returns {*}
  */
-exports.joinURI = function (p1, p2) {
-    p1 = exports.toURI(p1);
-    p2 = exports.toURI(p2);
+exports.joinURI = function () {
+    var args = allocation.args(arguments);
+    var argL = args.length;
 
-    if (REG_PROTOTOL.test(p2)) {
-        return p2;
+    if (argL < 2) {
+        return args[argL - 1] || '';
     }
 
-    var protocol = '';
+    var _joinURI = function (p1, p2) {
+        p1 = exports.toURI(p1);
+        p2 = exports.toURI(p2);
 
-    p1 = p1.replace(REG_PROTOTOL, function (_protocol) {
-        protocol = _protocol;
-        return '';
-    });
+        if (REG_PROTOTOL.test(p2)) {
+            return p2;
+        }
 
-    p1 = exports.join(p1, p2);
+        var protocol = '';
 
-    return protocol + p1;
+        p1 = p1.replace(REG_PROTOTOL, function (_protocol) {
+            protocol = _protocol;
+            return '';
+        });
+
+        p1 = exports.join(p1, p2);
+
+        return protocol + p1;
+    };
+
+    var ret = args[argL - 1];
+
+    while (argL-- > 1) {
+        ret = _joinURI(args[argL - 1], ret);
+    }
+
+    return ret;
 };
 
 

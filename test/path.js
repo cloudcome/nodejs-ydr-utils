@@ -35,10 +35,12 @@ describe('libs/path', function () {
         var ret1 = path.joinURI('http://abc.com', 'def/123');
         var ret2 = path.joinURI('http://abc.com', 'http://def/123');
         var ret3 = path.joinURI('http://abc.com/p1/p2/p3', '../pp');
+        var ret4 = path.joinURI('http://', 'xx.com', 'abc', 'def', 'xyz/mno', '../zxc');
 
         assert.equal(ret1, 'http://abc.com/def/123');
         assert.equal(ret2, 'http://def/123');
         assert.equal(ret3, 'http://abc.com/p1/p2/pp');
+        assert.equal(ret4, 'http://xx.com/abc/def/xyz/zxc');
     });
 });
 
