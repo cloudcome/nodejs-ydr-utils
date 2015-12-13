@@ -14,10 +14,9 @@ qiniu.config({
     access_key: '-',
     secret_key: '-',
     bucket: 'fed-community',
-    host: 'https://dn-fed.qbox.me/@/'
-});
-
-var kat = qiniu.generateKeyAndToken({
+    host: 'https://dn-fed.qbox.me/@/',
     dirname: '/res/'
 });
+
+var kat = qiniu.signature('abc.jpg');
 console.log(kat);

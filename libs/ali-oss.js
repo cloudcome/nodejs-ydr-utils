@@ -12,6 +12,8 @@ var allocation = require('./allocation.js');
 var path = require('./path.js');
 var dato = require('./dato.js');
 var mime = require('./mime.js');
+var typeis = require('./typeis.js');
+var random = require('./random.js');
 
 
 var configs = {
@@ -23,6 +25,8 @@ var configs = {
     // 1年，单位 秒
     expires: 31536000,
     domain: '',
+    // 保存目录
+    dirname: '/',
     // 生成资源链接协议
     https: true
 };
@@ -49,15 +53,27 @@ exports.config = function (key, val) {
 /**
  * 操作签名
  * @param method {String} 请求方式
- * @param object {String} 资源路径
+ * @param [filename] {String} 文件名
  * @param [headers] {Object} 头信息
  * @returns {{url: *, headers: *}}
  */
-exports.signature = function (method, object, headers) {
+exports.signature = function (method, filename, headers) {
+    var args = allocation.args(arguments);
+
+    // signature(method, headers);
+    if (args.length === 2 && typeis(args[1]) === 'object') {
+        filename = random.guid();
+        headers = args[1];
+    }
+    // signature(method)
+    else if(args.length === 1){
+        filename = random.guid();
+    }
+
     headers = headers || {};
     var auth = 'OSS ' + configs.accessKeyId + ':';
     var date = headers.date || new Date().toUTCString();
-    var contentType = headers['content-type'] || mime.get(path.extname(object));
+    var contentType = headers['content-type'] || mime.get(path.extname(filename));
     var contentMD5 = headers['content-md5'] || '';
     var params = [
         method.toUpperCase(),
@@ -65,7 +81,7 @@ exports.signature = function (method, object, headers) {
         contentType,
         date
     ];
-    var resource = '/' + path.join(configs.bucket, object);
+    var resource = '/' + path.join(configs.bucket, configs.dirname, filename);
     var signature;
     var ossHeaders = {};
 

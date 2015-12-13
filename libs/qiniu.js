@@ -55,6 +55,11 @@ exports.config = function () {
 };
 
 
+/**
+ * 签名
+ * @param filename
+ * @returns {{key: string, token: string, url: *}}
+ */
 exports.signature = function (filename) {
     var dirname = '';
 
@@ -63,9 +68,6 @@ exports.signature = function (filename) {
     }
 
     var key = path.join(dirname, filename || random.guid());
-
-    // 文件名
-    configs.dirname = String(configs.dirname).trim();
 
     var encoded = urlsafeBase64Encode(JSON.stringify({
         scope: configs.bucket + ':' + key,
