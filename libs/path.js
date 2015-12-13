@@ -76,6 +76,36 @@ exports.toURI = function (p) {
 };
 
 
+var REG_PROTOTOL = /^((https?|fpts?):)?\/\//;
+
+
+/**
+ * 合并 URL
+ * @param p1 {String} url1
+ * @param p2 {String} url2
+ * @returns {*}
+ */
+exports.joinURI = function (p1, p2) {
+    p1 = exports.toURI(p1);
+    p2 = exports.toURI(p2);
+
+    if (REG_PROTOTOL.test(p2)) {
+        return p2;
+    }
+
+    var protocol = '';
+
+    p1.replace(REG_PROTOTOL, function (_protocol) {
+        protocol = _protocol;
+        return '';
+    });
+
+    p1 = exports.join(p1, p2);
+
+    return protocol + p1;
+};
+
+
 /**
  * 路径合并
  * @param from {String} 路径
