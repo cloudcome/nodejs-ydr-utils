@@ -35,7 +35,7 @@ var configs = {
     dirname: '/',
     // 有效期，10分钟，单位秒
     deadline: 10 * 60 * 1000,
-    mimeLimit: '*/*'
+    mimeLimit: '*'
 };
 
 
@@ -73,7 +73,7 @@ exports.signature = function (filename) {
         scope: configs.bucket + ':' + key,
         // 有效期
         deadline: Math.floor((configs.deadline + Date.now()) / 1000),
-        mimeLimit: configs.mimeLimit || '*/*'
+        mimeLimit: configs.mimeLimit
     }));
     var encoded_signed = base64ToUrlSafe(hmacSha1(encoded, configs.secretKey));
 
