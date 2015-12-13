@@ -9,6 +9,9 @@
 
 var error = require('../libs/error.js');
 
+error.config(401, {
+    message: '呵呵'
+});
 var err = error.create(401);
 
 console.log(err.status);

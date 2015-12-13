@@ -7,10 +7,13 @@
 
 'use strict';
 
+var crypto = require('crypto');
 
+var allocation = require('./allocation.js');
 var dato = require('./dato.js');
 var random = require('./random.js');
-var crypto = require('crypto');
+var path = require('./path.js');
+
 var defaults = {
     accessKey: '',
     secretKey: '',
@@ -22,6 +25,62 @@ var defaults = {
     mimeLimit: 'image/*'
 };
 var REG_END = /\/$/;
+var configs = {
+    accessKey: '',
+    secretKey: '',
+    bucket: '',
+    // 绑定域名
+    host: '/',
+    // 上传目录
+    dirname: '/',
+    // 有效期，10分钟，单位秒
+    expires: 10 * 60 * 1000,
+    mimeLimit: 'image/*'
+};
+
+
+/**
+ * 配置参数
+ * @returns {*}
+ */
+exports.config = function () {
+    return allocation.getset({
+        get: function (key) {
+            return configs[key]
+        },
+        set: function (key, val) {
+            configs[key] = val;
+        }
+    }, arguments);
+};
+
+
+exports.signature = function (filename) {
+    var dirname = '';
+
+    if (configs.dirname && configs.dirname.length > 1) {
+        dirname = REG_END.test(configs.dirname) ? configs.dirname : configs.dirname + '/';
+    }
+
+    var key = path.join(dirname, filename || random.guid());
+
+    // 文件名
+    configs.dirname = String(configs.dirname).trim();
+
+    var encoded = urlsafeBase64Encode(JSON.stringify({
+        scope: configs.bucket + ':' + key,
+        // 有效期
+        deadline: Math.floor((configs.expires + Date.now()) / 1000),
+        mimeLimit: configs.mimeLimit
+    }));
+    var encoded_signed = base64ToUrlSafe(hmacSha1(encoded, configs.secretKey));
+
+    return {
+        key: key,
+        token: configs.accessKey + ':' + encoded_signed + ':' + encoded,
+        url: path.joinURI(configs.host, key)
+    };
+};
 
 
 /**
