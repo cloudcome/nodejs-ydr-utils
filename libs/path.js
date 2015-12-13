@@ -95,7 +95,7 @@ exports.joinURI = function (p1, p2) {
 
     var protocol = '';
 
-    p1.replace(REG_PROTOTOL, function (_protocol) {
+    p1 = p1.replace(REG_PROTOTOL, function (_protocol) {
         protocol = _protocol;
         return '';
     });
