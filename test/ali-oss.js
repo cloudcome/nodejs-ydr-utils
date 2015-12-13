@@ -8,17 +8,33 @@
 'use strict';
 
 
+var fs = require('fs');
+var path = require('path');
 var aliOSS = require('../libs/ali-oss.js');
+var request = require('../libs/request.js');
 
 aliOSS.config({
-
+    accessKeyId: 'x',
+    accessKeySecret: 'y',
+    bucket: 'z'
 });
 
 describe('ali-oss', function () {
-    it('singature', function () {
-        var ret = aliOSS.signature('put', '/abc/def/123.jpg');
+    it('singature', function (done) {
+        var ret = aliOSS.signature('put', '/test/image/im2.jpg');
 
-        console.log(ret);
+        request.put({
+            url: ret.requestURL,
+            headers: ret.headers,
+            body: fs.createReadStream(path.join(__dirname, './im.jpg'))
+        }, function (err, body, res) {
+            console.log(this.options.headers);
+            console.log(res.statusCode);
+            console.log(res.headers);
+            console.log(err);
+            console.log(body);
+            done();
+        });
     });
 });
 

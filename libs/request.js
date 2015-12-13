@@ -186,7 +186,6 @@ function _remote(options, callback) {
                 delete(options.headers.host);
                 delete(options.headers.origin);
                 delete(options.headers.referer);
-                delete(options.headers.referrer);
                 request();
             } else {
                 clearTimeout(timeid);
@@ -286,8 +285,7 @@ function _request(options, callback) {
     requestOptions.headers = {
         host: requestOptions.host,
         origin: requestOptions.protocol + '//' + requestOptions.host,
-        referer: options.url,
-        referrer: options.url
+        referer: options.url
     };
 
     if (options.simulateBrowser) {
@@ -381,7 +379,9 @@ function _lowerCaseHeaders(headers) {
     var headers2 = {};
 
     dato.each(headers, function (key, val) {
-        headers2[String(key).trim().toLowerCase()] = String(val).trim();
+        if (val !== null && val !== undefined) {
+            headers2[String(key).trim().toLowerCase()] = String(val).trim();
+        }
     });
 
     return headers2;

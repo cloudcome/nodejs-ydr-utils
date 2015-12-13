@@ -49,53 +49,60 @@ exports.config = function (key, val) {
  * 操作签名
  * @param method {String} 请求方式
  * @param object {String} 资源路径
- * @param [contentType] {String} 资源类型
+ * @param [headers] {Object} 头信息
  * @returns {{url: *, headers: *}}
  */
-exports.signature = function (method, object, contentType) {
+exports.signature = function (method, object, headers) {
+    headers = headers || {};
     var auth = 'OSS ' + configs.accessKeyId + ':';
-    var date = new Date().toUTCString();
-    contentType = contentType || mime.get(path.extname(object));
+    var date = headers.date || new Date().toUTCString();
+    var contentType = headers['content-type'] || mime.get(path.extname(object));
+    var contentMD5 = headers['content-md5'] || '';
     var params = [
         method.toUpperCase(),
-        '', // md5 留空
+        contentMD5,
         contentType,
         date
     ];
-    var resource = path.join('/' + configs.bucket, object);
+    var resource = '/' + path.join(configs.bucket, object);
     var signature;
+    var ossHeaders = {};
 
-    //var ossHeaders = {};
-    //
-    //dato.each(headers, function (key, val) {
-    //    var lkey = key.toLowerCase().trim();
-    //
-    //    if (lkey.indexOf('x-oss-') === 0) {
-    //        ossHeaders[lkey] = ossHeaders[lkey] || [];
-    //        ossHeaders[lkey].push(val.trim());
-    //    }
-    //});
-    //
-    //Object.keys(ossHeaders).sort().forEach(function (key) {
-    //    params.push(key + ':' + ossHeaders[key].join(','));
-    //});
+    dato.each(headers, function (key, val) {
+        var lkey = key.toLowerCase().trim();
+
+        if (lkey.indexOf('x-oss-') === 0) {
+            ossHeaders[lkey] = ossHeaders[lkey] || [];
+            ossHeaders[lkey].push(val.trim());
+        }
+    });
+
+    Object.keys(ossHeaders).sort().forEach(function (key) {
+        params.push(key + ':' + ossHeaders[key].join(','));
+    });
 
     params.push(resource);
     signature = crypto.createHmac('sha1', configs.accessKeySecret);
     signature = signature.update(params.join('\n')).digest('base64');
 
-    var protocol = configs.https ? 'https://' : 'http://';
-    var domain = configs.domain || configs.bucket + '.' + configs.host;
-    var objectURL = path.joinURI(protocol, domain, object || '');
+    var originProtocol = 'http://';
+    var protocol = configs.https ? 'https://' : originProtocol;
+    var originDomain = configs.bucket + '.' + configs.host;
+    var domain = configs.domain || originDomain;
+    var objectURL = path.joinURI(protocol, domain, object);
+    var requestURL = path.joinURI('http://', originDomain, object);
+
+    dato.extend(headers, {
+        'content-type': contentType,
+        authorization: auth + signature,
+        date: date,
+        'cache-control': configs.cacheControl,
+        expires: new Date(Date.now() + configs.expires * 1000).toUTCString()
+    });
 
     return {
-        url: objectURL,
-        headers: {
-            'content-type': contentType,
-            authorization: auth + signature,
-            date: date,
-            'cache-control': configs.cacheControl,
-            expires: new Date(Date.now() + configs.expires * 1000).toUTCString()
-        }
+        requestURL: requestURL,
+        objectURL: objectURL,
+        headers: headers
     };
 };
