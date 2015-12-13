@@ -16,7 +16,8 @@ var request = require('../libs/request.js');
 aliOSS.config({
     accessKeyId: 'x',
     accessKeySecret: 'y',
-    bucket: 'z'
+    bucket: 'z',
+    domain: 'z.com'
 });
 
 describe('ali-oss', function () {
