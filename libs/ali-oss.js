@@ -19,6 +19,9 @@ var configs = {
     accessKeySecret: '',
     bucket: '',
     host: 'oss-cn-hangzhou.aliyuncs.com',
+    cacheControl: 'public',
+    // 1年，单位 秒
+    expires: 31536000,
     domain: '',
     https: true
 };
@@ -52,10 +55,11 @@ exports.config = function (key, val) {
 exports.signature = function (method, object, contentType) {
     var auth = 'OSS ' + configs.accessKeyId + ':';
     var date = new Date().toUTCString();
+    contentType = contentType || mime.get(path.extname(object));
     var params = [
         method.toUpperCase(),
         '', // md5 留空
-        contentType || mime.get(path.extname(object)),
+        contentType,
         date
     ];
     var resource = path.join('/' + configs.bucket, object);
@@ -87,8 +91,11 @@ exports.signature = function (method, object, contentType) {
     return {
         url: objectURL,
         headers: {
+            'content-type': contentType,
             authorization: auth + signature,
-            date: date
+            date: date,
+            'cache-control': configs.cacheControl,
+            expires: new Date(Date.now() + configs.expires * 1000).toUTCString()
         }
     };
 };
