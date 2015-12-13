@@ -85,12 +85,12 @@ exports.signature = function (method, object, headers) {
     signature = crypto.createHmac('sha1', configs.accessKeySecret);
     signature = signature.update(params.join('\n')).digest('base64');
 
-    var originProtocol = 'http://';
-    var protocol = configs.https ? 'https://' : originProtocol;
+    var originProtocol = 'https://';
+    var protocol = configs.https ? originProtocol : 'http://';
     var originDomain = configs.bucket + '.' + configs.host;
     var domain = configs.domain || originDomain;
     var objectURL = path.joinURI(protocol, domain, object);
-    var requestURL = path.joinURI('http://', originDomain, object);
+    var requestURL = path.joinURI(originProtocol, originDomain, object);
 
     dato.extend(headers, {
         'content-type': contentType,

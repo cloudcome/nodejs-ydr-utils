@@ -21,20 +21,20 @@ aliOSS.config({
 
 describe('ali-oss', function () {
     it('singature', function (done) {
-        var ret = aliOSS.signature('put', '/test/image/im2.jpg');
+        var ret = aliOSS.signature('put', '/test/image/im3.jpg');
 
-        //request.put({
-        //    url: ret.requestURL,
-        //    headers: ret.headers,
-        //    body: fs.createReadStream(path.join(__dirname, './im.jpg'))
-        //}, function (err, body, res) {
-        //    console.log(this.options.headers);
-        //    console.log(res.statusCode);
-        //    console.log(res.headers);
-        //    console.log(err);
-        //    console.log(body);
-        //    done();
-        //});
+        request.put({
+            url: ret.requestURL,
+            headers: ret.headers,
+            body: fs.createReadStream(path.join(__dirname, './im.jpg'))
+        }, function (err, body, res) {
+            console.log(this.options.headers);
+            console.log(res.statusCode);
+            console.log(res.headers);
+            console.log(err);
+            console.log(body);
+            done();
+        });
     });
 });
 
