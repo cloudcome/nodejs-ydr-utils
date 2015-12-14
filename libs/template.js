@@ -51,20 +51,16 @@ var configs = {
 };
 var increase = 0;
 var filters = {};
+
+var generatorVar = function () {
+    return '__' + (increase++) + '__';
+};
+
 var Template = klass.create({
     constructor: function (template, options) {
         this._options = dato.extend(true, {}, configs, options);
         this._init(String(template));
         this.className = 'template';
-    },
-
-    /**
-     * 生成一个变量
-     * @returns {string}
-     * @private
-     */
-    _generatorVar: function () {
-        return namespace + increase++;
     },
 
 
@@ -79,8 +75,8 @@ var Template = klass.create({
 
         exp = exp.replace(REG_F, '');
         return '(function(){try{' +
-            'if(' + the._selfVarible + '.typeis.empty(' + exp + ') && ' + the._selfVarible + '.options.debug){return String(' + exp + ');}\n' +
-            'return ' + exp + '}catch(e){return ' + the._selfVarible + '.options.debug?e.message:"";}}())';
+            'if(' + the._selfVarible + '.typeis.empty(' + exp + ') && ' + the._selfVarible + '.options.debug){return String(' + exp + ');}' +
+            'return ' + exp + '}catch(e){return ' + the._selfVarible + '.options.debug?e.message:""}}())';
     },
 
 
@@ -92,8 +88,12 @@ var Template = klass.create({
      */
     _init: function (template) {
         var the = this;
-        var _var = the._generatorVar();
-        var selfVarible = the._generatorVar();
+        var options = the._options;
+        var _var = generatorVar();
+        var selfVarible = generatorVar();
+        var _forKey = generatorVar();
+        var _evalKey = generatorVar();
+        var dataVarible = generatorVar();
         var fnStr = 'var ' + _var + '="";\n';
         var output = [];
         var parseTimes = 0;
@@ -103,6 +103,13 @@ var Template = klass.create({
         var inExp = false;
 
         fnStr += 'var ' + selfVarible + '=this;\n';
+        fnStr += 'var ' + _evalKey + '="";\n' +
+            'for(var ' + _forKey + ' in ' + dataVarible + '){\n' +
+                /**/'\tif(/^[a-z$_]/i.test(' + _forKey + ')){\n' +
+                /**//**/'\t\t' + _evalKey + '+="var "+' + _forKey + '+"=' + dataVarible + '[\'"+' + _forKey + '+"\'];";\n' +
+                /**/'\t}\n' +
+            '}\n' +
+            'eval(' + _evalKey + ');\n\n';
         the._template = {
             escape: string.escapeHTML,
             filters: {}
@@ -247,8 +254,28 @@ var Template = klass.create({
             }
         });
 
-        fnStr += output.join('\n') + 'return ' + _var + ';\n';
-        the.fn = fnStr;
+        fnStr += output.join(';\n') + '\nreturn ' + _var + ';\n';
+
+        var fn;
+
+        try {
+            /* jshint evil: true */
+            fn = new Function(dataVarible, 'try{\n\n' +
+                fnStr +
+                '\n\n}catch(err){\n' +
+                'return this.options.debug?err.message:"";\n' +
+                '}\n');
+        } catch (err) {
+            fn = function () {
+                return options.debug ? err.message : '';
+            };
+        }
+
+        //fn.toString = function () {
+        //    return fnStr;
+        //};
+        fn.context = the;
+        the.compiler = fn;
 
         return the;
     },
@@ -277,9 +304,6 @@ var Template = klass.create({
     render: function (data) {
         var the = this;
         var options = the._options;
-        var _var = the._generatorVar();
-        var vars = [];
-        var fn;
         var existFilters = dato.extend(true, {}, filters, the._template.filters);
         var self = dato.extend(true, {}, {
             each: function (obj) {
@@ -299,9 +323,6 @@ var Template = klass.create({
         var ret;
 
         data = data || {};
-        dato.each(data, function (key) {
-            vars.push('var ' + key + '=' + _var + '["' + key + '"];\n');
-        });
 
         dato.each(the._useFilters, function (filter) {
             if (!existFilters[filter]) {
@@ -310,25 +331,10 @@ var Template = klass.create({
         });
 
         try {
-            /* jshint evil: true */
-            fn = new Function(_var, 'try{\n' +
-                vars.join('') +
-                this.fn +
-                '\n}catch(err){\n' +
-                'return this.options.debug?err.message:"";\n' +
-                '}');
-        } catch (err) {
-            fn = function () {
-                return options.debug ? err.message : '';
-            };
-        }
-
-        try {
-            ret = fn.call(self, data);
+            ret = the.compiler.call(self, data);
         } catch (err) {
             ret = options.debug ? err.message : '';
         }
-
 
         ret = String(ret);
         ret = options.compress ? _cleanHTML(ret) : ret;
@@ -489,9 +495,9 @@ var Template = klass.create({
         var the = this;
         var matches = str.trim().match(REH_LIST);
         var parse;
-        var randomKey1 = this._generatorVar();
-        var randomKey2 = this._generatorVar();
-        var randomVal = this._generatorVar();
+        var randomKey1 = generatorVar();
+        var randomKey2 = generatorVar();
+        var randomVal = generatorVar();
 
         if (!matches) {
             throw new Error('parse error ' + str);
@@ -623,6 +629,26 @@ Template.filter = function (name, callback, isOverride) {
 };
 
 
+/**
+ * 模板引擎
+ *
+ * @param {Object} [options] 配置
+ * @param {Boolean} [options.cache=true] 是否缓存上次结果
+ * @param {Boolean} [options.compress=true] 是否输出压缩内容
+ * @param {Boolean} [options.debug=false] 是否输出调试新
+ * @constructor
+ *
+ * @example
+ * var tpl = new Template('{{name}}');
+ * tpl.render({name: 'yundanran'});
+ * // => 'yundanran'
+ */
+module.exports = Template;
+
+
+
+
+
 /*===========================================================================================*/
 /*======================================【NODEJS】============================================*/
 /*===========================================================================================*/
@@ -733,28 +759,6 @@ Template.__express = function (file, data, callback) {
 Template.__koa = function (app, viewsRoot) {
     app.context.render = promiseify(function (file, data, callback) {
         Template.__express(path.join(viewsRoot, file), data, callback);
-    });
+    }, global);
 };
-
-
-/*===========================================================================================*/
-/*======================================【NODEJS】============================================*/
-/*===========================================================================================*/
-
-
-/**
- * 模板引擎
- *
- * @param {Object} [options] 配置
- * @param {Boolean} [options.cache=true] 是否缓存上次结果
- * @param {Boolean} [options.compress=true] 是否输出压缩内容
- * @param {Boolean} [options.debug=false] 是否输出调试新
- * @constructor
- *
- * @example
- * var tpl = new Template('{{name}}');
- * tpl.render({name: 'yundanran'});
- * // => 'yundanran'
- */
-module.exports = Template;
 
