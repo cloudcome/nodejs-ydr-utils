@@ -7,7 +7,7 @@
 
 'use strict';
 
-require('../libs/console.js')(['error']);
+require('../libs/console.js');
 
 var points = ['-', '\\', '|', '/', '-', '\\', '|', '/'];
 

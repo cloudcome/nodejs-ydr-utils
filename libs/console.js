@@ -73,71 +73,73 @@ module.exports = function (options) {
             };
         }
     });
-
-    /**
-     * 打点
-     * @param str
-     */
-    global.console.point = function (str) {
-        str = String(str);
-        process.stdout.clearLine();
-        process.stdout.cursorTo(0);
-        process.stdout.write(str);
-    };
-    global.console.pointEnd = function () {
-        process.stdout.clearLine();
-        process.stdout.cursorTo(0);
-    };
+};
 
 
-    var lineCursor = 0;
-    global.console.lineStart = function () {
-        lineCursor = 0;
-    };
-    /**
-     * 打线
-     * @param str
-     */
-    global.console.line = function (str) {
-        str = String(str);
-        process.stdout.cursorTo(lineCursor);
-        process.stdout.write(str);
-        lineCursor += str.length;
-    };
-    global.console.lineEnd = function () {
-        lineCursor = 0;
-        process.stdout.write('\n');
-    };
 
-    var dictionaries = ['-', '\\', '|', '/', '-', '\\', '|', '/'];
-    var timer = 0;
-    global.console.loading = function (interval, _dictionaries) {
-        if (timer) {
-            global.console.loadingEnd();
-        }
+/**
+ * 打点
+ * @param str
+ */
+global.console.point = function (str) {
+    str = String(str);
+    process.stdout.clearLine();
+    process.stdout.cursorTo(0);
+    process.stdout.write(str);
+};
+global.console.pointEnd = function () {
+    process.stdout.clearLine();
+    process.stdout.cursorTo(0);
+};
 
-        var args = allocation.args(arguments);
-        var times = 0;
 
-        if (args.length === 1 && typeis.Array(args[0])) {
-            _dictionaries = args[0];
-            interval = null;
-        }
+var lineCursor = 0;
+global.console.lineStart = function () {
+    lineCursor = 0;
+};
+/**
+ * 打线
+ * @param str
+ */
+global.console.line = function (str) {
+    str = String(str);
+    process.stdout.cursorTo(lineCursor);
+    process.stdout.write(str);
+    lineCursor += str.length;
+};
+global.console.lineEnd = function () {
+    lineCursor = 0;
+    process.stdout.write('\n');
+};
 
-        interval = interval || 80;
-        _dictionaries = _dictionaries || dictionaries;
-        var length = _dictionaries.length - 1;
-        timer = setInterval(function () {
-            var index = times % length;
-            global.console.point(_dictionaries[index]);
-            times++;
-        }, interval);
-    };
-    global.console.loadingEnd = function () {
-        clearInterval(timer);
-        timer = 0;
-        global.console.pointEnd();
-    };
+var dictionaries = ['-', '\\', '|', '/', '-', '\\', '|', '/'];
+var timer = 0;
+global.console.loading = function (interval, _dictionaries) {
+    if (timer) {
+        global.console.loadingEnd();
+    }
+
+    var args = allocation.args(arguments);
+    var times = 0;
+
+    if (args.length === 1 && typeis.Array(args[0])) {
+        _dictionaries = args[0];
+        interval = null;
+    }
+
+    interval = interval || 80;
+    _dictionaries = _dictionaries || dictionaries;
+    var length = _dictionaries.length - 1;
+    timer = setInterval(function () {
+        var index = times % length;
+        global.console.point(_dictionaries[index]);
+        times++;
+    }, interval);
+};
+global.console.loadingEnd = function () {
+    clearInterval(timer);
+    timer = 0;
+    global.console.pointEnd();
 };
 
 
