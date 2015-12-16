@@ -11,7 +11,7 @@ var klass = require('./class.js');
 var typeis = require('./typeis.js');
 var dato = require('./dato.js');
 var allocation = require('./allocation.js');
-var Emitter = require('events');
+var Emitter = require('./emitter.js');
 var howdo = require('howdo');
 
 /*====================================
