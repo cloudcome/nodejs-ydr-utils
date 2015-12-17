@@ -102,7 +102,9 @@ var fs = require('fs');
  * // => "text"
  */
 var typeis = function (object) {
-    if (typeof object === udf) {
+    if (object !== object) {
+        return 'nan';
+    } else if (typeof object === udf) {
         return udf;
     } else if (typeof window !== udf && object === window) {
         return 'window';
@@ -118,8 +120,6 @@ var typeis = function (object) {
 
     if (/element/.test(ret)) {
         return 'element';
-    } else if (isNaN(object) && ret === 'number') {
-        return 'nan';
     }
 
     return ret;
