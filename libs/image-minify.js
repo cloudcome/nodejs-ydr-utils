@@ -126,5 +126,8 @@ exports.zhitu = function (stream, options, callback) {
             callback(null, stream);
         });
 };
-
+exports.zhitu.gif = false;
+exports.zhitu.png = true;
+exports.zhitu.jpeg = true;
+exports.zhitu.jpg = true;
 
