@@ -81,13 +81,6 @@ exports.signature = function (method, filename, headers) {
         contentType,
         date
     ];
-    filename = filename.split('/').map(function (item) {
-        try {
-            return encodeURIComponent(item);
-        } catch (err) {
-            return '--encodeURIComponent-error--';
-        }
-    }).join('/');
     var object = path.join(configs.dirname, filename);
     var resource = '/' + path.join(configs.bucket, object);
     var signature;
@@ -108,11 +101,15 @@ exports.signature = function (method, filename, headers) {
 
     params.push(resource);
     signature = crypto.createHmac('sha1', configs.accessKeySecret);
-    signature = signature.update(params.join('\n')).digest('base64');
+    signature = signature.update(params.join('\n'), 'utf-8').digest('base64');
 
     var protocol = configs.https ? 'https://' : 'http://';
     var originDomain = configs.bucket + '.' + configs.host;
     var customDomain = configs.domain || originDomain;
+    // fix: 中文文件名的 BUG
+    object = object.split('/').map(function (item) {
+        return encodeURIComponent(item);
+    }).join('/');
     var objectURL = path.joinURI(protocol, customDomain, object);
     var requestURL = path.joinURI(protocol, originDomain, object);
 
