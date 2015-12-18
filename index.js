@@ -39,6 +39,8 @@ module.exports = {
     favicon: require('./libs/favicon.js'),
     // HTTP status
     httpStatus: require('./libs/http-status.js'),
+    // 图片流压缩
+    imageMinify: require('./libs/image-minify.js'),
     // 应用日志
     log: require('./libs/log.js'),
     // 中间件
