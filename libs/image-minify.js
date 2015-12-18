@@ -10,6 +10,7 @@
 
 var howdo = require('howdo');
 var fse = require('fs-extra');
+var FormData = require('form-data');
 
 var request = require('./request.js');
 var allocation = require('./allocation.js');
@@ -23,11 +24,12 @@ var noop = function () {
 
 /**
  * 腾讯智图压缩
- * @ref http://zhitu.isux.us
+ * @link http://zhitu.isux.us
  * @param stream {Object|String} 输入流或文件路径
  * @param [options] {Object} 配置
  * @param [options.quality=0.7] {Number} 指定压缩后的质量
  * @param [options.filename="file.png"] {String} 指定数据流的文件名
+ * @param [options.debug=false] {Boolean} 是否输出调试信息
  * @param [callback] {Function} 回调，如果处理失败则返回原始数据流
  */
 exports.zhitu = function (stream, options, callback) {
@@ -35,7 +37,8 @@ exports.zhitu = function (stream, options, callback) {
     var defaults = {
         // 图片质量：0.1 - 1
         quality: 0.7,
-        filename: 'file.png'
+        filename: 'file.png',
+        debug: false
     };
     var args = allocation.args(arguments);
 
@@ -63,7 +66,7 @@ exports.zhitu = function (stream, options, callback) {
     fd.append('fileSelect', stream);
 
     howdo
-    // 上传
+        // 上传
         .task(function (next) {
             request.post({
                 url: url,
@@ -77,6 +80,12 @@ exports.zhitu = function (stream, options, callback) {
             }
 
             var json = {};
+
+            body = body.trim();
+
+            if (options.debug) {
+                console.log('upload zhitu response body is\n', body);
+            }
 
             try {
                 //{ code: 3,
@@ -105,7 +114,11 @@ exports.zhitu = function (stream, options, callback) {
         .try(function (stream) {
             callback(null, stream);
         })
-        .catch(function () {
+        .catch(function (err) {
+            if (options.debug) {
+                console.error('zhitu error: ', err.message);
+            }
+
             callback(null, stream);
         });
 };
