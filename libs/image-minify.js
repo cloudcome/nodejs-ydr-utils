@@ -66,7 +66,7 @@ exports.zhitu = function (stream, options, callback) {
     fd.append('fileSelect', stream);
 
     howdo
-        // 上传
+    // 上传
         .task(function (next) {
             request.post({
                 url: url,
@@ -76,7 +76,7 @@ exports.zhitu = function (stream, options, callback) {
         // 下载
         .task(function (next, body, res) {
             if (res.statusCode !== 200) {
-                return next(new Error('upload zhitu response statusCode is ' + res.statusCode));
+                return next(new Error('upload response statusCode is ' + res.statusCode));
             }
 
             var json = {};
@@ -84,7 +84,7 @@ exports.zhitu = function (stream, options, callback) {
             body = body.trim();
 
             if (options.debug) {
-                console.log('upload zhitu response body is\n', body);
+                console.log('upload response body is\n', body);
             }
 
             try {
@@ -95,7 +95,11 @@ exports.zhitu = function (stream, options, callback) {
                 //output_webp: 'null' }
                 json = JSON.parse(body);
             } catch (err) {
-                return next(new Error('parse zhitu response body error'));
+                return next(new Error('parse response body error'));
+            }
+
+            if (!json.output) {
+                return new Error('can not minify this file');
             }
 
             request.down(json.output, function (err, stream, res) {
@@ -104,7 +108,7 @@ exports.zhitu = function (stream, options, callback) {
                 }
 
                 if (res.statusCode !== 200) {
-                    return next(new Error('download zhitu response statusCode is ' + res.statusCode));
+                    return next(new Error('download response statusCode is ' + res.statusCode));
                 }
 
                 next(null, stream);
