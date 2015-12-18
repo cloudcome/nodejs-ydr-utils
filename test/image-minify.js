@@ -12,8 +12,8 @@ var path = require('path');
 
 var imageMinify = require('../libs/image-minify.js');
 
-var src = path.join(__dirname, 'image.gif');
-var dest = path.join(__dirname, 'image.min.gif');
+var src = path.join(__dirname, 'image.jpg');
+var dest = path.join(__dirname, 'image.min.jpg');
 
 imageMinify.zhitu(src, {debug: true},function (err, stream) {
     stream.pipe(fs.createWriteStream(dest)).on('end', function () {
