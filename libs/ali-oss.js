@@ -81,6 +81,13 @@ exports.signature = function (method, filename, headers) {
         contentType,
         date
     ];
+    filename = filename.split('/').map(function (item) {
+        try {
+            return encodeURIComponent(item);
+        } catch (err) {
+            return '--encodeURIComponent-error--';
+        }
+    }).join('/');
     var object = path.join(configs.dirname, filename);
     var resource = '/' + path.join(configs.bucket, object);
     var signature;
