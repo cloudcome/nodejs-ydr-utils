@@ -1,4 +1,13 @@
 # ydr-utils
+[![Build Status][travis-img]][travis-url] 
+[![ydr-utils][shields-img]][shields-url]
+
+[travis-img]: https://travis-ci.org/cloudcome/nodejs-ydr-utils.svg?branch=master
+[travis-url]: https://travis-ci.org/cloudcome/nodejs-ydr-utils
+[shields-img]: https://img.shields.io/npm/v/ydr-utils.svg
+[shields-url]: https://www.npmjs.com/package/ydr-utils
+
+
 
 ```
 libs
@@ -18,6 +27,7 @@ libs
 ├── error.js
 ├── favicon.js
 ├── http-status.js
+├── image-minify.js
 ├── log.js
 ├── middleware.js
 ├── mime.js
