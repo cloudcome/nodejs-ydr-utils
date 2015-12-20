@@ -1,18 +1,21 @@
 'use strict';
 
+var assert = require('assert');
+
 var csrf = require('../libs/csrf.js');
 
+describe('csrf', function () {
+    it('1', function () {
+        var token1 = csrf.create();
+        var token2 = csrf.create();
 
-var token1 = csrf.create();
-var token2 = csrf.create();
+        var b1 = csrf.validate(token1);
+        var b2 = csrf.validate(token2);
+        var b3 = csrf.validate(token1 + token2);
 
-console.log(token1);
-console.log(token2);
+        assert.equal(b1, true);
+        assert.equal(b2, true);
+        assert.equal(b3, false);
+    });
+});
 
-var b1 = csrf.validate(token1);
-var b2 = csrf.validate(token2);
-var b3 = csrf.validate('a9fb8e03e0338d6741d4b80c00fddffb');
-
-console.log(b1);
-console.log(b2);
-console.log(b3);
