@@ -7,13 +7,20 @@
 
 'use strict';
 
-var fs = require('fs');
-var path = require('path');
-var template = fs.readFileSync(path.join(__dirname, './template.md'), 'utf8');
+var assert = require('assert');
 var Template = require('../libs/template.js');
-var tpl = new Template(template);
-var html = tpl.render({
-    user: '丑陋大葱么'
+
+describe('template', function () {
+    it('base', function () {
+        var template = '{{user}}';
+        var tpl = new Template(template);
+        var data = {
+            user: '丑陋大葱么'
+        };
+        var html = tpl.render(data);
+
+        assert.equal(html, data.user);
+    });
 });
 
-console.log(html);
+
