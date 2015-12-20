@@ -15,18 +15,48 @@
 // 网站名称：FrontEndDev
 // 网站地址：http://FrontEndDev.org
 
+//API key：735045026
+//keyfrom：ydr-me
+//创建时间：2015-12-20
+//网站名称：ydr-me
+//网站地址：http://ydr.me
+
+//API key：892359432
+//keyfrom：s-ydr-me
+//创建时间：2015-12-20
+//网站名称：s-ydr-me
+//网站地址：http://s.ydr.me
+
 var qs = require('querystring');
 var dato = require('./dato.js');
 var typeis = require('./typeis.js');
 var request = require('./request.js');
+var random = require('./random.js');
+
+var keyFroms = [
+    'FrontEndDev',
+    'ydr-me',
+    's-ydr-me'
+];
+var keys = [
+    '537362269',
+    '735045026',
+    '892359432'
+];
 // 只允许：英文、数字、下划线、短横线
 var REG_RP = /[^\w-]/g;
 var REG_LP = /-+/g;
 var REG_LR = /^-+|-+$/g;
 var url = 'http://fanyi.youdao.com/openapi.do?';
 var configs = {
-    keyfrom: 'FrontEndDev',
-    key: '537362269',
+    keyfrom: function () {
+        var index = random.number(0, keyFroms.length - 1);
+        return keyFroms[index];
+    },
+    key: function () {
+        var index = random.number(0, keys.length - 1);
+        return keys[index];
+    },
     type: 'data',
     doctype: 'json',
     version: '1.1',
@@ -48,9 +78,19 @@ var errMap = {
  * @param callback {Function} 翻译回调
  */
 var translate = function (word, callback) {
-    configs.q = String(word);
+    var query = dato.extend({}, configs);
+
+    if (typeis.Function(configs.keyfrom)) {
+        query.keyfrom = configs.keyfrom();
+    }
+
+    if (typeis.Function(configs.key)) {
+        query.key = configs.key();
+    }
+
+    query.q = String(word);
     request.get({
-        url: url + qs.stringify(configs)
+        url: url + qs.stringify(query)
     }, function (err, body) {
         if (err) {
             return callback(err);
