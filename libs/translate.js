@@ -24,7 +24,7 @@ var REG_RP = /[^\w-]/g;
 var REG_LP = /-+/g;
 var REG_LR = /^-+|-+$/g;
 var url = 'http://fanyi.youdao.com/openapi.do?';
-var query = {
+var configs = {
     keyfrom: 'FrontEndDev',
     key: '537362269',
     type: 'data',
@@ -48,9 +48,9 @@ var errMap = {
  * @param callback {Function} 翻译回调
  */
 module.exports = function (word, callback) {
-    query.q = String(word);
+    configs.q = String(word);
     request.get({
-        url: url + qs.stringify(query)
+        url: url + qs.stringify(configs)
     }, function (err, body) {
         if (err) {
             return callback(err);
@@ -93,8 +93,8 @@ module.exports = function (word, callback) {
  * 设置参数
  * @param options
  */
-module.exports.setOptions = function (options) {
-    dato.extend(query, options);
+module.exports.config = function (options) {
+    dato.extend(configs, options);
 };
 
 
@@ -103,7 +103,7 @@ module.exports.setOptions = function (options) {
  * @param word
  * @returns {string}
  */
-module.exports.setFilter = function (word) {
+module.exports.filter = function (word) {
     return word
         .toLowerCase()
         .trim()

@@ -4,10 +4,18 @@
  * @create 2015-04-09 20:28
  */
 
+var assert = require('assert');
 
 var translate = require('../').translate;
 
-translate('你好', function (err, word) {
-    console.log(err);
-    console.log(word);
+describe('translate', function () {
+    it('1', function (done) {
+        translate('你好', function (err, word) {
+            assert.equal(!err, true);
+            console.log(word);
+            assert.equal(word !== '', true);
+            done();
+        });
+    });
 });
+
