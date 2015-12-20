@@ -7,11 +7,11 @@
 
 'use strict';
 
-require('../libs/console.js');
+require('../libs/console.js')();
 
 
 describe('console', function () {
-    it('1', function () {
+    it('base', function () {
         console.log('log 日志');
         console.info('info 日志');
         console.warn('warn 日志');

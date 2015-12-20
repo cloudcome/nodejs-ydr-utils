@@ -320,14 +320,7 @@ function _request(options, callback) {
             if (options.callbackStream) {
                 callback.call(context, null, stream, res);
             } else {
-                stream.setEncoding(options.encoding);
-                stream.on('data', function (chunk) {
-                    if (isUtf8) {
-                        bufferList.push(new Buffer(chunk, 'utf8'));
-                    } else {
-                        binarys += chunk;
-                    }
-                }).on('end', function () {
+                var onEnd = function () {
                     var data;
 
                     if (isUtf8) {
@@ -337,7 +330,15 @@ function _request(options, callback) {
                     }
 
                     callback.call(context, null, data, res);
-                }).on('error', callback.bind(context));
+                };
+                stream.setEncoding(options.encoding);
+                stream.on('data', function (chunk) {
+                    if (isUtf8) {
+                        bufferList.push(new Buffer(chunk, 'utf8'));
+                    } else {
+                        binarys += chunk;
+                    }
+                }).on('end', onEnd).on('close', onEnd).on('error', callback.bind(context));
             }
         };
 

@@ -73,6 +73,8 @@ module.exports = function (options) {
             };
         }
     });
+
+    return global.console;
 };
 
 
@@ -82,13 +84,21 @@ module.exports = function (options) {
  */
 global.console.point = function (str) {
     str = String(str);
-    process.stdout.clearLine();
-    process.stdout.cursorTo(0);
+    try {
+        process.stdout.clearLine();
+        process.stdout.cursorTo(0);
+    } catch (err) {
+        // ignore
+    }
     process.stdout.write(str);
 };
 global.console.pointEnd = function () {
-    process.stdout.clearLine();
-    process.stdout.cursorTo(0);
+    try {
+        process.stdout.clearLine();
+        process.stdout.cursorTo(0);
+    } catch (err) {
+        // ignore
+    }
 };
 
 
@@ -102,7 +112,11 @@ global.console.lineStart = function () {
  */
 global.console.line = function (str) {
     str = String(str);
-    process.stdout.cursorTo(lineCursor);
+    try {
+        process.stdout.cursorTo(lineCursor);
+    } catch (err) {
+        // ignore
+    }
     process.stdout.write(str);
     lineCursor += str.length;
 };
@@ -111,7 +125,7 @@ global.console.lineEnd = function (clear) {
 
     if (clear) {
         global.console.pointEnd();
-    }else{
+    } else {
         process.stdout.write('\n');
     }
 };
@@ -145,6 +159,3 @@ global.console.loadingEnd = function () {
     timer = 0;
     global.console.pointEnd();
 };
-
-
-
