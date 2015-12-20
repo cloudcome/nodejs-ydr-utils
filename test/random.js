@@ -7,26 +7,27 @@
 
 'use strict';
 
+var assert = require('assert');
+
 var random = require('../libs/random.js');
-//var map = {};
 
-//for (var i = 1; i < 100000; i++) {
-//    var r = random.string(6, 'a0A');
-//
-//    if (map[r]) {
-//        console.log('has repeat', r, i);
-//        process.exit();
-//    }
-//
-//    map[r] = 1;
-//}
-//
-//
-//console.log('no repeat');
 
-var i = 300;
-while (i--){
-    console.log(random.guid());
-}
+describe('random', function () {
+    it('number', function () {
+        var ret = random.number(1, 10);
+        assert.equal(ret >= 1, true);
+        assert.equal(ret <= 10, true);
+    });
+
+    it('string', function () {
+        assert.equal(random.string().length, 6);
+    });
+
+    it('guid', function () {
+        assert.equal(random.guid().length, 16);
+    });
+});
+
+
 
 
