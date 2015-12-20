@@ -76,7 +76,6 @@ module.exports = function (options) {
 };
 
 
-
 /**
  * 打点
  * @param str
@@ -107,9 +106,14 @@ global.console.line = function (str) {
     process.stdout.write(str);
     lineCursor += str.length;
 };
-global.console.lineEnd = function () {
+global.console.lineEnd = function (clear) {
     lineCursor = 0;
-    process.stdout.write('\n');
+
+    if (clear) {
+        global.console.pointEnd();
+    }else{
+        process.stdout.write('\n');
+    }
 };
 
 var dictionaries = ['-', '\\', '|', '/', '-', '\\', '|', '/'];
