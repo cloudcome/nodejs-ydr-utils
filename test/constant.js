@@ -7,12 +7,25 @@
 
 'use strict';
 
+var assert = require('assert');
+
 var constant = require('../libs/constant.js');
 
-var o = constant('a', {
-    b: 1
+describe('constant', function () {
+    it('a', function () {
+        var o = constant('a', {
+            b: 1
+        });
+
+        assert.equal(o.a.b, 1);
+
+        try {
+            o.a.b = 2;
+        } catch (err) {
+            // ignore
+        }
+
+        assert.equal(o.a.b, 1);
+    });
 });
 
-console.log(o.a.b);
-//o.a.b= 2;
-//console.log(o.a.b);
