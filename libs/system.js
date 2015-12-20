@@ -8,11 +8,13 @@
 'use strict';
 
 var os = require('os');
+var fse = require('fs-extra');
 var childProcess = require('child_process');
 var howdo = require('howdo');
 
 var dato = require('./dato.js');
 var request = require('./request.js');
+var path = require('./path.js');
 var osReleaseMap = require('../data/os-release.json');
 var winReleaseMap = require('../data/win-release.json');
 
@@ -111,23 +113,25 @@ exports.remoteIP = function (callback) {
 
 /**
  * 获取系统信息
- * @returns {{cpus: *, version: string, type: *, platform, hostname: *, release: *, arch, username: *, pid: number}}
+ * @returns {{}}
  */
-exports.info = function () {
-    return {
-        cpus: os.cpus().length,
-        platform: os.platform(),
-        hostname: os.hostname(),
-        release: os.release(),
-        os: parseOS(),
-        arch: os.arch(),
-        username: process.env.LOGNAME || process.env.USER,
-        pid: process.pid,
-        locale: getOSlocale(),
-        node: process.version.replace(/^v/i, '').trim(),
-        npm: getNPMVersion(),
-        modules: getGlobalNodeModules()
-    };
+exports.info = function (callback) {
+    getGlobalNodeModules(function (modules) {
+        callback({
+            cpus: os.cpus().length,
+            platform: os.platform(),
+            hostname: os.hostname(),
+            release: os.release(),
+            os: parseOS(),
+            arch: os.arch(),
+            username: process.env.LOGNAME || process.env.USER || 'unkown',
+            pid: process.pid,
+            language: getOSlanguage(),
+            node: process.version.replace(/^v/i, '').trim(),
+            npm: getNPMVersion(),
+            modules: modules
+        });
+    });
 };
 
 
@@ -192,15 +196,11 @@ function parseWin32Release(release) {
  * @ref https://github.com/sindresorhus/os-locale
  * @returns {*}
  */
-function getOSlocale() {
+function getOSlanguage() {
     var env = process.env;
-    var locale = env.LC_ALL || env.LC_MESSAGES || env.LANG || env.LANGUAGE;
+    var locale = env.LANG || env.LANGUAGE || env.LC_ALL || env.LC_MESSAGES || env.LC_CTYPE;
 
-    if (locale) {
-        return locale.replace(/[.:].*$/, '');
-    }
-
-    return 'unknow';
+    return locale || 'EN:UTF-8';
 }
 
 
@@ -219,28 +219,22 @@ function getNPMVersion() {
 
 /**
  * 同步获取全局安装的 node 模块
- * @returns {Object}
+ * @param callback
  */
-function getGlobalNodeModules() {
-    var listStr;
+function getGlobalNodeModules(callback) {
+    childProcess.exec('npm list --global --depth 0', function (err, stdout, stderr) {
+        var listArr = stdout.split('\n');
+        var REG = /\s([a-z\d][a-z\d_\.\-]*)@(.*)$/;
+        var ret = {};
 
-    try {
-        listStr = childProcess.execSync('npm list --global --depth 0').toString();
-    } catch (err) {
-        return {};
-    }
+        listArr.forEach(function (item) {
+            var mathes = item.match(REG);
 
-    var listArr = listStr.split('\n');
-    var REG = /\s([a-z\d][a-z\d_\.\-]*)@(.*)$/;
-    var ret = {};
+            if (mathes) {
+                ret[mathes[1].trim()] = mathes[2].trim();
+            }
+        });
 
-    listArr.forEach(function (item) {
-        var mathes = item.match(REG);
-
-        if (mathes) {
-            ret[mathes[1].trim()] = mathes[2].trim();
-        }
+        callback(ret);
     });
-
-    return ret;
 }
