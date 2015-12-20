@@ -47,7 +47,7 @@ var errMap = {
  * @param word {String} 翻译词
  * @param callback {Function} 翻译回调
  */
-module.exports = function (word, callback) {
+var translate = function (word, callback) {
     configs.q = String(word);
     request.get({
         url: url + qs.stringify(configs)
@@ -82,7 +82,7 @@ module.exports = function (word, callback) {
 
         var word2 = String(json.translation);
 
-        word2 = module.exports.setFilter(word2);
+        word2 = module.exports.filter(word2);
         callback(err, word2);
     });
 
@@ -93,7 +93,7 @@ module.exports = function (word, callback) {
  * 设置参数
  * @param options
  */
-module.exports.config = function (options) {
+translate.config = function (options) {
     dato.extend(configs, options);
 };
 
@@ -103,7 +103,7 @@ module.exports.config = function (options) {
  * @param word
  * @returns {string}
  */
-module.exports.filter = function (word) {
+translate.filter = function (word) {
     return word
         .toLowerCase()
         .trim()
@@ -112,3 +112,5 @@ module.exports.filter = function (word) {
         .replace(REG_LR, '');
 };
 
+
+module.exports = translate;
