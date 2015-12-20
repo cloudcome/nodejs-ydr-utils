@@ -16,10 +16,6 @@ var src = path.join(__dirname, 'image.jpg');
 var dest = path.join(__dirname, 'image.min.jpg');
 
 imageMinify.zhitu(src, {debug: true},function (err, stream) {
-    stream.pipe(fs.createWriteStream(dest)).on('end', function () {
-        console.log('pipe end');
-    }).on('close', function () {
-        console.log('pipe close');
-    });
+
 });
 
