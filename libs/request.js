@@ -221,10 +221,6 @@ function _remote(options, callback) {
  * @private
  */
 function _request(options, callback) {
-    if (typeis(options.url) !== 'string') {
-        return callback(new Error('request url must be a string'));
-    }
-
     var requestOptions = urlHelper.parse(options.url);
     var _http = requestOptions.protocol === 'https:' ? https : http;
     var form = options.form;
@@ -320,7 +316,13 @@ function _request(options, callback) {
             if (options.callbackStream) {
                 callback.call(context, null, stream, res);
             } else {
+                var ended = false;
                 var onEnd = function () {
+                    if (ended) {
+                        return;
+                    }
+
+                    ended = true;
                     var data;
 
                     if (isUtf8) {

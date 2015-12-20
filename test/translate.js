@@ -8,7 +8,7 @@
 
 var assert = require('assert');
 
-var translate = require('../').translate;
+var translate = require('../libs/translate.js');
 
 describe('translate', function () {
     it('1', function (done) {
