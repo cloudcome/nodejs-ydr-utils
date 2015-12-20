@@ -8,6 +8,12 @@
 'use strict';
 
 var dato = require('../libs/dato.js');
-var ga = dato.gravatar('cloudcome@163.com');
 
-console.log(ga);
+describe('dato', function () {
+    it('gravatar', function () {
+        var ga = dato.gravatar('cloudcome@163.com');
+
+        console.log(ga);
+    });
+});
+
