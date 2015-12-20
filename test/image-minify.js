@@ -7,15 +7,21 @@
 
 'use strict';
 
-var fs = require('fs');
+
+var assert = require('assert');
 var path = require('path');
 
 var imageMinify = require('../libs/image-minify.js');
 
-var src = path.join(__dirname, 'image.jpg');
-var dest = path.join(__dirname, 'image.min.jpg');
 
-imageMinify.zhitu(src, {debug: true},function (err, stream) {
+describe('imageMinify', function () {
+    it(1, function (done) {
+        var src = path.join(__dirname, 'image.jpg');
 
+        imageMinify.zhitu(src, {debug: true}, function (err, stream) {
+            done();
+        });
+    });
 });
+
 
