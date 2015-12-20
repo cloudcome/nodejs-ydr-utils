@@ -49,13 +49,13 @@ var REG_LP = /-+/g;
 var REG_LR = /^-+|-+$/g;
 var url = 'http://fanyi.youdao.com/openapi.do?';
 var configs = {
-    keyfrom: function () {
-        var index = random.number(0, keyFroms.length - 1);
-        return keyFroms[index];
-    },
-    key: function () {
+    random: function () {
         var index = random.number(0, keys.length - 1);
-        return keys[index];
+
+        return {
+            key: keys[index],
+            keyfrom: keyFroms[index]
+        };
     },
     type: 'data',
     doctype: 'json',
@@ -80,15 +80,12 @@ var errMap = {
 var translate = function (word, callback) {
     var query = dato.extend({}, configs);
 
-    if (typeis.Function(configs.keyfrom)) {
-        query.keyfrom = configs.keyfrom();
-    }
-
-    if (typeis.Function(configs.key)) {
-        query.key = configs.key();
+    if (typeis.Function(configs.random)) {
+        dato.extend(query, configs.random());
     }
 
     query.q = String(word);
+    query.random = undefined;
     request.get({
         url: url + qs.stringify(query)
     }, function (err, body) {
