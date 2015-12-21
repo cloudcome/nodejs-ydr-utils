@@ -17,6 +17,7 @@ var number = require('./number.js');
 var klass = require('./class.js');
 var typeis = require('./typeis.js');
 var Emitter = require('./emitter.js');
+var buffer = require('./buffer.js');
 
 var REG_LINK = /<link[^<>]*?>/ig;
 var REG_META = /<meta[^<>]*?>/ig;
@@ -359,9 +360,14 @@ var Favicon = klass.extends(Emitter).create({
                 return next();
             }
 
-
             var filePath = path.join(configs.saveDirection, the._url.hostname + configs.extname);
+            var callbacked = false;
             var onend = function () {
+                if (callbacked) {
+                    return;
+                }
+
+                callbacked = true;
                 the.faviconFile = filePath;
                 // 推出最后一个
                 the._hostnameList.pop();
@@ -378,6 +384,10 @@ var Favicon = klass.extends(Emitter).create({
 
             stream
                 .pipe(fse.createWriteStream(filePath))
+                .on('data', function (bf) {
+                    //var bf = fse.readFileSync(filePath);
+                    console.log('buffer fileType', buffer.fileType(bf));
+                })
                 .on('error', function () {
                     the.emit('erorr', err);
                     next();

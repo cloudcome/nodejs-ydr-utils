@@ -304,7 +304,7 @@ function _request(options, callback) {
     var req = _http.request(requestOptions, function (res) {
         var bufferList = [];
         var binarys = '';
-        var isUtf8 = options.encoding === 'utf8';
+        var isUtf8 = options.encoding === 'utf8' || options.encoding === 'utf-8';
 
         if (requestOptions.method === 'HEAD') {
             req.abort();
