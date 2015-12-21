@@ -1,5 +1,5 @@
 /**
- * 文件描述
+ * buffer
  * @author ydr.me
  * @create 2015-12-21 13:54
  */
@@ -91,6 +91,7 @@ exports.isUTF8 = function (bf) {
 
 /**
  * 活动 buffer 内的文件类型
+ * @link https://github.com/sindresorhus/file-type/blob/master/index.js
  * @param bf
  * @returns {*}
  */
