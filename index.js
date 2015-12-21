@@ -11,6 +11,8 @@ module.exports = {
     aliOSS: require('./libs/ali-oss.js'),
     // 调用
     allocation: require('./libs/allocation.js'),
+    // 数据缓冲对象
+    buffer: require('./libs/buffer.js'),
     // 调用
     cache: require('./libs/cache.js'),
     // 类
