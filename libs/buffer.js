@@ -305,59 +305,38 @@ exports.fileType = function (bf) {
     }
 
     if (bf[0] === 0x4E && bf[1] === 0x45 && bf[2] === 0x53 && bf[3] === 0x1A) {
-        return {
-            ext: '.nes',
-            mime: 'application/x-nintendo-nes-rom'
-        };
+        return 'nes';
     }
 
     if (bf[0] === 0x43 && bf[1] === 0x72 && bf[2] === 0x32 && bf[3] === 0x34) {
-        return {
-            ext: '.crx',
-            mime: 'application/x-google-chrome-extension'
-        };
+        return 'crx';
     }
 
     if (
         (bf[0] === 0x4D && bf[1] === 0x53 && bf[2] === 0x43 && bf[3] === 0x46) ||
         (bf[0] === 0x49 && bf[1] === 0x53 && bf[2] === 0x63 && bf[3] === 0x28)
     ) {
-        return {
-            ext: '.cab',
-            mime: 'application/vnd.ms-cab-compressed'
-        };
+        return 'cab';
     }
 
     // needs to be before `ar` check
     if (bf[0] === 0x21 && bf[1] === 0x3C && bf[2] === 0x61 && bf[3] === 0x72 && bf[4] === 0x63 && bf[5] === 0x68 && bf[6] === 0x3E && bf[7] === 0x0A && bf[8] === 0x64 && bf[9] === 0x65 && bf[10] === 0x62 && bf[11] === 0x69 && bf[12] === 0x61 && bf[13] === 0x6E && bf[14] === 0x2D && bf[15] === 0x62 && bf[16] === 0x69 && bf[17] === 0x6E && bf[18] === 0x61 && bf[19] === 0x72 && bf[20] === 0x79) {
-        return {
-            ext: '.deb',
-            mime: 'application/x-deb'
-        };
+        return 'deb';
     }
 
     if (bf[0] === 0x21 && bf[1] === 0x3C && bf[2] === 0x61 && bf[3] === 0x72 && bf[4] === 0x63 && bf[5] === 0x68 && bf[6] === 0x3E) {
-        return {
-            ext: '.ar',
-            mime: 'application/x-unix-archive'
-        };
+        return 'ar';
     }
 
     if (
         (bf[0] === 0x1F && bf[1] === 0xA0) ||
         (bf[0] === 0x1F && bf[1] === 0x9D)
     ) {
-        return {
-            ext: '.Z',
-            mime: 'application/x-compress'
-        };
+        return 'z';
     }
 
     if (bf[0] === 0x4C && bf[1] === 0x5A && bf[2] === 0x49 && bf[3] === 0x50) {
-        return {
-            ext: '.lz',
-            mime: 'application/x-lzip'
-        };
+        return 'lz';
     }
 
     return null;
