@@ -8,6 +8,8 @@
 'use strict';
 
 var assert = require('assert');
+var fs = require('fs');
+var path = require('path');
 
 var buffer = require('../libs/buffer.js');
 
@@ -20,6 +22,18 @@ describe('buffer.js', function () {
 
         assert.equal(ret1, true);
         assert.equal(ret2, false);
+    });
+
+    it('.fileType', function () {
+        var ico = path.join(__dirname, 'image.ico');
+        var png = path.join(__dirname, 'image.png');
+        var bf1 = fs.readFileSync(ico);
+        var bf2 = fs.readFileSync(png);
+        var ret1 = buffer.fileType(bf1);
+        var ret2 = buffer.fileType(bf2);
+
+        assert.equal(ret1, 'ico');
+        assert.equal(ret2, 'png');
     });
 });
 
