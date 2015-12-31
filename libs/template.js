@@ -58,9 +58,11 @@ var generatorVar = function () {
 
 var Template = klass.create({
     constructor: function (template, options) {
-        this._options = dato.extend(true, {}, configs, options);
-        this._init(String(template));
-        this.className = 'template';
+        var the = this;
+
+        the.className = 'template';
+        the._options = dato.extend(true, {}, configs, options);
+        the._init(String(template));
     },
 
 
@@ -215,7 +217,7 @@ var Template = klass.create({
                 }
                 // /list
                 else if ($0 === '/list') {
-                    output.push('}, this);\n' + _var + '+=' + $1 + ';');
+                    output.push('});\n' + _var + '+=' + $1 + ';');
                 }
                 // var
                 else if (the._hasPrefix($0, 'var')) {
@@ -263,7 +265,7 @@ var Template = klass.create({
             fn = new Function(dataVarible, 'try{\n\n' +
                 fnStr +
                 '\n\n}catch(err){\n' +
-                'return this.options.debug?err.message:"";\n' +
+                'return '+the._selfVarible+'.options.debug?err.message:"";\n' +
                 '}\n');
         } catch (err) {
             fn = function () {
@@ -309,7 +311,7 @@ var Template = klass.create({
             each: function (obj) {
                 var args = allocation.args(arguments);
 
-                if (typeis(obj) === 'string') {
+                if (typeis.String(obj)) {
                     args[0] = [];
                 }
 
@@ -364,7 +366,7 @@ var Template = klass.create({
     filter: function (name, callback, isOverride) {
         var instanceFilters = this._template.filters;
 
-        if (typeis(name) !== 'string') {
+        if (!typeis.String(name)) {
             throw new Error('filter name must be a string');
         }
 
@@ -373,7 +375,7 @@ var Template = klass.create({
             throw new Error('override a exist instance filter');
         }
 
-        if (typeis(callback) !== 'function') {
+        if (!typeis.Function(name)) {
             throw new Error('filter callback must be a function');
         }
 
@@ -394,7 +396,7 @@ var Template = klass.create({
      * // => return test filter function
      */
     getFilter: function (name) {
-        return typeis(name) === 'string' ?
+        return typeis.String(name) ?
             this._template.filters[name] :
             this._template.filters;
     },
@@ -464,7 +466,7 @@ var Template = klass.create({
         }
 
         exp = this._wrapSafe(exp);
-        return (unEscape ? '(' : 'this.escape(') + exp + ')';
+        return (unEscape ? '(' : the._selfVarible + '.escape(') + exp + ')';
     },
 
 
@@ -509,7 +511,7 @@ var Template = klass.create({
             val: matches[4] ? matches[4] : matches[2]
         };
 
-        return 'this.each(' + the._wrapSafe(parse.list) + ', function(' + randomKey1 + ', ' + randomVal + '){' +
+        return the._selfVarible +'.each(' + the._wrapSafe(parse.list) + ', function(' + randomKey1 + ', ' + randomVal + '){' +
             'var ' + parse.key + ' = ' + randomKey1 + ';\n' +
             'var ' + parse.val + '=' + randomVal + ';\n';
     },
