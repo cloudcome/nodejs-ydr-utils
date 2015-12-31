@@ -374,7 +374,7 @@ var Favicon = klass.extends(Emitter).create({
                 dato.each(the._hostnameList, function (index, hostname) {
                     var copyFilePath = path.join(configs.saveDirection, hostname + configs.extname);
                     try {
-                        fse.copySync(filePath, copyFilePath);
+                        fse.copy(filePath, copyFilePath);
                     } catch (err) {
                         // ignore
                     }
