@@ -208,7 +208,7 @@ exports.dirname = function (args, dirnameKey) {
     var CWD = process.cwd();
     var srcDirname = '';
 
-    if (args.dirname) {
+    if (args && args[dirnameKey]) {
         if (path.isAbsolute(args[dirnameKey])) {
             srcDirname = args[dirnameKey];
         } else {
