@@ -11,6 +11,7 @@ var typeis = require('./typeis.js');
 var udf;
 var canListTypeArr = 'array object nodelist htmlcollection arguments namednodemap'.split(' ');
 var REG_BEGIN_0 = /^0+/;
+var w = global;
 
 
 /**
