@@ -171,9 +171,10 @@ exports.parseIP = function (ip, callback) {
 
     howdo
         .task(function (next) {
-            exports.remoteIP({
+            var req = typeis.Object(ip) ? ip : {
                 ip: ip
-            }, next);
+            };
+            exports.remoteIP(req, next);
         })
         .task(function (next, ip) {
             request.get({
