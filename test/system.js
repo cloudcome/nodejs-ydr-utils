@@ -27,6 +27,13 @@ describe('system', function () {
         });
     });
 
+    it('parseIP', function (done) {
+        system.parseIP(function (err, info) {
+            console.log(info);
+            done();
+        });
+    });
+
     it('info', function (done) {
         system.info(function (info) {
             console.log(info);

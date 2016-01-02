@@ -20,6 +20,10 @@ var typeis = require('./typeis.js');
 var osReleaseMap = require('../data/os-release.json');
 var winReleaseMap = require('../data/win-release.json');
 
+var IP_138 = 'http://1111.ip138.com/ic.asp';
+var IP_QQ = 'http://ip.qq.com/';
+var IP_LOOKUP = 'http://int.dpool.sina.com.cn/iplookup/iplookup.php';
+
 
 /**
  * 获取本机局域网 IP 地址
@@ -64,6 +68,7 @@ exports.remoteIP = function (req, callback) {
         req = {};
     }
 
+    req.headers = req.headers || {};
     var ip = req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || req.ip;
 
     if (ip && !typeis.localIP(ip)) {
@@ -74,7 +79,7 @@ exports.remoteIP = function (req, callback) {
     // 从 ip138.com 处获取
         .task(function (done) {
             this.req = request.get({
-                url: 'http://1111.ip138.com/ic.asp'
+                url: IP_138
             }, function (err, body) {
                 if (err) {
                     return done(err);
@@ -97,7 +102,7 @@ exports.remoteIP = function (req, callback) {
         // 从 ip.qq.com 处获取
         .task(function (done) {
             this.req = request.get({
-                url: 'http://ip.qq.com/'
+                url: IP_QQ
             }, function (err, body) {
                 if (err) {
                     return done(err);
@@ -148,6 +153,52 @@ exports.info = function (callback) {
             modules: modules
         });
     });
+};
+
+
+/**
+ * 解析 IP 信息
+ * @param ip
+ * @param callback
+ */
+exports.parseIP = function (ip, callback) {
+    var args = allocation.args(arguments);
+
+    if (args.length === 1) {
+        callback = args[0];
+        ip = null;
+    }
+
+    howdo
+        .task(function (next) {
+            exports.remoteIP({
+                ip: ip
+            }, next);
+        })
+        .task(function (next, ip) {
+            request.get({
+                url: IP_LOOKUP,
+                query: {
+                    ip: ip,
+                    format: 'json'
+                }
+            }, function (err, body) {
+                var ret = {};
+
+                try {
+                    ret = JSON.parse(body);
+                } catch (err) {
+                    // ignore
+                }
+
+                ret.country = ret.country || '';
+                ret.province = ret.province || '';
+                ret.city = ret.city || '';
+                ret.ip = ip;
+                next(null, ret);
+            });
+        })
+        .follow(callback);
 };
 
 
