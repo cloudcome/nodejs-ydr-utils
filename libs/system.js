@@ -15,6 +15,8 @@ var howdo = require('howdo');
 var dato = require('./dato.js');
 var request = require('./request.js');
 var path = require('./path.js');
+var allocation = require('./allocation.js');
+var typeis = require('./typeis.js');
 var osReleaseMap = require('../data/os-release.json');
 var winReleaseMap = require('../data/win-release.json');
 
@@ -51,9 +53,23 @@ exports.localIP = function () {
 
 /**
  * 获取本机的广域网 IP 地址
- * @param callback
+ * @param [req] {Object} 请求对象
+ * @param callback {Function} 回调
  */
-exports.remoteIP = function (callback) {
+exports.remoteIP = function (req, callback) {
+    var args = allocation.args(arguments);
+
+    if (args.length === 1) {
+        callback = args[0];
+        req = {};
+    }
+
+    var ip = req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || req.ip;
+
+    if (ip && !typeis.localIP(ip)) {
+        return callback(null, ip);
+    }
+
     howdo
     // 从 ip138.com 处获取
         .task(function (done) {
