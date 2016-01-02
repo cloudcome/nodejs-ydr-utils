@@ -332,6 +332,42 @@ typeis.file = function (_path) {
 };
 
 
+// @link: https://www.zhihu.com/question/19813460/answer/13042143
+// A类地址：10.0.0.0--10.255.255.255
+// B类地址：172.16.0.0--172.31.255.255
+// C类地址：192.168.0.0--192.168.255.255
+/**
+ * 判断是否为局域网 IP
+ * @param ip
+ * @returns {boolean}
+ */
+typeis.localIP = function (ip) {
+    ip = String(ip).toUpperCase().trim();
+
+    if (ip === '[::1]' || ip === 'localhost'|| ip === '127.0.0.1') {
+        return true;
+    }
+
+    var ipList = ip.split('.');
+    var part0 = Number(ipList[0]);
+    var part1 = Number(ipList[1]);
+    //var part2 = Number(ipList[2]);
+    //var part3 = Number(ipList[3]);
+
+    // A 类
+    if (part0 === 10) {
+        return true;
+    }
+
+    // B 类
+    if (part0 === 172 && part1 > 15 && part1 < 32) {
+        return true;
+    }
+
+    return part0 === 192 && part1 === 168;
+};
+
+
 /**
  * @name string
  * @name number
