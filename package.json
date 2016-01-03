@@ -1,6 +1,6 @@
 {
   "name": "ydr-utils",
-  "version": "37.2.3",
+  "version": "37.2.4",
   "private": false,
   "description": "utils for ydr.me",
   "scripts": {
@@ -74,7 +74,7 @@
     "form-data": "^1.0.0-rc3",
     "fs-extra": "^0.26.2",
     "glob": "^6.0.1",
-    "howdo": "^3.2.0",
+    "howdo": "^3.3.0",
     "marked": "^0.3.5",
     "promiseify": "^0.2.0"
   },
