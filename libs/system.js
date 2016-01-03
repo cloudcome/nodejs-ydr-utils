@@ -192,6 +192,10 @@ exports.parseIP = function (ip, callback) {
                     // ignore
                 }
 
+                if (!typeis.Object(ret)) {
+                    ret = {};
+                }
+
                 ret.country = ret.country || '';
                 ret.province = ret.province || '';
                 ret.city = ret.city || '';
