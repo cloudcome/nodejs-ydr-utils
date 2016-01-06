@@ -14,6 +14,8 @@ var xss = require('xss');
 var allocation = require('./allocation.js');
 var dato = require('./dato.js');
 var markedLink = require('./_marked-link.js');
+var markedHeading = require('./_marked-heading.js');
+var markedImage = require('./_marked-image.js');
 
 var xssDefaults = {
     // 通过 whiteList 来指定，格式为：{'标签名': ['属性1', '属性2']}。
@@ -195,7 +197,9 @@ exports.render = function (text, options) {
         headingClass: 'heading'
     };
     options = dato.extend(defaults, options);
-    markedRender.link =  markedLink(options);
+    markedRender.link = markedLink(options);
+    markedRender.heading = markedHeading(options);
+    markedRender.image = markedImage(options);
 
     var html = markedRender(text);
     var safe = xss(html, xssDefaults);
