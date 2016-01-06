@@ -16,6 +16,7 @@ var dato = require('./dato.js');
 var markedLink = require('./_marked-link.js');
 var markedHeading = require('./_marked-heading.js');
 var markedImage = require('./_marked-image.js');
+var markedParagraphe = require('./_marked-paragraphe.js');
 
 var xssDefaults = {
     // 通过 whiteList 来指定，格式为：{'标签名': ['属性1', '属性2']}。
@@ -202,6 +203,7 @@ exports.render = function (text, options) {
     markedRender.link = markedLink(options);
     markedRender.heading = markedHeading(options);
     markedRender.image = markedImage(options);
+    markedRender.paragraph = markedParagraphe(options);
     marked.setOptions({renderer: markedRender});
 
     var html = marked(text);
