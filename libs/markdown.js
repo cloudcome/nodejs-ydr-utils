@@ -21,8 +21,8 @@ var xssDefaults = {
     // 通过 whiteList 来指定，格式为：{'标签名': ['属性1', '属性2']}。
     // 不在白名单上 的标签将被过滤，不在白名单上的属性也会被过滤。
     whiteList: {
-        a: ['href', 'title', 'target'],
-        img: ['src', 'title', 'alt', 'width', 'height', 'data-original'],
+        a: ['href', 'title', 'target', 'class'],
+        img: ['src', 'title', 'alt', 'width', 'height', 'data-original', 'class'],
         b: [],
         i: [],
         s: [],
@@ -35,7 +35,7 @@ var xssDefaults = {
         h4: ['id', 'class'],
         h5: ['id', 'class'],
         h6: ['id', 'class'],
-        table: [],
+        table: ['class'],
         thead: [],
         tbody: [],
         tfoot: [],
@@ -197,6 +197,7 @@ exports.render = function (text, options) {
         headingLink: false,
         headingClass: 'heading'
     };
+
     options = dato.extend(defaults, options);
     markedRender.link = markedLink(options);
     markedRender.heading = markedHeading(options);
