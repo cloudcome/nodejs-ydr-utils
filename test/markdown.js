@@ -14,13 +14,25 @@ var path = require('path');
 var markdown = require('../libs/markdown.js');
 
 describe('markdown.js', function () {
-    it('render', function () {
+    it('toc', function () {
+        var file = path.join(__dirname, 'markdown-toc.md');
+        var data = fs.readFileSync(file, 'utf8');
+        var ret = markdown.toc(data);
+
+        console.log('\n\n');
+        console.log('------------ html ------------');
+        console.log(ret);
+        console.log('\n\n');
+    });
+
+
+    xit('render', function () {
         var file = path.join(__dirname, 'markdown.md');
         var data = fs.readFileSync(file, 'utf8');
         var ret = markdown.render(data);
 
         console.log('\n\n');
-        console.log('------------ source ------------');
+        console.log('------------ html ------------');
         console.log(ret.html);
         console.log('\n\n');
         console.log('------------ safe ------------');

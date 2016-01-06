@@ -44,7 +44,12 @@ var xssDefaults = {
         hr: [],
         p: [],
         pre: ['class'],
-        code: []
+        code: [],
+        ul: [],
+        ol: [],
+        li: [],
+        dt: [],
+        dd: []
     },
 
     // 通过 stripIgnoreTag 来设置：
