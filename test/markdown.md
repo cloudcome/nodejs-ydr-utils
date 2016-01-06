@@ -1,6 +1,6 @@
 # xss markdown
 
-@@someone1@
+@@someone1@someone2
 
 <script>alert(1);</script>
 <a href="#" class="d">alert(1);</a>

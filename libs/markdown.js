@@ -42,7 +42,9 @@ var xssDefaults = {
         tfoot: [],
         caption: [],
         hr: [],
-        p: []
+        p: [],
+        pre: ['class'],
+        code: []
     },
 
     // 通过 stripIgnoreTag 来设置：
