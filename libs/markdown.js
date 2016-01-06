@@ -112,6 +112,8 @@ exports.config = function () {
  * @param [options.toc]
  * @param [options.headingPrefix]
  * @param [options.render]
+ * @param [options.before]
+ * @param [options.after]
  * @returns {string}
  */
 exports.toc = function (text, options) {
@@ -121,7 +123,9 @@ exports.toc = function (text, options) {
     var defaults = {
         toc: true,
         headingPrefix: 'heading',
-        render: true
+        render: true,
+        before: '<div class="toc">',
+        after: '</div>'
     };
     options = dato.extend({}, defaults, options);
 
@@ -147,7 +151,7 @@ exports.toc = function (text, options) {
         toc = exports.render(toc).safe;
     }
 
-    return toc;
+    return options.before + toc + options.after;
 };
 
 
