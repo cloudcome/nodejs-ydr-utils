@@ -35,10 +35,6 @@ var SAFE_HOSTS = [
     '*.fed.cm',
     'fed.cm'
 ];
-var configs = {
-    atLink: '/developer/${at}/',
-    atClass: 'at'
-};
 
 
 module.exports = function (options) {
@@ -116,16 +112,8 @@ module.exports = function (options) {
 function _buildLink(href, title, text, isBlank, isFavicon) {
     text = text.trim();
 
-    var isAt = false;
-
-    if (REG_AT_LINK_TEXT.test(text)) {
-        isFavicon = false;
-        isAt = true;
-    }
-
     return ''.concat(
         '<a href="' + href + '"',
-        isAt ? ' class="' + configs.atClass + '"' : '',
         isBlank ? ' target="_blank" rel="nofollow"' : '',
         title ? ' ' + title : '',
         '>',
