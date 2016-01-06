@@ -71,7 +71,7 @@ var Queue = klass.extends(Emitter).create({
         /**
          * @event push
          */
-        the.emit('push');
+        the.emit('pushed');
 
         return the;
     },
@@ -96,7 +96,7 @@ var Queue = klass.extends(Emitter).create({
         /**
          * @event shift
          */
-        the.emit('shift');
+        the.emit('shifted');
 
         return the;
     },
@@ -129,7 +129,7 @@ var Queue = klass.extends(Emitter).create({
                 /**
                  * @event pause
                  */
-                the.emit('pause');
+                the.emit('paused');
                 return the;
             }
 
@@ -137,7 +137,7 @@ var Queue = klass.extends(Emitter).create({
                 /**
                  * @event stop
                  */
-                the.emit('stop');
+                the.emit('stoped');
                 the.state = STATES.ready;
 
                 /**
@@ -162,7 +162,7 @@ var Queue = klass.extends(Emitter).create({
                 /**
                  * @event step
                  */
-                the.emit('step');
+                the.emit('steped');
                 item.c();
                 next();
             });
@@ -256,7 +256,7 @@ var Queue = klass.extends(Emitter).create({
         /**
          * @event clear
          */
-        the.emit('clear');
+        the.emit('cleared');
 
         return the;
     }
