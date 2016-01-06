@@ -22,19 +22,19 @@ var xssDefaults = {
     // 不在白名单上 的标签将被过滤，不在白名单上的属性也会被过滤。
     whiteList: {
         a: ['href', 'title', 'target'],
-        img: ['src', 'title', 'alt'],
+        img: ['src', 'title', 'alt', 'width', 'height', 'data-original'],
         b: [],
         i: [],
         s: [],
         big: [],
         strong: [],
         small: [],
-        h1: [],
-        h2: [],
-        h3: [],
-        h4: [],
-        h5: [],
-        h6: [],
+        h1: ['id', 'class'],
+        h2: ['id', 'class'],
+        h3: ['id', 'class'],
+        h4: ['id', 'class'],
+        h5: ['id', 'class'],
+        h6: ['id', 'class'],
         table: [],
         thead: [],
         tbody: [],
@@ -188,6 +188,7 @@ exports.summary = function (source, maxLength) {
 exports.render = function (text, options) {
     var markedRender = new marked.Renderer();
     var defaults = {
+        xss: true,
         // 是否提取链接的 favicon
         favicon: true,
         // 是否解析 at
@@ -203,7 +204,11 @@ exports.render = function (text, options) {
     marked.setOptions({renderer: markedRender});
 
     var html = marked(text);
-    var safe = xss(html, xssDefaults);
+    var safe = html;
+
+    if (options.xss) {
+        safe = xss(html, xssDefaults);
+    }
 
     return {
         html: html,
