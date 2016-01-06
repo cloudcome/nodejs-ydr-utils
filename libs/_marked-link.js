@@ -1,5 +1,5 @@
 /**
- * 文件描述
+ * marked link
  * @author ydr.me
  * @create 2016-01-06 18:40
  */
@@ -46,11 +46,7 @@ module.exports = function (options) {
         // 是否提取链接的 favicon
         favicon: true,
         // 是否解析 at
-        at: true,
-        // 是否 heading 加上链接
-        headingLink: false,
-        // heading 前缀
-        headingClass: 'heading'
+        at: true
     };
 
     options = dato.extend(defaults, options);
