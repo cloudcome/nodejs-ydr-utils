@@ -13,6 +13,7 @@ var xss = require('xss');
 
 var allocation = require('./allocation.js');
 var dato = require('./dato.js');
+var markedLink = require('./_marked-link.js');
 
 var xssDefaults = {
     // 通过 whiteList 来指定，格式为：{'标签名': ['属性1', '属性2']}。
@@ -133,7 +134,7 @@ exports.toc = function (text, options) {
     });
 
     if (options.render) {
-        toc = exports.render(toc);
+        toc = exports.render(toc).safe;
     }
 
     return toc;
@@ -176,43 +177,31 @@ exports.summary = function (source, maxLength) {
 };
 
 
+/**
+ * 渲染 markdown 为 html
+ * @param text
+ * @param options
+ * @returns {{html: *, safe: *, toc: string}}
+ */
 exports.render = function (text, options) {
-    var converter = new showdown.Converter();
-    var html = converter.makeHtml(text);
-    var safe = xss(html, xssDefaults);
-    var toc = '';
+    var markedRender = new marked.Renderer();
     var defaults = {
-        toc: true,
-        headingPrefix: 'heading'
+        // 是否提取链接的 favicon
+        favicon: true,
+        // 是否解析 at
+        at: true,
+        // 是否 heading 加上链接
+        headingLink: false,
+        headingClass: 'heading'
     };
-    options = dato.extend({}, defaults, options);
+    options = dato.extend(defaults, options);
+    markedRender.link =  markedLink(options);
 
-    if (options.toc) {
-        var tokens = marked.lexer(text);
-        var index = 0;
-
-        tokens.forEach(function (token) {
-            if (token.type !== 'heading') {
-                return;
-            }
-
-            var text = token.text;
-
-            // remove image
-            text = text.replace(REG_IMAGE, '')
-                // clean link
-                .replace(REG_LINK2, '$1');
-
-            var depth = new Array((token.depth - 1) * 4 + 1).join(' ');
-            //var id = encryption.md5(exports.mdRender(text).replace(REG_TAG_P, '').trim());
-
-            toc += depth + '- [' + text + '](#' + options.headingPrefix + '-' + token.depth + '-' + (index++) + ')\n';
-        });
-    }
+    var html = markedRender(text);
+    var safe = xss(html, xssDefaults);
 
     return {
         html: html,
-        safe: safe,
-        toc: toc
+        safe: safe
     };
 };
