@@ -37,7 +37,7 @@ describe('markdown.js', function () {
     });
 
     it('render', function () {
-        var file = path.join(__dirname, 'markdown.md');
+        var file = path.join(__dirname, 'markdown-xss.md');
         var data = fs.readFileSync(file, 'utf8');
         var ret = markdown.render(data);
 
