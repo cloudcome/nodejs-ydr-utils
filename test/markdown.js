@@ -19,7 +19,7 @@ describe('markdown.js', function () {
         var data = fs.readFileSync(file, 'utf8');
         var ret = markdown.render(data);
 
-        console.log(ret);
+        console.log(ret.safe);
     });
 });
 

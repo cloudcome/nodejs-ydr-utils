@@ -13,7 +13,7 @@ var xss = require('xss');
 var allocation = require('./allocation.js');
 var dato = require('./dato.js');
 
-var defaults = {
+var xssDefaults = {
     // 通过 whiteList 来指定，格式为：{'标签名': ['属性1', '属性2']}。
     // 不在白名单上 的标签将被过滤，不在白名单上的属性也会被过滤。
     whiteList: {
@@ -66,14 +66,14 @@ var defaults = {
 exports.config = function () {
     return allocation.getset({
         get: function (key) {
-            return defaults[key];
+            return xssDefaults[key];
         },
 
         set: function (key, val) {
             var o = {};
 
             o[key] = val;
-            dato.extend(true, defaults, o);
+            dato.extend(true, xssDefaults, o);
         }
     }, arguments);
 };
@@ -81,5 +81,10 @@ exports.config = function () {
 exports.render = function (text, options) {
     var converter = new showdown.Converter();
     var html = converter.makeHtml(text);
-    return xss(html, defaults);
+    var safe = xss(html, xssDefaults);
+
+    return {
+        html: html,
+        safe: safe
+    };
 };
