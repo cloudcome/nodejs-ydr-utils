@@ -14,7 +14,7 @@ var path = require('path');
 var markdown = require('../libs/markdown.js');
 
 describe('markdown.js', function () {
-    it('toc', function () {
+    xit('toc', function () {
         var file = path.join(__dirname, 'markdown-toc.md');
         var data = fs.readFileSync(file, 'utf8');
         var ret = markdown.toc(data);
@@ -25,8 +25,18 @@ describe('markdown.js', function () {
         console.log('\n\n');
     });
 
+    xit('summary', function () {
+        var file = path.join(__dirname, 'markdown-summary.md');
+        var data = fs.readFileSync(file, 'utf8');
+        var ret = markdown.summary(data);
 
-    xit('render', function () {
+        console.log('\n\n');
+        console.log('------------ summary ------------');
+        console.log(ret);
+        console.log('\n\n');
+    });
+
+    it('render', function () {
         var file = path.join(__dirname, 'markdown.md');
         var data = fs.readFileSync(file, 'utf8');
         var ret = markdown.render(data);
@@ -37,6 +47,9 @@ describe('markdown.js', function () {
         console.log('\n\n');
         console.log('------------ safe ------------');
         console.log(ret.safe);
+        console.log('\n\n');
+        console.log('------------ atList ------------');
+        console.log(ret.atList);
         console.log('\n\n');
     });
 });

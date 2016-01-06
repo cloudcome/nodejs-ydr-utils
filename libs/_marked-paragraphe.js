@@ -17,11 +17,12 @@ var REG_AT_LINK = /\[@[^]]+]\([^)]+\)/;
 var REG_AT_LINK_TEXT = /^@[a-z\d_.-]+$/i;
 
 
-module.exports = function (options) {
+module.exports = function (options, atList) {
     var defaults = {
         atClass: 'at',
         atLink: '/~/${username}/'
     };
+    var map = {};
 
     options = dato.extend(defaults, options);
 
@@ -38,6 +39,12 @@ module.exports = function (options) {
             var link = string.assign(options.atLink, {
                 username: username
             });
+
+            if (!map[username]) {
+                map[username] = true;
+                atList.push(username);
+            }
+
             return '<a class="at" href="' + link + '" data-at="' + username + '">@' + username + '</a>';
         });
 

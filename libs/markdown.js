@@ -209,12 +209,13 @@ exports.render = function (text, options) {
         headingLink: false,
         headingClass: 'heading'
     };
+    var atList = [];
 
     options = dato.extend(defaults, options);
     markedRender.link = markedLink(options);
     markedRender.heading = markedHeading(options);
     markedRender.image = markedImage(options);
-    markedRender.paragraph = markedParagraphe(options);
+    markedRender.paragraph = markedParagraphe(options, atList);
     marked.setOptions({renderer: markedRender});
 
     var html = marked(text);
@@ -226,6 +227,7 @@ exports.render = function (text, options) {
 
     return {
         html: html,
-        safe: safe
+        safe: safe,
+        atList: atList
     };
 };
