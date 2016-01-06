@@ -79,14 +79,26 @@ exports.config = function () {
     }, arguments);
 };
 
+
+// ![]()
+var REG_IMAGE = /!\[.*?][\[\(].*[\]\)]/g;
+// [][] []()
+var REG_LINK2 = /\[(.*?)][\[\(].*?[\]\)]/g;
+
+
 exports.render = function (text, options) {
     var converter = new showdown.Converter();
     var html = converter.makeHtml(text);
     var safe = xss(html, xssDefaults);
+    var toc = '';
+    var defaults = {
+        toc: true,
+        headingPrefix: 'heading'
+    };
+    options = dato.extend({}, defaults, options);
 
-    if(options.toc){
-        var tokens = marked.lexer(source);
-        var toc = '\n\n';
+    if (options.toc) {
+        var tokens = marked.lexer(text);
         var index = 0;
 
         tokens.forEach(function (token) {
@@ -104,15 +116,13 @@ exports.render = function (text, options) {
             var depth = new Array((token.depth - 1) * 4 + 1).join(' ');
             //var id = encryption.md5(exports.mdRender(text).replace(REG_TAG_P, '').trim());
 
-            toc += depth + '- [' + text + '](#heading-' + token.depth + '-' + (index++) + ')\n';
+            toc += depth + '- [' + text + '](#' + options.headingPrefix + '-' + token.depth + '-' + (index++) + ')\n';
         });
-
-        return toc + '\n\n';
     }
 
     return {
         html: html,
         safe: safe,
-        toc: ''
+        toc: toc
     };
 };
