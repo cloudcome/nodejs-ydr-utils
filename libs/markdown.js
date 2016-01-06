@@ -59,6 +59,20 @@ var xssDefaults = {
         'template'
     ]
 };
+// 空白
+//var REG_SPACE = /[\x00-\x20\x7F-\xA0\u1680\u180E\u2000-\u200B\u2028\u2029\u202F\u205F\u3000\uFEFF\t\v]{1,}/g;
+var REG_BREAK_LINE = /\r/g;
+var REG_BREAK_LINE_SAFE = /\n+/g;
+var REG_LONG_BREAK_LINE = /\n{3,}/g;
+var REG_PRE1 = /^`{3,}.*$\n((^.*$\n)*?)^`{3,}.*$/mg;
+var REG_PRE2 = /(^ {4}.*$)+\n/mg;
+// ![]()
+var REG_IMAGE = /!\[.*?][\[\(].*[\]\)]/g;
+var REG_LINK1 = /<(http|ftp).*?>/ig;
+// [][] []()
+var REG_LINK2 = /\[(.*?)][\[\(].*?[\]\)]/g;
+var REG_BLOCKQUOTE = /^( *>[^\n]*)+/mg;
+
 
 /**
  * 配置
@@ -80,16 +94,25 @@ exports.config = function () {
 };
 
 
-// ![]()
-var REG_IMAGE = /!\[.*?][\[\(].*[\]\)]/g;
-// [][] []()
-var REG_LINK2 = /\[(.*?)][\[\(].*?[\]\)]/g;
-
-
+/**
+ * 返回 markdown table of content
+ * @param text
+ * @param [options]
+ * @param [options.toc]
+ * @param [options.headingPrefix]
+ * @param [options.render]
+ * @returns {string}
+ */
 exports.toc = function (text, options) {
     var tokens = marked.lexer(text);
     var index = 0;
     var toc = '';
+    var defaults = {
+        toc: true,
+        headingPrefix: 'heading',
+        render: true
+    };
+    options = dato.extend({}, defaults, options);
 
     tokens.forEach(function (token) {
         if (token.type !== 'heading') {
@@ -109,7 +132,47 @@ exports.toc = function (text, options) {
         toc += depth + '- [' + text + '](#' + options.headingPrefix + '-' + token.depth + '-' + (index++) + ')\n';
     });
 
+    if (options.render) {
+        toc = exports.render(toc);
+    }
+
     return toc;
+};
+
+
+/**
+ * 返回 markdown 摘要信息
+ * @param source
+ * @param [maxLength]
+ * @returns {string}
+ */
+exports.summary = function (source, maxLength) {
+    maxLength = maxLength || 140;
+
+    var lines = source
+        .replace(REG_PRE1, '')
+        .replace(REG_PRE2, '')
+        .replace(REG_IMAGE, '')
+        .replace(REG_LINK1, '')
+        .replace(REG_LINK2, '$1')
+        .replace(REG_BLOCKQUOTE, ' ')
+        .split(/\n{2,}/g);
+
+    var length = 0;
+    var ret = '';
+
+    dato.each(lines, function (index, line) {
+        var chunk = line.replace(REG_BREAK_LINE_SAFE, ' ');
+
+        ret += chunk;
+        length += chunk.length;
+
+        if (length >= maxLength) {
+            return false;
+        }
+    });
+
+    return ret;
 };
 
 
