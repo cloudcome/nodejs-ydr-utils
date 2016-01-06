@@ -45,6 +45,8 @@ module.exports = {
     imageMinify: require('./libs/image-minify.js'),
     // 应用日志
     log: require('./libs/log.js'),
+    // markdown
+    markdown: require('./libs/markdown.js'),
     // 中间件
     Middleware: require('./libs/middleware.js'),
     // MIME
