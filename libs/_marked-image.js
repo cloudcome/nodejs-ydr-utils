@@ -9,7 +9,7 @@
 
 var typeis = require('./typeis.js');
 
-var REG_SIZE = /(?:\s+?=\s*?(\d+)(?:[x*×](\d+))?)?$/i;
+var REG_SIZE = /(?:\s+?=(\d+)(?:[x*](\d+))?)?$/i;
 
 module.exports = function () {
     // ![](1.png =200x100)

@@ -183,7 +183,7 @@ exports.summary = function (source, maxLength) {
  * 渲染 markdown 为 html
  * @param text
  * @param options
- * @returns {{html: *, safe: *, toc: string}}
+ * @returns {{html: String, safe: String}}
  */
 exports.render = function (text, options) {
     var markedRender = new marked.Renderer();
