@@ -7,6 +7,7 @@
 
 'use strict';
 
+var marked = require('marked');
 var showdown = require('showdown');
 var xss = require('xss');
 
@@ -83,8 +84,35 @@ exports.render = function (text, options) {
     var html = converter.makeHtml(text);
     var safe = xss(html, xssDefaults);
 
+    if(options.toc){
+        var tokens = marked.lexer(source);
+        var toc = '\n\n';
+        var index = 0;
+
+        tokens.forEach(function (token) {
+            if (token.type !== 'heading') {
+                return;
+            }
+
+            var text = token.text;
+
+            // remove image
+            text = text.replace(REG_IMAGE, '')
+                // clean link
+                .replace(REG_LINK2, '$1');
+
+            var depth = new Array((token.depth - 1) * 4 + 1).join(' ');
+            //var id = encryption.md5(exports.mdRender(text).replace(REG_TAG_P, '').trim());
+
+            toc += depth + '- [' + text + '](#heading-' + token.depth + '-' + (index++) + ')\n';
+        });
+
+        return toc + '\n\n';
+    }
+
     return {
         html: html,
-        safe: safe
+        safe: safe,
+        toc: ''
     };
 };
