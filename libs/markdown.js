@@ -200,8 +200,9 @@ exports.render = function (text, options) {
     markedRender.link = markedLink(options);
     markedRender.heading = markedHeading(options);
     markedRender.image = markedImage(options);
+    marked.setOptions({renderer: markedRender});
 
-    var html = markedRender(text);
+    var html = marked(text);
     var safe = xss(html, xssDefaults);
 
     return {
