@@ -86,6 +86,33 @@ var REG_IMAGE = /!\[.*?][\[\(].*[\]\)]/g;
 var REG_LINK2 = /\[(.*?)][\[\(].*?[\]\)]/g;
 
 
+exports.toc = function (text, options) {
+    var tokens = marked.lexer(text);
+    var index = 0;
+    var toc = '';
+
+    tokens.forEach(function (token) {
+        if (token.type !== 'heading') {
+            return;
+        }
+
+        var text = token.text;
+
+        // remove image
+        text = text.replace(REG_IMAGE, '')
+            // clean link
+            .replace(REG_LINK2, '$1');
+
+        var depth = new Array((token.depth - 1) * 4 + 1).join(' ');
+        //var id = encryption.md5(exports.mdRender(text).replace(REG_TAG_P, '').trim());
+
+        toc += depth + '- [' + text + '](#' + options.headingPrefix + '-' + token.depth + '-' + (index++) + ')\n';
+    });
+
+    return toc;
+};
+
+
 exports.render = function (text, options) {
     var converter = new showdown.Converter();
     var html = converter.makeHtml(text);
