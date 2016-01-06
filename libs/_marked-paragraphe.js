@@ -38,14 +38,14 @@ module.exports = function (options) {
             var link = string.assign(options.atLink, {
                 username: username
             });
-            return '<a class="at" href="' + link + '">' + username + '</a>';
+            return '<a class="at" href="' + link + '" data-at="' + username + '">@' + username + '</a>';
         });
 
         dato.each(oM, function (key, val) {
             text = text.replace(key, val);
         });
 
-        return text;
+        return '\n<p>' + text + '</p>\n';
     };
 };
 
