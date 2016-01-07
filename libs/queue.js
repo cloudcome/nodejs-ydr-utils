@@ -158,6 +158,7 @@ var Queue = klass.extends(Emitter).create({
                 return the;
             }
 
+            console.log(item);
             item.t.call(the, function () {
                 /**
                  * @event step
