@@ -23,7 +23,7 @@ var STATES = {
 var index = 0;
 var defaults = {
     // 自动开始
-    autoStart: false
+    auto: false
 };
 var Queue = klass.extends(Emitter).create({
     constructor: function (options) {
@@ -81,7 +81,7 @@ var Queue = klass.extends(Emitter).create({
          */
         the.emit('pushed');
 
-        if (the._options.autoStart) {
+        if (the._options.auto) {
             the.start();
         }
 
