@@ -34,6 +34,7 @@
 - number
 - path
 - qiniu
+- Queue
 - random
 - request
 - string

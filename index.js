@@ -59,6 +59,8 @@ module.exports = {
     path: require('./libs/path.js'),
     // qiniu
     qiniu: require('./libs/qiniu.js'),
+    // 队列
+    Queue: require('./libs/queue.js'),
     // 随机数
     random: require('./libs/random.js'),
     // 请求
