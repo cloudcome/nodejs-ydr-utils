@@ -1,6 +1,6 @@
 {
   "name": "ydr-utils",
-  "version": "39.0.0",
+  "version": "39.1.0",
   "private": false,
   "description": "utils for ydr.me",
   "scripts": {
@@ -37,9 +37,11 @@
     "http status",
     "log",
     "mime",
+    "markdown",
     "number",
     "path",
     "qiniu",
+    "queue",
     "random",
     "request",
     "string",
@@ -70,6 +72,7 @@
     "url": "https://github.com/cloudcome/nodejs-ydr-utils/issues"
   },
   "dependencies": {
+    "chalk": "^1.1.1",
     "colors": "^1.1.2",
     "form-data": "^1.0.0-rc3",
     "fs-extra": "^0.26.2",
