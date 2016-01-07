@@ -1,5 +1,6 @@
 - request 改成消息通知模式，30x 通知等等
 - xss => markdown √
 - emoji
-- queue
+- queue √
 - color => chalk
+- 邮件发送系统，采用队列机制
