@@ -16,18 +16,23 @@ describe('queue.js', function () {
             auto: true
         });
 
-        setInterval(function () {
-            var name = random.string();
+        var name = random.string();
+        var i = 10;
+
+        while (i--) {
             q.push(function (next) {
                 setTimeout(function () {
                     console.log(name, 'done');
                     next();
                 }, random.number(100, 400));
             });
-        }, 300);
+        }
 
         q.start();
-        //q.on('done', done);
+        q.on('done', function () {
+            console.log('is done');
+            done();
+        });
     });
 });
 
