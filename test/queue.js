@@ -16,15 +16,14 @@ describe('queue.js', function () {
             auto: true
         });
 
-        var name = random.string();
         var i = 10;
 
         while (i--) {
             q.push(function (next) {
                 setTimeout(function () {
-                    console.log(name, 'done');
+                    console.log(random.string(), 'done');
                     next();
-                }, random.number(100, 400));
+                }, random.number(100, 1000));
             });
         }
 
