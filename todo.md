@@ -1,3 +1,5 @@
 - request 改成消息通知模式，30x 通知等等
-- xss => markdown
+- xss => markdown √
 - emoji
+- queue
+- color => chalk
