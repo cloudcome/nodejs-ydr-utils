@@ -81,6 +81,10 @@ var Queue = klass.extends(Emitter).create({
          */
         the.emit('pushed');
 
+        if (the._options.autoStart) {
+            the.start();
+        }
+
         return the;
     },
 
