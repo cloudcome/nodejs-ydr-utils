@@ -15,16 +15,18 @@ describe('queue.js', function () {
         var q = new Queue();
 
         //setInterval(function () {
-            var name = random.string();
-            q.push(function (next) {
-                setTimeout(function () {
-                    console.log(name, 'done')
-                    next();
-                }, random.number(100, 400));
-            });
+        var name = random.string();
+        q.push(function (next) {
+            setTimeout(function () {
+                console.log(name, 'done')
+                next();
+            }, random.number(100, 400));
+        }, function () {
+            console.log(this);
+        });
         //});
 
-        q.begin();
+        q.start();
         q.on('done', done);
     });
 });

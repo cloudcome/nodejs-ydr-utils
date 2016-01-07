@@ -12,19 +12,26 @@ var noop = function () {
 };
 var typeis = require('./typeis.js');
 var klass = require('./class.js');
+var dato = require('./dato.js');
 var Emitter = require('./emitter.js');
 var STATES = {
     ready: 1,
-    begin: 2,
+    start: 2,
     pause: 3,
     stop: 4
 };
 var index = 0;
+var defaults = {
+    // 自动开始
+    autoStart: false
+};
 var Queue = klass.extends(Emitter).create({
-    constructor: function () {
+    constructor: function (options) {
         var the = this;
 
         the.id = index++;
+        the._index = 0;
+        the._options = dato.extend({}, defaults, options);
         the._queueList = [];
         the.state = STATES.ready;
         the.className = 'queue';
@@ -55,15 +62,16 @@ var Queue = klass.extends(Emitter).create({
      *
      * @example
      * queue.push(function(next){
-         *     // 标记完成，或者 this.stop() / this.pause()
-         *     next();
-         * });
+     *     // 标记完成，或者 this.stop() / this.pause()
+     *     next();
+     * });
      */
     push: function (task, callback) {
         var the = this;
 
         callback = typeis.function(callback) ? callback : noop;
         the._queueList.push({
+            index: the._index++,
             t: task,
             c: callback
         });
@@ -106,14 +114,14 @@ var Queue = klass.extends(Emitter).create({
      * 开始执行队列
      * @returns {Queue}
      */
-    begin: function () {
+    start: function () {
         var the = this;
 
         if (the.state > STATES.ready) {
             return the;
         }
 
-        the.state = STATES.begin;
+        the.state = STATES.start;
 
         if (the.size() === 0) {
             the.state = STATES.ready;
@@ -158,7 +166,6 @@ var Queue = klass.extends(Emitter).create({
                 return the;
             }
 
-            console.log(item);
             item.t.call(the, function () {
                 /**
                  * @event step
@@ -183,7 +190,7 @@ var Queue = klass.extends(Emitter).create({
         var the = this;
 
 
-        if (the.state !== STATES.begin) {
+        if (the.state !== STATES.start) {
             return the;
         }
 
@@ -206,7 +213,7 @@ var Queue = klass.extends(Emitter).create({
 
         the.state = STATES.ready;
 
-        return the.begin();
+        return the.start();
     },
 
 
