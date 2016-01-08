@@ -443,6 +443,6 @@ Validation.getRule = function (name) {
     return name ? validationMap[name] : validationMap;
 };
 
-require('../data/validation-rules.js')(Validation);
+require('./_validation-rules.js')(Validation);
 Validation.defaults = defaults;
 module.exports = Validation;

@@ -7,10 +7,10 @@
 
 'use strict';
 
-var typeis = require('../libs/typeis.js');
-var number = require('../libs/number.js');
-var string = require('../libs/string.js');
-var lang = require('./validation-lang.js');
+var typeis = require('./typeis.js');
+var number = require('./number.js');
+var string = require('./string.js');
+var lang = require('./_validation-lang.js');
 
 var REG_NUMBERIC = /^-?[\d.]+$/;
 
