@@ -7,14 +7,18 @@
 
 'use strict';
 
+var nodemailer = require('nodemailer');
+
 var random = require('./random.js');
 var typeis = require('./typeis.js');
 var log = require('./log.js');
 var dato = require('./dato.js');
 var allocation = require('./allocation.js');
+var Queue = require('./queue.js');
 
-var nodemailer = require('nodemailer');
-
+var queue = new Queue({
+    auto: true
+});
 // smtp 列表
 var smtps = [];
 
@@ -23,7 +27,8 @@ var configs = {
     from: '',
     to: '',
     subject: '',
-    html: ''
+    html: '',
+    timeout: 1000
 };
 
 /**
@@ -68,7 +73,7 @@ exports.config = function (options) {
  * @param options.html {String} 配置
  * @param callback
  */
-exports.send = function (options, callback) {
+var send = function (options, callback) {
     var max = smtps.length - 1;
     var index = random.number(0, max);
     var smtp = smtps[index];
@@ -86,5 +91,27 @@ exports.send = function (options, callback) {
     }
 };
 
+
+/**
+ * 进入队列发送邮件
+ * @param options
+ * @param callback
+ */
+exports.send = function (options, callback) {
+    if (!typeis.Function(callback)) {
+        callback = log.holdError;
+    }
+
+    queue.push(function (next) {
+        send(options, function () {
+            var args = arguments;
+            var self = this;
+            setTimeout(function () {
+                callback.apply(self, args);
+                next();
+            }, configs.timeout);
+        });
+    });
+};
 
 
