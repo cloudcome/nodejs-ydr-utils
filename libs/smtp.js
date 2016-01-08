@@ -21,14 +21,14 @@ var queue = new Queue({
 });
 // smtp 列表
 var smtps = [];
-
 // 发信配置
 var configs = {
     from: '',
     to: '',
     subject: '',
     html: '',
-    timeout: 2000
+    // 超时区间 1s <=> 30s
+    timeout: [1000, 30000]
 };
 
 /**
@@ -59,6 +59,10 @@ exports.config = function (options) {
         },
         set: function (key, val) {
             configs[key] = val;
+
+            if (!typeis.Array(configs.timeout)) {
+                configs.timeout = [configs.timeout, configs.timeout];
+            }
         }
     }, arguments);
 };
@@ -109,7 +113,8 @@ exports.send = function (options, callback) {
     queue.push(function (next) {
         send(options, function () {
             callback.apply(this, arguments);
-            setTimeout(next, configs.timeout);
+            var timeout = random.number(configs.timeout[0], configs.timeout[1]);
+            setTimeout(next, timeout);
         });
     });
 };
