@@ -2,5 +2,4 @@
 - xss => markdown √
 - emoji
 - queue √
-- color => chalk
 - 邮件发送系统，采用队列机制
