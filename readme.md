@@ -37,6 +37,7 @@
 - Queue
 - random
 - request
+- smtp
 - string
 - system
 - Template
