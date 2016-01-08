@@ -14,7 +14,7 @@ var path = require('path');
 var markdown = require('../libs/markdown.js');
 
 describe('markdown.js', function () {
-    xit('toc', function () {
+    it('toc', function () {
         var file = path.join(__dirname, 'markdown-toc.md');
         var data = fs.readFileSync(file, 'utf8');
         var ret = markdown.toc(data);
@@ -25,7 +25,7 @@ describe('markdown.js', function () {
         console.log('\n\n');
     });
 
-    xit('summary', function () {
+    it('summary', function () {
         var file = path.join(__dirname, 'markdown-summary.md');
         var data = fs.readFileSync(file, 'utf8');
         var ret = markdown.summary(data);

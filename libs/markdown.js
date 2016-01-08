@@ -8,7 +8,6 @@
 'use strict';
 
 var marked = require('marked');
-var showdown = require('showdown');
 var xss = require('xss');
 
 var allocation = require('./allocation.js');
