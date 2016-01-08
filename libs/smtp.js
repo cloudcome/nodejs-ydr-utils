@@ -28,7 +28,7 @@ var configs = {
     to: '',
     subject: '',
     html: '',
-    timeout: 1000
+    timeout: 2000
 };
 
 /**
@@ -67,11 +67,11 @@ exports.config = function (options) {
 /**
  * 发送邮件
  * @param options {Object} 配置
- * @param [options.from] {String} 配置
- * @param options.to {String} 配置
- * @param options.subject {String} 配置
- * @param options.html {String} 配置
- * @param callback
+ * @param [options.from] {String} 发信人
+ * @param options.to {String} 收信人
+ * @param options.subject {String} 邮件主题
+ * @param options.html {String} 邮件内容
+ * @param callback {Function} 发送完成回调
  */
 var send = function (options, callback) {
     var max = smtps.length - 1;
@@ -93,9 +93,13 @@ var send = function (options, callback) {
 
 
 /**
- * 进入队列发送邮件
- * @param options
- * @param callback
+ * 队列模式发送邮件
+ * @param options {Object} 配置
+ * @param [options.from] {String} 发信人
+ * @param options.to {String} 收信人
+ * @param options.subject {String} 邮件主题
+ * @param options.html {String} 邮件内容
+ * @param callback {Function} 发送完成回调
  */
 exports.send = function (options, callback) {
     if (!typeis.Function(callback)) {
@@ -104,12 +108,8 @@ exports.send = function (options, callback) {
 
     queue.push(function (next) {
         send(options, function () {
-            var args = arguments;
-            var self = this;
-            setTimeout(function () {
-                callback.apply(self, args);
-                next();
-            }, configs.timeout);
+            callback.apply(this, arguments);
+            setTimeout(next, configs.timeout);
         });
     });
 };
