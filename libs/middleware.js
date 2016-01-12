@@ -62,7 +62,9 @@ var Middleware = klass.extends(Emitter).create({
      */
     bindContext: function (context) {
         var the = this;
-        this._options.context = context;
+
+        the._options.context = context;
+
         return the;
     },
 
@@ -71,10 +73,12 @@ var Middleware = klass.extends(Emitter).create({
      * @returns {*}
      */
     exec: function (/*arguments*/) {
-        if (this._options.async) {
-            return this._execAsync.apply(this, arguments);
+        var the = this;
+
+        if (the._options.async) {
+            return the._execAsync.apply(this, arguments);
         } else {
-            return this._execSync(arguments[0]);
+            return the._execSync(arguments[0]);
         }
     },
 
@@ -144,7 +148,9 @@ var Middleware = klass.extends(Emitter).create({
      */
     catchError: function (callback) {
         var the = this;
+
         the._catchError = callback;
+
         return the;
     }
 });
