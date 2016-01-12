@@ -111,8 +111,10 @@ var Middleware = klass.extends(Emitter).create({
                 the.emit('error', err);
             }
         }).follow(function (err) {
+            var err2 = the._catchError(err);
             var args = allocation.args(arguments);
-
+            
+            args[0] = err2;
             args.shift();
             callback.apply(the._options.context, args);
         });
@@ -133,7 +135,11 @@ var Middleware = klass.extends(Emitter).create({
             try {
                 arg = middleware.call(the._options.context, arg);
             } catch (err) {
-                the.emit('error', err);
+                var err2 = the._catchError(err);
+
+                if (err2) {
+                    the.emit('error', err2);
+                }
             }
         });
 
