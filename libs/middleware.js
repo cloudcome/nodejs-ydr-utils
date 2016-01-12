@@ -31,27 +31,39 @@ var defaults = {
 };
 var Middleware = klass.extends(Emitter).create({
     constructor: function (options) {
-        this._options = dato.extend({}, defaults, options);
-        this._options.context = this._options.context || this;
-        this._middlewareStack = [];
+        var the = this;
+        the._options = dato.extend({}, defaults, options);
+        the._options.context = this._options.context || the;
+        the._middlewareStack = [];
+        the._catchError = function (err) {
+            return err;
+        };
     },
 
     /**
      * 注入中间件
      * @param callback {function} 回调
+     * @returns {Middleware}
      */
     use: function (callback) {
+        var the = this;
+
         if (typeis.function(callback)) {
-            this._middlewareStack.push(callback);
+            the._middlewareStack.push(callback);
         }
+
+        return the;
     },
 
     /**
      * 绑定中间件上下文
      * @param context
+     * @returns {Middleware}
      */
     bindContext: function (context) {
+        var the = this;
         this._options.context = context;
+        return the;
     },
 
     /**
@@ -117,12 +129,23 @@ var Middleware = klass.extends(Emitter).create({
             try {
                 arg = middleware.call(the._options.context, arg);
             } catch (err) {
-                err.middlewareName = middleware.middlewareName || middleware.name;
                 the.emit('error', err);
             }
         });
 
         return arg;
+    },
+
+
+    /**
+     * 捕获错误，用于重写 error 对象
+     * @param callback
+     * @returns {Middleware}
+     */
+    catchError: function (callback) {
+        var the = this;
+        the._catchError = callback;
+        return the;
     }
 });
 
