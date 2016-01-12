@@ -101,20 +101,27 @@ var Middleware = klass.extends(Emitter).create({
             }
 
             args.push(function (err) {
-                if (err) {
+                var err2 = err;
+
+                // throw string
+                if (typeis.String(err)) {
+                    err2 = new Error(err);
+                }
+
+                if (err2) {
                     errorMiddleware = middleware;
                 }
 
                 args.pop();
-                args.unshift(err);
+                args.unshift(err2);
                 next.apply(global, args);
+                the.emit('error', err2, errorMiddleware);
             });
 
             try {
                 middleware.apply(the._options.context, args);
             } catch (err) {
-                errorMiddleware = middleware;
-                the.emit('error', err);
+                args[args.length - 1](err);
             }
         }).follow(function (err) {
             if (err) {
@@ -143,10 +150,17 @@ var Middleware = klass.extends(Emitter).create({
             try {
                 arg = middleware.call(the._options.context, arg);
             } catch (err) {
-                var err2 = the._catchError(err, middleware);
+                var err2 = err;
+
+                // throw string
+                if (typeis.String(err)) {
+                    err2 = new Error(err);
+                }
+
+                err2 = the._catchError(err2, middleware);
 
                 if (err2) {
-                    the.emit('error', err2);
+                    the.emit('error', err2, middleware);
                     return false;
                 }
             }
