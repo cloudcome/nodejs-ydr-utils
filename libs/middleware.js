@@ -93,29 +93,37 @@ var Middleware = klass.extends(Emitter).create({
         var the = this;
         var args = allocation.args(arguments);
         var callback = args.pop();
+        var errorMiddleware = null;
 
         howdo.each(the._middlewareStack, function (index, middleware, next) {
             if (index) {
                 args.shift();
             }
 
-            args.push(function () {
+            args.push(function (err) {
+                if (err) {
+                    errorMiddleware = middleware;
+                }
+
                 args.pop();
-                args.unshift(null);
+                args.unshift(err);
                 next.apply(global, args);
             });
 
             try {
                 middleware.apply(the._options.context, args);
             } catch (err) {
+                errorMiddleware = middleware;
                 the.emit('error', err);
             }
         }).follow(function (err) {
-            var err2 = the._catchError(err);
+            if (err) {
+                err = the._catchError(err, errorMiddleware);
+            }
+
             var args = allocation.args(arguments);
-            
-            args[0] = err2;
-            args.shift();
+
+            args[0] = err;
             callback.apply(the._options.context, args);
         });
 
@@ -135,7 +143,7 @@ var Middleware = klass.extends(Emitter).create({
             try {
                 arg = middleware.call(the._options.context, arg);
             } catch (err) {
-                var err2 = the._catchError(err);
+                var err2 = the._catchError(err, middleware);
 
                 if (err2) {
                     the.emit('error', err2);
