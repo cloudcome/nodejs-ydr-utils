@@ -147,6 +147,7 @@ var Middleware = klass.extends(Emitter).create({
 
                 if (err2) {
                     the.emit('error', err2);
+                    return false;
                 }
             }
         });

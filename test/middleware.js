@@ -45,21 +45,28 @@ describe('utils/middleware.js', function () {
         });
     });
 
-    xit('sync', function () {
+    it('sync', function () {
         var md = new Middleware({
             async: false
         });
 
-        md.use(function (options) {
+        md.use(function m2 (options) {
+            console.log('do m1');
             options.code += '2';
 
             return options1;
         });
 
-        md.use(function (options) {
+        md.use(function m2 (options) {
+            console.log('do m2');
             options.code += '3';
 
             return options;
+        });
+
+        md.catchError(function (err, middleware) {
+            err.name = middleware.name;
+            return err;
         });
 
         md.on('error', function (err) {
@@ -71,7 +78,7 @@ describe('utils/middleware.js', function () {
         });
 
         console.log(options);
-        assert.equal(options.code, '123');
+        assert.equal(options.code, '12');
     });
 });
 
