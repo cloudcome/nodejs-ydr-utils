@@ -256,7 +256,7 @@ var Request = klass.extends(stream.Stream).create({
                 });
             });
 
-            the._receiveResponse(res);
+            the._receiveResponse(req, res);
         });
 
         req.on('error', function (err) {
@@ -312,15 +312,21 @@ var Request = klass.extends(stream.Stream).create({
 
     /**
      * 接收响应
+     * @param req
      * @param res
      * @private
      */
-    _receiveResponse: function (res) {
+    _receiveResponse: function (req, res) {
         var the = this;
         var options = the._options;
 
         if (options.method === 'HEAD') {
-            return the.emit('response', res);
+            the._ignoreError = true;
+            req.abort();
+            controller.nextTick(function () {
+                the.emit('response', res);
+            });
+            return;
         }
 
         var bfList = [];
