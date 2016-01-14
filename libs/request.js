@@ -69,6 +69,7 @@ var Request = klass.extends(stream.Stream).create({
         the._urlMap[options.url] = 1;
         the._requestTimes = 0;
         the._cookies = the._options.cookie || {};
+        the._pipeTo = [];
         the._request();
     },
 
@@ -360,8 +361,20 @@ var Request = klass.extends(stream.Stream).create({
         });
     },
 
-    pipe: function () {
 
+    /**
+     * 流导向
+     * @param writeStream
+     * @returns {Request}
+     */
+    pipe: function (writeStream) {
+        var the = this;
+
+        if (writeStream && writeStream.writable && writeStream instanceof stream.Stream) {
+            the._pipeTo.push(writeStream);
+        }
+
+        return the;
     }
 });
 

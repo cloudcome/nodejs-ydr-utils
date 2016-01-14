@@ -77,6 +77,7 @@ describe('request', function () {
 
     it('download', function (done) {
         var url = 'https://ss0.bdstatic.com/5aV1bjqh_Q23odCf/static/superman/img/logo/bd_logo1_31bdc765.png';
+        var file1 = path.join(__dirname, 'request1.png');
 
         request({
             debug: true,
@@ -99,14 +100,14 @@ describe('request', function () {
         }).on('body', function (body) {
             console.log('\n\n-------------------------------------');
             console.log('response body');
-            var file = path.join(__dirname, 'request1.png');
-            fs.writeFileSync(file, body, 'binary');
+            var file2 = path.join(__dirname, 'request2.png');
+            fs.writeFileSync(file2, body, 'binary');
             done();
         }).on('response', function (res) {
             console.log('\n\n-------------------------------------');
             console.log('response headers');
             console.log(res.headers);
-        });
+        }).pipe(fs.createWriteStream(file1));
     });
 });
 
