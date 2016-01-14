@@ -1,11 +1,13 @@
 /**
- * 文件描述
+ * controller
  * @author ydr.me
  * @create 2016-01-14 19:57
  */
 
 
 'use strict';
+
+var win = global;
 
 /**
  * 至少间隔一段时间执行
@@ -132,7 +134,6 @@ exports.toggle = function (/*fn*/) {
 };
 
 
-
 /**
  * 下一步
  * @param callback {Function} 回调
@@ -140,33 +141,14 @@ exports.toggle = function (/*fn*/) {
  */
 exports.nextTick = function (callback, context/*arguments*/) {
     context = context || win;
-
     var args = [].slice.call(arguments, 2);
-    var $doc = document;
-    var $body = $doc.body;
+
     var fn = exports.once(function () {
         callback.apply(context, args);
     });
 
-    // chrome18+, safari6+, firefox14+,ie11+,opera15
-    if (MutationObserver) {
-        var observer = new win[MutationObserver](fn);
-
-        observer.observe($link, {
-            attributes: true
-        });
-        $link.setAttribute('a', String(Math.random()));
-    } else if ('VBArray' in win) {
-        var $script = doc.createElement('script');
-        // IE下这个通常只要 1 ms,而且没有副作用，不会发现请求
-        $script.onreadystatechange = function () {
-            fn(); //在interactive阶段就触发
-            $script.onreadystatechange = null;
-            $body.removeChild($script);
-            $script = null;
-        };
-
-        $body.appendChild($script);
+    if (process.nextTick) {
+        process.nextTick(fn);
     } else {
         setTimeout(fn, 0);
     }
