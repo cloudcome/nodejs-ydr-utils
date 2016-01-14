@@ -340,20 +340,15 @@ var Request = klass.extends(stream.Stream).create({
         }
 
         var isUTF8 = options.encoding === 'utf8';
-        var binary = '';
 
         res.setEncoding(options.encoding);
         responseContent.on('data', function (chunk) {
-            if (isUTF8) {
-                bfList.push(new Buffer(chunk, the._options.encoding));
-            } else {
-                binary += chunk;
-            }
+            bfList.push(new Buffer(chunk, options.encoding));
         }).on('end', function () {
             if (isUTF8) {
                 the.emit('body', Buffer.concat(bfList).toString());
             } else {
-                the.emit('body', binary);
+                the.emit('body', new Buffer(bfList));
             }
         }).on('close', function () {
             if (the._ignoreError) {
