@@ -24,7 +24,6 @@ var smtps = [];
 var froms = [];
 // 发信配置
 var configs = {
-    from: '',
     to: '',
     subject: '',
     html: '',
@@ -35,23 +34,26 @@ var configs = {
 /**
  * 添加发信源
  * @param config
- * @param config.auth
- * @param config.user
- * @param config.pass
- * @param config.secureConnection
- * @param config.secure
- * @param config.host
- * @param config.port
- * @param config.from
+ * @param config.user {String} QQ号，阿里云发信地址
+ * @param config.pass {String} QQ邮箱密码，阿里云发信 smtp 密码
+ * @param config.secureConnection {Boolean} 阿里云邮箱设置为 true
+ * @param config.secure {Boolean} QQ 邮箱设置为 true
+ * @param config.host {String} QQ：smtp.qq.com，阿里云：smtp.dm.aliyun.com
+ * @param config.port {String} QQ：465，阿里云：25
+ * @param config.from {String} 发信地址，不同的 smtp，发信地址应该不一样
  */
 exports.push = function (config) {
-    config.auth = {
-        user: config.user,
-        pass: config.pass
+    var options = {
+        auth: {
+            user: config.user,
+            pass: config.pass
+        },
+        secureConnection: config.secureConnection,
+        secure: config.secure,
+        host: config.host,
+        port: config.port
     };
-    delete(config.user);
-    delete(config.pass);
-    var smtp = nodemailer.createTransport(config);
+    var smtp = nodemailer.createTransport(options);
     smtps.push(smtp);
     froms.push(config.from);
 };
