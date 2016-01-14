@@ -407,5 +407,18 @@ request.get = function (url) {
         method: 'get'
     });
 };
+request.post = function (url) {
+    return new Request({
+        url: url,
+        method: 'post'
+    });
+};
+request.down = request.download = function (url) {
+    return new Request({
+        url: url,
+        method: 'get',
+        encoding: 'binary'
+    });
+};
 
 module.exports = request;
