@@ -1,6 +1,8 @@
 'use strict';
 
 var assert = require('assert');
+var fs = require('fs');
+var path = require('path');
 
 
 var request = require('../libs/request.js');
@@ -73,12 +75,12 @@ describe('request', function () {
             });
     });
 
-    it('timeout', function (done) {
-        var url = 'http://192.168.0.161:10000/';
+    it('download', function (done) {
+        var url = 'https://ss0.bdstatic.com/5aV1bjqh_Q23odCf/static/superman/img/logo/bd_logo1_31bdc765.png';
 
         request({
             debug: true,
-            method: 'head',
+            method: 'get',
             url: url,
             query: {
                 a: 1,
@@ -88,9 +90,7 @@ describe('request', function () {
                 c: 3,
                 d: 4
             },
-            headers: {
-                'content-type': 'application/json'
-            }
+            encoding: 'binary'
         }).on('error', function (err) {
             console.log('\n\n-------------------------------------');
             console.log('response error');
@@ -99,7 +99,8 @@ describe('request', function () {
         }).on('body', function (body) {
             console.log('\n\n-------------------------------------');
             console.log('response body');
-            console.log(body.slice(0, 200));
+            var file = path.join(__dirname, 'request1.png');
+            fs.writeFileSync(file, body);
             done();
         }).on('response', function (res) {
             console.log('\n\n-------------------------------------');

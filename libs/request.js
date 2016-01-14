@@ -33,7 +33,7 @@ var NO_BODY_REQUEST = {
 var defaults = {
     headers: {
         'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-        'accept-encoding': 'gzip, deflate, sdch',
+        'accept-encoding': 'gzip',
         'accept-language': 'zh-CN,zh;q=0.8,en;q=0.6',
         'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.90 Safari/537.36'
     },
@@ -205,8 +205,8 @@ var Request = klass.extends(stream.Stream).create({
         the.debug('will request', options.method, requestOptions);
 
         var req = client.request(requestOptions, function (res) {
-            the.debug('get response status code', res.statusCode);
-            the.debug('get response headers', res.headers);
+            the.debug('response status code', res.statusCode);
+            the.debug('response headers', res.headers);
             the._buildCookies(res);
 
             if (res.statusCode === 301 || res.statusCode === 302) {
@@ -339,10 +339,21 @@ var Request = klass.extends(stream.Stream).create({
             res.pipe(responseContent);
         }
 
+        var isUTF8 = options.encoding === 'utf8';
+        var binary = '';
+
         responseContent.on('data', function (chunk) {
-            bfList.push(new Buffer(chunk, the._options.encoding));
+            if (isUTF8) {
+                bfList.push(new Buffer(chunk, the._options.encoding));
+            } else {
+                binary += chunk;
+            }
         }).on('end', function () {
-            the.emit('body', Buffer.concat(bfList).toString());
+            if (isUTF8) {
+                the.emit('body', Buffer.concat(bfList).toString());
+            } else {
+                the.emit('body', binary);
+            }
         }).on('close', function () {
             if (the._ignoreError) {
                 the._ignoreError = false;
