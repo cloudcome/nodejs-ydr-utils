@@ -100,6 +100,7 @@ describe('request', function () {
         }).on('body', function (body) {
             console.log('\n\n-------------------------------------');
             console.log('response body');
+            console.log(body.slice(0, 200));
             var file2 = path.join(__dirname, 'request2.png');
             fs.writeFileSync(file2, body, 'binary');
             done();
@@ -107,7 +108,8 @@ describe('request', function () {
             console.log('\n\n-------------------------------------');
             console.log('response headers');
             console.log(res.headers);
-        }).pipe(fs.createWriteStream(file1));
+        })
+            //.pipe(fs.createWriteStream(file1));
     });
 });
 

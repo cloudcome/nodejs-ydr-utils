@@ -346,10 +346,12 @@ var Request = klass.extends(stream.Stream).create({
         responseContent.on('data', function (chunk) {
             bfList.push(new Buffer(chunk, options.encoding));
         }).on('end', function () {
+            var bfCollection = Buffer.concat(bfList);
+
             if (isUTF8) {
-                the.emit('body', Buffer.concat(bfList).toString());
+                the.emit('body', bfCollection.toString());
             } else {
-                the.emit('body', new Buffer(bfList));
+                the.emit('body', new Buffer(bfCollection));
             }
         }).on('close', function () {
             if (the._ignoreError) {
@@ -359,6 +361,10 @@ var Request = klass.extends(stream.Stream).create({
 
             the.emit('error', new Error('response closed'));
         });
+
+        //dato.each(the._pipeTo, function (index, writeStream) {
+        //    responseContent.pipe(writeStream);
+        //});
     },
 
 
