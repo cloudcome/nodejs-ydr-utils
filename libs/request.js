@@ -189,8 +189,12 @@ var Request = klass.extends(stream.Stream).create({
             // pipe event to instance
             dato.each(READABLE_STREAM_EVENTS, function (index, eventType) {
                 res.on(eventType, function () {
-                    var args = allocation.args(arguments);
+                    if (the._ignoreError && eventType === 'error') {
+                        the._ignoreError = false;
+                        return;
+                    }
 
+                    var args = allocation.args(arguments);
                     args.unshift(eventType);
                     the.emit.apply(the, args);
                 });
@@ -200,19 +204,26 @@ var Request = klass.extends(stream.Stream).create({
         });
 
         req.on('error', function (err) {
+            if (the._ignoreError) {
+                the._ignoreError = false;
+                return;
+            }
+
             the.emit('error', err);
         });
 
         req.end();
 
-        if(options.timeout > 0){
-            the._requestTimer = setTimeout(function () {
+        if (options.timeout > 0) {
+            req.setTimeout(options.timeout, function () {
                 the._ignoreError = true;
-                the.abort();
+                req.abort();
                 controller.nextTick(function () {
-
+                    var requestTimeoutError = 'request timeout ' + options.timeout + 'ms';
+                    the.debug(requestTimeoutError);
+                    the.emit('error', new Error(requestTimeoutError));
                 });
-            }, options.timeout);
+            });
         }
     },
 

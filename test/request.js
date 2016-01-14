@@ -66,7 +66,8 @@ describe('request', function () {
 
         request({
             debug: true,
-            url: url
+            url: url,
+            timeout: 1000
         })
             .on('error', function (err) {
                 console.error(err);
