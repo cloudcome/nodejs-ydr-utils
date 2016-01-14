@@ -317,8 +317,13 @@ var Request = klass.extends(stream.Stream).create({
      */
     _receiveResponse: function (res) {
         var the = this;
-        var bfList = [];
+        var options = the._options;
 
+        if (options.method === 'HEAD') {
+
+        }
+
+        var bfList = [];
         var responseContent = res;
         var contentEncoding = res.headers['content-encoding'] || 'identity';
         contentEncoding = contentEncoding.trim().toLowerCase();

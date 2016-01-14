@@ -66,7 +66,7 @@ describe('request', function () {
 
         request({
             debug: true,
-            method: 'post',
+            method: 'head',
             url: url,
             query: {
                 a: 1,
@@ -85,6 +85,8 @@ describe('request', function () {
         }).on('body', function (body) {
             console.log('response', body.slice(0, 200));
             done();
+        }).on('response', function (res) {
+            console.log(res.headers);
         });
     });
 });
