@@ -67,7 +67,10 @@ describe('request', function () {
         request({
             debug: true,
             url: url,
-            timeout: 1000
+            query: {
+                a: 1,
+                b: 2
+            }
         })
             .on('error', function (err) {
                 console.error(err);
@@ -75,7 +78,6 @@ describe('request', function () {
             })
             .on('body', function (body) {
                 console.log('response', body.slice(0, 200));
-                assert.equal(/baidu/.test(body), true);
                 done();
             });
     });

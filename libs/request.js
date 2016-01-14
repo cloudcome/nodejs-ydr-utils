@@ -55,19 +55,40 @@ var Request = klass.extends(stream.Stream).create({
             };
         }
 
-        the._options = dato.extend(true, defaults, options);
-        the._url = ur.parse(the._options.url);
-        the._urlList = [the._options.url];
+        options = the._options = dato.extend(true, defaults, options);
+        options.url = the._buildURL();
+        the._url = ur.parse(options.url);
+        the._urlList = [options.url];
         the._urlMap = {};
-        the._urlMap[the._options.url] = 1;
+        the._urlMap[options.url] = 1;
         the._requestTimes = 0;
         the._cookies = the._options.cookie || {};
         the._request();
     },
 
 
+    /**
+     * 构建 url
+     * @returns {*|String|{method?, callbackStream?}}
+     * @private
+     */
     _buildURL: function () {
+        var the = this;
+        var options = the._options;
+        var query = '';
 
+        if (options.query) {
+            query = qs.stringify(options.query);
+        }
+
+        if (!query) {
+            return options.url;
+        }
+
+        options.url += options.url.indexOf('?') > -1 ? '&' : '?';
+        options.url += query;
+
+        return options.url;
     },
 
 
