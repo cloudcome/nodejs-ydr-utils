@@ -13,9 +13,9 @@ var https = require('https');
 var stream = require('stream');
 var qs = require('querystring');
 var ur = require('url');
+var zlib = require('zlib');
 
 
-var Emitter = require('./emitter.js');
 var klass = require('./class.js');
 var dato = require('./dato.js');
 var typeis = require('./typeis.js');
@@ -46,7 +46,7 @@ var defaults = {
     // 是否调试模式
     debug: false
 };
-var Request = klass.extends(Emitter).create({
+var Request = klass.extends(stream.Stream).create({
     constructor: function (options) {
         var the = this;
 
@@ -58,6 +58,7 @@ var Request = klass.extends(Emitter).create({
 
         the._options = dato.extend(true, defaults, options);
         the._url = ur.parse(the._options.url);
+        the._requestTimes = 0;
         the._request();
     },
 
@@ -73,6 +74,7 @@ var Request = klass.extends(Emitter).create({
             return the;
         }
 
+        console.log();
         console.log('[REQUEST DEBUG]\n%s', util.format.apply(util, arguments));
 
         return the;
@@ -89,12 +91,8 @@ var Request = klass.extends(Emitter).create({
         var options = the._options;
         var ret = {};
 
-        ret.protocol = the._url.protocol;
-        ret.host = the._url.host;
-        ret.hostname = the._url.hostname;
-        ret.port = the._url.port || 80;
-        ret.method = options.method.toUpperCase();
-        ret.path = the._url.path;
+        ret.url = the._url.href;
+        dato.extend(ret, the._url);
         ret.headers = dato.extend({}, options.headers);
 
         return ret;
@@ -109,9 +107,24 @@ var Request = klass.extends(Emitter).create({
         var the = this;
         var client = the._url.protocol === 'https:' ? https : http;
         var requestOptions = the._buildRequestOptions();
+
+        the._requestTimes++;
         the.debug('will request', requestOptions);
+
         var req = client.request(requestOptions, function (res) {
+            the.debug('get response status code', res.statusCode);
             the.debug('get response headers', res.headers);
+
+            if (res.statusCode === 301 || res.statusCode === 302) {
+                var redirectURL = res.headers.location || the._url.href;
+
+                the.debug('request redirect to', redirectURL);
+                the._url = ur.parse(redirectURL);
+                req.abort();
+                the._request();
+                return;
+            }
+
             // pipe event to instance
             dato.each(READABLE_STREAM_EVENTS, function (index, eventType) {
                 res.on(eventType, function () {
@@ -123,6 +136,10 @@ var Request = klass.extends(Emitter).create({
             });
 
             the._receiveResponse(res);
+        });
+
+        req.on('error', function (err) {
+            the.emit('error', err);
         });
 
         req.end();
@@ -138,14 +155,21 @@ var Request = klass.extends(Emitter).create({
         var the = this;
         var bfList = [];
 
-        res.on('data', function (chunk) {
+        var responseContent = res;
+        var contentEncoding = res.headers['content-encoding'] || 'identity';
+        contentEncoding = contentEncoding.trim().toLowerCase();
+
+        if (contentEncoding === 'gzip') {
+            responseContent = zlib.createGunzip();
+            res.pipe(responseContent);
+        }
+
+        responseContent.on('data', function (chunk) {
             bfList.push(new Buffer(chunk, the._options.encoding));
         }).on('end', function () {
             the.emit('body', Buffer.concat(bfList).toString());
         }).on('close', function () {
-
-        }).on('error', function () {
-
+            the.emit('error', new Error('response closed'));
         });
     },
 
