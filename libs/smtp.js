@@ -28,8 +28,8 @@ var configs = {
     to: '',
     subject: '',
     html: '',
-    // 超时区间 1s <=> 30s
-    timeout: [1000, 30000]
+    // 超时区间 123ms <=> 12345ms
+    timeout: [123, 12345]
 };
 
 /**
