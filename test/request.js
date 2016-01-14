@@ -75,6 +75,9 @@ describe('request', function () {
             body: {
                 c: 3,
                 d: 4
+            },
+            headers: {
+                'content-type': 'application/json'
             }
         }).on('error', function (err) {
             console.error(err);
