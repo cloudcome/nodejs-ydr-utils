@@ -21,6 +21,7 @@ var queue = new Queue({
 });
 // smtp 列表
 var smtps = [];
+var froms = [];
 // 发信配置
 var configs = {
     from: '',
@@ -34,6 +35,14 @@ var configs = {
 /**
  * 添加发信源
  * @param config
+ * @param config.auth
+ * @param config.user
+ * @param config.pass
+ * @param config.secureConnection
+ * @param config.secure
+ * @param config.host
+ * @param config.port
+ * @param config.from
  */
 exports.push = function (config) {
     config.auth = {
@@ -44,6 +53,7 @@ exports.push = function (config) {
     delete(config.pass);
     var smtp = nodemailer.createTransport(config);
     smtps.push(smtp);
+    froms.push(config.from);
 };
 
 
@@ -81,12 +91,15 @@ var send = function (options, callback) {
     var max = smtps.length - 1;
     var index = random.number(0, max);
     var smtp = smtps[index];
+    var from = froms[index];
 
     if (!typeis.Function(callback)) {
         callback = log.holdError;
     }
 
-    options = dato.extend({}, configs, options);
+    options = dato.extend({}, configs, {
+        from: from
+    }, options);
 
     try {
         smtp.sendMail(options, callback);
