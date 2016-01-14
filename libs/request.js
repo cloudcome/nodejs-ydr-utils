@@ -330,24 +330,24 @@ var Request = klass.extends(stream.Stream).create({
         }
 
         var bfList = [];
-        var responseContent = res;
+        var resContent = res;
         var contentEncoding = res.headers['content-encoding'] || 'identity';
         contentEncoding = contentEncoding.trim().toLowerCase();
 
         if (contentEncoding === 'gzip') {
-            responseContent = zlib.createGunzip();
-            responseContent = res.pipe(responseContent);
+            resContent = zlib.createGunzip();
+            resContent = res.pipe(resContent);
         }
 
         if (the._pipeTo) {
-            responseContent.pipe(the._pipeTo);
+            resContent.pipe(the._pipeTo);
             return;
         }
 
         var isUTF8 = options.encoding === 'utf8';
 
-        responseContent.setEncoding(options.encoding);
-        responseContent.on('data', function (chunk) {
+        resContent.setEncoding(options.encoding);
+        resContent.on('data', function (chunk) {
             the._reading = true;
             bfList.push(new Buffer(chunk, options.encoding));
         }).on('end', function () {

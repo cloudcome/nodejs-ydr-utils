@@ -82,9 +82,8 @@ describe('request', function () {
         request({
             url: url,
             encoding: 'binary'
-        }).on('body', function (body, res) {
-            //fs.writeFileSync(file1, body);
-            body.pipe(fs.createWriteStream(file));
+        }).on('body', function (body) {
+            fs.writeFileSync(file, body);
             done();
         }).on('data', function (chunk) {
             console.log(chunk.length);
