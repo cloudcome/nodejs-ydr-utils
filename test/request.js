@@ -66,6 +66,7 @@ describe('request', function () {
 
         request({
             debug: true,
+            method: 'post',
             url: url,
             query: {
                 a: 1,

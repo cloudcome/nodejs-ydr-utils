@@ -167,11 +167,12 @@ var Request = klass.extends(stream.Stream).create({
      * @param req
      * @private
      */
-    _buildBody: function (req) {
+    _buildRequestEnd: function (req) {
         var the = this;
         var options = the._options;
 
         if (NO_BODY_REQUEST[options.method]) {
+            req.end();
             return;
         }
 
@@ -185,7 +186,8 @@ var Request = klass.extends(stream.Stream).create({
             }
         }
 
-        req.write(requestBody);
+        the.debug('request body', requestBody);
+        req.end(requestBody);
     },
 
 
@@ -266,9 +268,7 @@ var Request = klass.extends(stream.Stream).create({
             the.emit('error', err);
         });
 
-        the._buildBody(req);
-
-        req.end();
+        the._buildRequestEnd(req);
 
         if (options.timeout > 0) {
             req.setTimeout(options.timeout, function () {
