@@ -61,6 +61,7 @@ var Request = klass.extends(stream.Stream).create({
         }
 
         options = the._options = dato.extend(true, defaults, options);
+        options.method = options.method.trim().toUpperCase();
         options.url = the._buildURL();
         the._url = ur.parse(options.url);
         the._urlList = [options.url];
@@ -147,6 +148,7 @@ var Request = klass.extends(stream.Stream).create({
         var options = the._options;
         var ret = {};
 
+        ret.method = options.method;
         ret.url = the._url.href;
         dato.extend(ret, the._url);
         ret.headers = dato.extend({}, options.headers);
@@ -169,17 +171,21 @@ var Request = klass.extends(stream.Stream).create({
         var the = this;
         var options = the._options;
 
-        if(NO_BODY_REQUEST[options.method]){
+        if (NO_BODY_REQUEST[options.method]) {
             return;
         }
 
-        if(typeis.plainObject(options.body)){
+        var requestBody = options.body;
+
+        if (typeis.plainObject(options.body)) {
             try {
-                options.body = JSON.stringify(options.body);
+                requestBody = JSON.stringify(options.body);
             } catch (err) {
-                // ignore
+                requestBody = '';
             }
         }
+
+        req.write(requestBody);
     },
 
 
@@ -194,8 +200,7 @@ var Request = klass.extends(stream.Stream).create({
         var requestOptions = the._buildRequestOptions();
 
         the._requestTimes++;
-        clearTimeout(the._requestTimer);
-        the.debug('will request', requestOptions);
+        the.debug('will request', options.method, requestOptions);
 
         var req = client.request(requestOptions, function (res) {
             the.debug('get response status code', res.statusCode);
