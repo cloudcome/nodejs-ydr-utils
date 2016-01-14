@@ -67,7 +67,7 @@ describe('request', function () {
         });
     });
 
-    xit('pipe', function (done) {
+    it('pipe', function (done) {
         var url = 'https://ss0.bdstatic.com/5aV1bjqh_Q23odCf/static/superman/img/logo/bd_logo1_31bdc765.png';
         var file = path.join(__dirname, 'request1.png');
 
@@ -75,10 +75,12 @@ describe('request', function () {
             console.log('data', chunk.length);
         }).on('close', function () {
             console.log('closed');
+        }).on('end', function () {
+            console.log('end');
         }).pipe(fs.createWriteStream(file));
     });
 
-    it('download', function (done) {
+    xit('download', function (done) {
         var url = 'https://ss0.bdstatic.com/5aV1bjqh_Q23odCf/static/superman/img/logo/bd_logo1_31bdc765.png';
         var file = path.join(__dirname, 'request2.png');
 
@@ -92,6 +94,8 @@ describe('request', function () {
             console.log('data', chunk.length);
         }).on('close', function () {
             console.log('closed');
+        }).on('end', function () {
+            console.log('end');
         });
     });
 
