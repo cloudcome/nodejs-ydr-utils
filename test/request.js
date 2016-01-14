@@ -61,7 +61,7 @@ describe('request', function () {
             });
     });
 
-    it('max redirect times', function (done) {
+    it('timeout', function (done) {
         var url = 'http://192.168.0.161:10000/';
 
         request({

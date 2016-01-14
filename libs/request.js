@@ -36,8 +36,6 @@ var defaults = {
     method: 'get',
     // 响应编码
     encoding: 'utf8',
-    // 是否跳转携带 cookie
-    redirectWithCookie: true,
     // 最大 30x 跳转次数
     maxRedirectTimes: 10,
     // 超时时间：15 秒
@@ -63,6 +61,7 @@ var Request = klass.extends(stream.Stream).create({
         the._urlMap = {};
         the._urlMap[the._options.url] = 1;
         the._requestTimes = 0;
+        the._cookies = the._options.cookie || {};
         the._request();
     },
 
@@ -125,6 +124,11 @@ var Request = klass.extends(stream.Stream).create({
         ret.url = the._url.href;
         dato.extend(ret, the._url);
         ret.headers = dato.extend({}, options.headers);
+        var cookieList = [];
+        dato.each(the._cookies, function (key, val) {
+            cookieList.push(key + '=' + val);
+        });
+        ret.headers.cookie = cookieList.join('; ');
 
         return ret;
     },
@@ -141,22 +145,24 @@ var Request = klass.extends(stream.Stream).create({
         var requestOptions = the._buildRequestOptions();
 
         the._requestTimes++;
+        clearTimeout(the._requestTimer);
         the.debug('will request', requestOptions);
 
         var req = client.request(requestOptions, function (res) {
             the.debug('get response status code', res.statusCode);
             the.debug('get response headers', res.headers);
+            the._buildCookies(res);
 
             if (res.statusCode === 301 || res.statusCode === 302) {
                 var redirectURL = res.headers.location || the._url.href;
                 redirectURL = the._fixURL(redirectURL);
+                the._urlList.push(redirectURL);
                 the._urlMap[redirectURL] = the._urlMap[redirectURL] || 0;
                 the._urlMap[redirectURL]++;
                 the._ignoreError = true;
                 req.abort();
                 the.debug('request redirect to', redirectURL);
 
-                the.debug('urlmap', the._urlMap);
                 if (the._urlMap[redirectURL] > 2) {
                     var maxRedirectRepeatTimesError = 'make redirect loop';
                     the.debug(maxRedirectRepeatTimesError);
@@ -198,6 +204,42 @@ var Request = klass.extends(stream.Stream).create({
         });
 
         req.end();
+
+        if(options.timeout > 0){
+            the._requestTimer = setTimeout(function () {
+                the._ignoreError = true;
+                the.abort();
+                controller.nextTick(function () {
+
+                });
+            }, options.timeout);
+        }
+    },
+
+
+    /**
+     * 构建 cookie
+     * @param res
+     * @private
+     */
+    _buildCookies: function (res) {
+        var the = this;
+        var cookies = res.headers['set-cookie'];
+
+        if (!cookies) {
+            return;
+        }
+
+        dato.each(cookies, function (index, cookieString) {
+            var mainCookieString = cookieString.split(';').shift();
+            var mainCookieList = mainCookieString.split('=');
+            var key = mainCookieList[0];
+            var val = mainCookieList[1];
+
+            if (key && val) {
+                the._cookies[key] = val;
+            }
+        });
     },
 
 
