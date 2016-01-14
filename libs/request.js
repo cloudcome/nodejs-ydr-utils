@@ -126,7 +126,10 @@ var Request = klass.extends(stream.Stream).create({
                 if (the._requestTimes > options.maxRedirectTimes) {
                     var maxRedirectTimesError = 'redirect times is over ' + options.maxRedirectTimes;
                     the.debug(maxRedirectTimesError);
-                    return the.emit('error', new Error(maxRedirectTimesError));
+                    controller.nextTick(function () {
+                        the.emit('error', new Error(maxRedirectTimesError));
+                    });
+                    return;
                 }
 
                 the._url = ur.parse(redirectURL);
