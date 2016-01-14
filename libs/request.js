@@ -342,6 +342,7 @@ var Request = klass.extends(stream.Stream).create({
         var isUTF8 = options.encoding === 'utf8';
         var binary = '';
 
+        res.setEncoding(options.encoding);
         responseContent.on('data', function (chunk) {
             if (isUTF8) {
                 bfList.push(new Buffer(chunk, the._options.encoding));
