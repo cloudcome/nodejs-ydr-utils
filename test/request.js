@@ -15,11 +15,15 @@ describe('request', function () {
             url: url
         })
             .on('error', function (err) {
+                console.log('\n\n-------------------------------------');
+                console.log('response error');
                 console.error(err);
                 done();
             })
             .on('body', function (body) {
-                console.log('response', body.slice(0, 200));
+                console.log('\n\n-------------------------------------');
+                console.log('response body');
+                console.log(body.slice(0, 200));
                 assert.equal(/baidu/.test(body), true);
                 done();
             });
@@ -33,11 +37,15 @@ describe('request', function () {
             url: url
         })
             .on('error', function (err) {
+                console.log('\n\n-------------------------------------');
+                console.log('response error');
                 console.error(err);
                 done();
             })
             .on('body', function (body) {
-                console.log('response', body.slice(0, 200));
+                console.log('\n\n-------------------------------------');
+                console.log('response body');
+                console.log(body.slice(0, 200));
                 assert.equal(/baidu/.test(body), true);
                 done();
             });
@@ -51,11 +59,15 @@ describe('request', function () {
             url: url
         })
             .on('error', function (err) {
+                console.log('\n\n-------------------------------------');
+                console.log('response error');
                 console.error(err);
                 done();
             })
             .on('body', function (body) {
-                console.log('response', body.slice(0, 200));
+                console.log('\n\n-------------------------------------');
+                console.log('response body');
+                console.log(body.slice(0, 200));
                 assert.equal(/baidu/.test(body), true);
                 done();
             });
@@ -80,12 +92,18 @@ describe('request', function () {
                 'content-type': 'application/json'
             }
         }).on('error', function (err) {
+            console.log('\n\n-------------------------------------');
+            console.log('response error');
             console.error(err);
             done();
         }).on('body', function (body) {
-            console.log('response', body.slice(0, 200));
+            console.log('\n\n-------------------------------------');
+            console.log('response body');
+            console.log(body.slice(0, 200));
             done();
         }).on('response', function (res) {
+            console.log('\n\n-------------------------------------');
+            console.log('response headers');
             console.log(res.headers);
         });
     });

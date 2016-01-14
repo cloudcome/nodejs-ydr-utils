@@ -320,7 +320,7 @@ var Request = klass.extends(stream.Stream).create({
         var options = the._options;
 
         if (options.method === 'HEAD') {
-
+            return the.emit('response', res);
         }
 
         var bfList = [];
