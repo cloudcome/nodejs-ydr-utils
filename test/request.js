@@ -4,9 +4,7 @@ var assert = require('assert');
 var fs = require('fs');
 var path = require('path');
 
-
 var request = require('../libs/request.js');
-
 
 describe('request', function () {
     xit('get nogzip', function (done) {
@@ -71,26 +69,31 @@ describe('request', function () {
 
     xit('pipe', function (done) {
         var url = 'https://ss0.bdstatic.com/5aV1bjqh_Q23odCf/static/superman/img/logo/bd_logo1_31bdc765.png';
-        var file1 = path.join(__dirname, 'request1.png');
+        var file = path.join(__dirname, 'request1.png');
 
-        request(url).on('end', done).pipe(fs.createWriteStream(file1));
+        request(url).on('end', done).pipe(fs.createWriteStream(file));
     });
 
 
-    xit('download', function (done) {
+    it('download', function (done) {
         var url = 'https://ss0.bdstatic.com/5aV1bjqh_Q23odCf/static/superman/img/logo/bd_logo1_31bdc765.png';
-        var file1 = path.join(__dirname, 'request2.png');
+        var file = path.join(__dirname, 'request2.png');
 
         request({
             url: url,
             encoding: 'binary'
-        }).on('body', function (body) {
-            fs.writeFileSync(file1, body);
+        }).on('body', function (body, res) {
+            //fs.writeFileSync(file1, body);
+            body.pipe(fs.createWriteStream(file));
             done();
+        }).on('data', function (chunk) {
+            console.log(chunk.length);
+        }).on('close', function () {
+            console.log('closed');
         });
     });
 
-    it('tmall', function (done) {
+    xit('tmall', function (done) {
         var url = 'https://detail.tmall.com/item.htm?id=525112500172';
 
         request({
@@ -107,6 +110,17 @@ describe('request', function () {
             console.log(body.slice(0, 200));
             assert.equal(/tmall/.test(body), true);
             done();
+        });
+    });
+
+    xit('simulateBrowser', function (done) {
+        var url = 'https://baidu.com';
+
+        request({
+            debug: true,
+            url: url
+        }).on('response', function () {
+
         });
     });
 });

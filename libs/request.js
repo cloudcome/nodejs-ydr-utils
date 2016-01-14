@@ -358,13 +358,6 @@ var Request = klass.extends(stream.Stream).create({
             } else {
                 the.emit('body', new Buffer(bfCollection));
             }
-        }).on('close', function () {
-            if (the._ignoreError) {
-                the._ignoreError = false;
-                return;
-            }
-
-            the.emit('error', new Error('response closed'));
         });
     },
 
@@ -390,6 +383,23 @@ var Request = klass.extends(stream.Stream).create({
         }
 
         return writeStream;
+    },
+
+
+    /**
+     * 中断请求
+     * @returns {Request}
+     */
+    abort: function () {
+        var the = this;
+
+        try {
+            the.req.abort();
+        } catch (err) {
+            // ignore
+        }
+
+        return the;
     }
 });
 
