@@ -22,7 +22,6 @@ var typeis = require('./typeis.js');
 var random = require('./random.js');
 var allocation = require('./allocation.js');
 
-var Buffer = global.Buffer;
 // @link https://nodejs.org/api/stream.html#stream_class_stream_readable
 var READABLE_STREAM_EVENTS = ['close', 'data', 'end', 'error', 'readable'];
 var defaults = {
@@ -123,21 +122,26 @@ var Request = klass.extends(Emitter).create({
                 });
             });
 
-
+            the._receiveResponse(res);
         });
 
         req.end();
     },
 
 
+    /**
+     * 接收响应
+     * @param res
+     * @private
+     */
     _receiveResponse: function (res) {
         var the = this;
         var bfList = [];
 
         res.on('data', function (chunk) {
-            bfList.push(new Buffer());
+            bfList.push(new Buffer(chunk, the._options.encoding));
         }).on('end', function () {
-
+            the.emit('body', Buffer.concat(bfList).toString());
         }).on('close', function () {
 
         }).on('error', function () {
