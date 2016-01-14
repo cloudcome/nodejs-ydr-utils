@@ -69,7 +69,8 @@ var Request = klass.extends(stream.Stream).create({
         the._urlMap[options.url] = 1;
         the._requestTimes = 0;
         the._cookies = the._options.cookie || {};
-        the._pipeTo = [];
+        the._pipeTo = null;
+        the._reading = false;
         the._request();
     },
 
@@ -165,15 +166,14 @@ var Request = klass.extends(stream.Stream).create({
 
     /**
      * 构建请求 body
-     * @param req
      * @private
      */
-    _buildRequestEnd: function (req) {
+    _buildRequestEnd: function () {
         var the = this;
         var options = the._options;
 
         if (NO_BODY_REQUEST[options.method]) {
-            req.end();
+            the.req.end();
             return;
         }
 
@@ -188,7 +188,7 @@ var Request = klass.extends(stream.Stream).create({
         }
 
         the.debug('request body', requestBody);
-        req.end(requestBody);
+        the.req.end(requestBody);
     },
 
 
@@ -205,10 +205,11 @@ var Request = klass.extends(stream.Stream).create({
         the._requestTimes++;
         the.debug('will request', options.method, requestOptions);
 
-        var req = client.request(requestOptions, function (res) {
+        var req = the.req = client.request(requestOptions, function (res) {
+            the.res = res;
             the.debug('response status code', res.statusCode);
             the.debug('response headers', res.headers);
-            the._buildCookies(res);
+            the._buildCookies();
 
             if (res.statusCode === 301 || res.statusCode === 302) {
                 var redirectURL = res.headers.location || the._url.href;
@@ -257,7 +258,7 @@ var Request = klass.extends(stream.Stream).create({
                 });
             });
 
-            the._receiveResponse(req, res);
+            the._receiveResponse();
         });
 
         req.on('error', function (err) {
@@ -269,7 +270,7 @@ var Request = klass.extends(stream.Stream).create({
             the.emit('error', err);
         });
 
-        the._buildRequestEnd(req);
+        the._buildRequestEnd();
 
         if (options.timeout > 0) {
             req.setTimeout(options.timeout, function () {
@@ -287,12 +288,11 @@ var Request = klass.extends(stream.Stream).create({
 
     /**
      * 构建 cookie
-     * @param res
      * @private
      */
-    _buildCookies: function (res) {
+    _buildCookies: function () {
         var the = this;
-        var cookies = res.headers['set-cookie'];
+        var cookies = the.res.headers['set-cookie'];
 
         if (!cookies) {
             return;
@@ -313,20 +313,19 @@ var Request = klass.extends(stream.Stream).create({
 
     /**
      * 接收响应
-     * @param req
-     * @param res
      * @private
      */
-    _receiveResponse: function (req, res) {
+    _receiveResponse: function () {
         var the = this;
         var options = the._options;
+        var req = the.req;
+        var res = the.res;
+
+        the.emit('response', res);
 
         if (options.method === 'HEAD') {
             the._ignoreError = true;
             req.abort();
-            controller.nextTick(function () {
-                the.emit('response', res);
-            });
             return;
         }
 
@@ -337,13 +336,19 @@ var Request = klass.extends(stream.Stream).create({
 
         if (contentEncoding === 'gzip') {
             responseContent = zlib.createGunzip();
-            res.pipe(responseContent);
+            responseContent = res.pipe(responseContent);
+        }
+
+        if (the._pipeTo) {
+            responseContent.pipe(the._pipeTo);
+            return;
         }
 
         var isUTF8 = options.encoding === 'utf8';
 
-        res.setEncoding(options.encoding);
+        responseContent.setEncoding(options.encoding);
         responseContent.on('data', function (chunk) {
+            the._reading = true;
             bfList.push(new Buffer(chunk, options.encoding));
         }).on('end', function () {
             var bfCollection = Buffer.concat(bfList);
@@ -361,10 +366,6 @@ var Request = klass.extends(stream.Stream).create({
 
             the.emit('error', new Error('response closed'));
         });
-
-        //dato.each(the._pipeTo, function (index, writeStream) {
-        //    responseContent.pipe(writeStream);
-        //});
     },
 
 
@@ -376,11 +377,19 @@ var Request = klass.extends(stream.Stream).create({
     pipe: function (writeStream) {
         var the = this;
 
-        if (writeStream && writeStream.writable && writeStream instanceof stream.Stream) {
-            the._pipeTo.push(writeStream);
+        if (the._reading) {
+            throw new Error('You cannot pipe after data has been emitted from the response.');
         }
 
-        return the;
+        if (the._pipeTo) {
+            throw new Error('You can not specify multiple targets');
+        }
+
+        if (writeStream && writeStream.writable && writeStream instanceof stream.Stream) {
+            the._pipeTo = writeStream;
+        }
+
+        return writeStream;
     }
 });
 
