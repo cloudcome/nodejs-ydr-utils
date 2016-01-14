@@ -59,8 +59,38 @@ var Request = klass.extends(stream.Stream).create({
 
         the._options = dato.extend(true, defaults, options);
         the._url = ur.parse(the._options.url);
+        the._urlList = [the._options.url];
+        the._urlMap = {};
+        the._urlMap[the._options.url] = 1;
         the._requestTimes = 0;
         the._request();
+    },
+
+
+    _buildURL: function () {
+
+    },
+
+
+    /**
+     * 修正 url
+     * @param url
+     * @returns {*}
+     * @private
+     */
+    _fixURL: function (url) {
+        var the = this;
+        var ret = ur.parse(url);
+
+        if (!ret.protocol) {
+            ret.protocol = the._url.protocol;
+        }
+
+        if (!ret.host) {
+            ret.host = the._url.host;
+        }
+
+        return ur.format(ret);
     },
 
 
@@ -119,9 +149,22 @@ var Request = klass.extends(stream.Stream).create({
 
             if (res.statusCode === 301 || res.statusCode === 302) {
                 var redirectURL = res.headers.location || the._url.href;
+                redirectURL = the._fixURL(redirectURL);
+                the._urlMap[redirectURL] = the._urlMap[redirectURL] || 0;
+                the._urlMap[redirectURL]++;
                 the._ignoreError = true;
                 req.abort();
                 the.debug('request redirect to', redirectURL);
+
+                the.debug('urlmap', the._urlMap);
+                if (the._urlMap[redirectURL] > 2) {
+                    var maxRedirectRepeatTimesError = 'make redirect loop';
+                    the.debug(maxRedirectRepeatTimesError);
+                    controller.nextTick(function () {
+                        the.emit('error', new Error(maxRedirectRepeatTimesError));
+                    });
+                    return;
+                }
 
                 if (the._requestTimes > options.maxRedirectTimes) {
                     var maxRedirectTimesError = 'redirect times is over ' + options.maxRedirectTimes;

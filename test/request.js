@@ -43,8 +43,26 @@ describe('request', function () {
             });
     });
 
-    it('get 30x', function (done) {
+    xit('get 30x', function (done) {
         var url = 'https://baidu.com';
+
+        request({
+            debug: true,
+            url: url
+        })
+            .on('error', function (err) {
+                console.error(err);
+                done();
+            })
+            .on('body', function (body) {
+                console.log('response', body.slice(0, 200));
+                assert.equal(/baidu/.test(body), true);
+                done();
+            });
+    });
+
+    it('max redirect times', function (done) {
+        var url = 'http://192.168.0.161:10000/';
 
         request({
             debug: true,
