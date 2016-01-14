@@ -21,6 +21,7 @@ var dato = require('./dato.js');
 var typeis = require('./typeis.js');
 var random = require('./random.js');
 var allocation = require('./allocation.js');
+var controller = require('./controller.js');
 
 // @link https://nodejs.org/api/stream.html#stream_class_stream_readable
 var READABLE_STREAM_EVENTS = ['close', 'data', 'end', 'error', 'readable'];
@@ -83,7 +84,7 @@ var Request = klass.extends(stream.Stream).create({
 
     /**
      * 构建请求参数
-     * @returns {{}}
+     * @returns {{object}}
      * @private
      */
     _buildRequestOptions: function () {
@@ -105,6 +106,7 @@ var Request = klass.extends(stream.Stream).create({
      */
     _request: function () {
         var the = this;
+        var options = the._options;
         var client = the._url.protocol === 'https:' ? https : http;
         var requestOptions = the._buildRequestOptions();
 
@@ -117,10 +119,17 @@ var Request = klass.extends(stream.Stream).create({
 
             if (res.statusCode === 301 || res.statusCode === 302) {
                 var redirectURL = res.headers.location || the._url.href;
-
-                the.debug('request redirect to', redirectURL);
-                the._url = ur.parse(redirectURL);
+                the._ignoreError = true;
                 req.abort();
+                the.debug('request redirect to', redirectURL);
+
+                if (the._requestTimes > options.maxRedirectTimes) {
+                    var maxRedirectTimesError = 'redirect times is over ' + options.maxRedirectTimes;
+                    the.debug(maxRedirectTimesError);
+                    return the.emit('error', new Error(maxRedirectTimesError));
+                }
+
+                the._url = ur.parse(redirectURL);
                 the._request();
                 return;
             }
@@ -169,6 +178,11 @@ var Request = klass.extends(stream.Stream).create({
         }).on('end', function () {
             the.emit('body', Buffer.concat(bfList).toString());
         }).on('close', function () {
+            if (the._ignoreError) {
+                the._ignoreError = false;
+                return;
+            }
+
             the.emit('error', new Error('response closed'));
         });
     },
