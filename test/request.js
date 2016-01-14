@@ -71,9 +71,12 @@ describe('request', function () {
         var url = 'https://ss0.bdstatic.com/5aV1bjqh_Q23odCf/static/superman/img/logo/bd_logo1_31bdc765.png';
         var file = path.join(__dirname, 'request1.png');
 
-        request(url).on('end', done).pipe(fs.createWriteStream(file));
+        request(url).on('data', function (chunk) {
+            console.log('data', chunk.length);
+        }).on('close', function () {
+            console.log('closed');
+        }).pipe(fs.createWriteStream(file));
     });
-
 
     it('download', function (done) {
         var url = 'https://ss0.bdstatic.com/5aV1bjqh_Q23odCf/static/superman/img/logo/bd_logo1_31bdc765.png';
@@ -86,7 +89,7 @@ describe('request', function () {
             fs.writeFileSync(file, body);
             done();
         }).on('data', function (chunk) {
-            console.log(chunk.length);
+            console.log('data', chunk.length);
         }).on('close', function () {
             console.log('closed');
         });

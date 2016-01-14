@@ -357,6 +357,7 @@ var Request = klass.extends(stream.Stream).create({
                 the.emit('body', bfCollection.toString());
             } else {
                 the.emit('body', new Buffer(bfCollection));
+                the.emit('close');
             }
         });
     },
