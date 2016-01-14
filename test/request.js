@@ -70,16 +70,18 @@ describe('request', function () {
             query: {
                 a: 1,
                 b: 2
+            },
+            body: {
+                c: 3,
+                d: 4
             }
-        })
-            .on('error', function (err) {
-                console.error(err);
-                done();
-            })
-            .on('body', function (body) {
-                console.log('response', body.slice(0, 200));
-                done();
-            });
+        }).on('error', function (err) {
+            console.error(err);
+            done();
+        }).on('body', function (body) {
+            console.log('response', body.slice(0, 200));
+            done();
+        });
     });
 });
 
