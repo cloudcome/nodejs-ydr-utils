@@ -100,7 +100,7 @@ describe('request', function () {
             console.log('\n\n-------------------------------------');
             console.log('response body');
             var file = path.join(__dirname, 'request1.png');
-            fs.writeFileSync(file, body);
+            fs.writeFileSync(file, body, 'binary');
             done();
         }).on('response', function (res) {
             console.log('\n\n-------------------------------------');
