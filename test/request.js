@@ -144,7 +144,7 @@ describe('request', function () {
     });
 
     it('pipe from', function (done) {
-        var url = 'https://baidu.com';
+        var url = 'http://192.168.0.172:10000/2/';
         var readStream = fs.createReadStream(__filename);
         var req = request({
             debug: true,

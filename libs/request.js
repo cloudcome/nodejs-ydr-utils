@@ -102,13 +102,14 @@ var Request = klass.extends(stream.Stream).create({
     _initEvent: function () {
         var the = this;
 
-        the.on('newListener', function () {
-            if (the._start || the._stop) {
-                return;
-            }
-
-            the._request();
-        });
+        //the.on('newListener', function (et) {
+        //    console.log('22222222222222222222222222222222222222', et);
+        //    if (the._start || the._stop) {
+        //        return;
+        //    }
+        //
+        //    the._request();
+        //});
     },
 
 
@@ -242,6 +243,8 @@ var Request = klass.extends(stream.Stream).create({
     _buildRequestEnd: function () {
         var the = this;
 
+        console.log('111111111111111111111111111111111111111111111111');
+
         if (the._writing) {
             return;
         }
@@ -263,7 +266,7 @@ var Request = klass.extends(stream.Stream).create({
             }
         }
 
-        the.debug('request body', requestBody);
+        the.debug('request body', '\n', requestBody);
         the.req.end(requestBody);
     },
 
@@ -280,12 +283,11 @@ var Request = klass.extends(stream.Stream).create({
 
         the._start = true;
         the._requestTimes++;
-        the.debug('will request', options.method, requestOptions);
+        the.debug('will request', options.method, '\n', requestOptions);
 
         var req = the.req = client.request(requestOptions, function (res) {
             the.res = res;
-            the.debug('response status code', res.statusCode);
-            the.debug('response headers', res.headers);
+            the.debug('has response', res.statusCode, '\n', res.headers);
             the._buildCookies();
 
             if (res.statusCode === 301 || res.statusCode === 302) {
@@ -353,7 +355,9 @@ var Request = klass.extends(stream.Stream).create({
             the.emit('error', err);
         });
 
-        the._buildRequestEnd();
+        controller.nextTick(function () {
+            the._buildRequestEnd();
+        });
 
         if (options.timeout > 0) {
             req.setTimeout(options.timeout, function () {
@@ -492,6 +496,8 @@ var Request = klass.extends(stream.Stream).create({
      */
     write: function () {
         var the = this;
+
+        console.log('0000000000000000000000000000000000000000000000000');
 
         if (the._redirecting || the._stop) {
             return;
