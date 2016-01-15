@@ -145,7 +145,7 @@ describe('request', function () {
     });
 
     it('pipe from', function (done) {
-        var url = 'http://192.168.0.215:10000/3/';
+        var url = 'http://192.168.0.215:10000/2/';
         var readStream = fs.createReadStream(__filename);
         var req = request({
             debug: true,

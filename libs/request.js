@@ -220,19 +220,19 @@ var Request = klass.extends(stream.Stream).create({
      * 构建请求 body
      * @private
      */
-    _buildRequestEnd: function () {
+    _buildRequestBody: function (requestOptions) {
         var the = this;
 
         console.log('111111111111111111111111111111111111111111111111', the._writing);
 
         if (the._writing) {
-
             return;
         }
 
         var options = the._options;
 
         if (NO_BODY_REQUEST[options.method]) {
+            requestOptions.headers['content-length'] = 0;
             the.req.end();
             return;
         }
@@ -247,6 +247,7 @@ var Request = klass.extends(stream.Stream).create({
             }
         }
 
+        requestOptions.headers['content-length'] = Buffer.byteLength(requestBody);
         the.debug('request body', '\n', requestBody);
         the.req.end(requestBody);
     },
@@ -262,6 +263,7 @@ var Request = klass.extends(stream.Stream).create({
         var client = the._url.protocol === 'https:' ? https : http;
         var requestOptions = the._buildRequestOptions();
 
+        the._buildRequestBody(requestOptions);
         the._started = true;
         the._requestTimes++;
         the.debug('will request', options.method, '\n', requestOptions);
@@ -283,7 +285,7 @@ var Request = klass.extends(stream.Stream).create({
                 the._urlMap[redirectURL] = the._urlMap[redirectURL] || 0;
                 the._urlMap[redirectURL]++;
                 the._ignoreError = true;
-                req.abort();
+                //req.abort();
                 the.debug('request redirect to', redirectURL);
 
                 if (the._urlMap[redirectURL] > 2) {
@@ -352,7 +354,7 @@ var Request = klass.extends(stream.Stream).create({
             });
         }
 
-        the._buildRequestEnd();
+
     },
 
 
@@ -517,6 +519,7 @@ var Request = klass.extends(stream.Stream).create({
      */
     end: function (chunk) {
         var the = this;
+        console.log('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<');
 
         if (the._stoped) {
             return;
@@ -540,6 +543,7 @@ var Request = klass.extends(stream.Stream).create({
     pause: function () {
         var the = this;
 
+        console.log('<<<<<<<<<<<<<<<<<<<<<<<<<<<');
         if (!the.resContent) {
             the._paused = true;
         } else {
@@ -554,6 +558,7 @@ var Request = klass.extends(stream.Stream).create({
     resume: function () {
         var the = this;
 
+        console.log('===============================');
         if (!the.resContent) {
             the._paused = false;
         } else {
