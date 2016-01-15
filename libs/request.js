@@ -277,6 +277,7 @@ var Request = klass.extends(stream.Stream).create({
      * @private
      */
     _request: function () {
+        console.log('_request_request_request_request_request');
         var the = this;
         var options = the._options;
         var client = the._url.protocol === 'https:' ? https : http;
@@ -329,8 +330,7 @@ var Request = klass.extends(stream.Stream).create({
                 the._url = ur.parse(redirectURL);
                 the._redirecting = true;
                 the._buildCookies();
-                console.log('666666666666666666666666666666666666666666');
-                the._request();
+                //the._request();
 
                 return;
             }
@@ -366,7 +366,7 @@ var Request = klass.extends(stream.Stream).create({
         });
 
         req.on('drain', function () {
-            console.log('777777777777777777777777777777777777777777');
+            console.log('ddddddddddddddddddddddddddddddddddddd');
             the.emit('drain');
         });
 
@@ -513,7 +513,6 @@ var Request = klass.extends(stream.Stream).create({
     write: function () {
         var the = this;
 
-        console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', the._stoped);
         the._pipeFrom = true;
 
         if (the._stoped) {
@@ -534,7 +533,7 @@ var Request = klass.extends(stream.Stream).create({
             the._request();
         }
 
-        console.log('0000000000000000000000000000000000000000000000000');
+        console.log('wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww');
         return the.req.write.apply(the.req, arguments);
     },
 
@@ -545,7 +544,7 @@ var Request = klass.extends(stream.Stream).create({
      */
     end: function (chunk) {
         var the = this;
-        console.log('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<', the._redirecting);
+        console.log('eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee', the._redirecting);
 
         if (the._stoped) {
             return;
@@ -569,7 +568,7 @@ var Request = klass.extends(stream.Stream).create({
     pause: function () {
         var the = this;
 
-        console.log('<<<<<<<<<<<<<<<<<<<<<<<<<<<');
+        console.log('pppppppppppppppppppppppppppppppppppppppppppp');
         if (!the.resContent) {
             the._paused = true;
         } else {
@@ -584,7 +583,7 @@ var Request = klass.extends(stream.Stream).create({
     resume: function () {
         var the = this;
 
-        console.log('===============================');
+        console.log('rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr');
         if (!the.resContent) {
             the._paused = false;
         } else {
