@@ -125,7 +125,7 @@ describe('request', function () {
         request({
             debug: true,
             url: url,
-            browser: true
+            browser: false
         }).on('response', function (res) {
             done();
         });

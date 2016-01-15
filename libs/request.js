@@ -14,6 +14,7 @@ var stream = require('stream');
 var qs = require('querystring');
 var ur = require('url');
 var zlib = require('zlib');
+var path = require('path');
 
 
 var pkg = require('../package.json');
@@ -46,12 +47,15 @@ var defaults = {
         accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
         'accept-encoding': 'gzip',
         'accept-language': 'zh-CN,zh;q=0.8,en;q=0.6',
-        'user-agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 7_0 like Mac OS X; en-us) AppleWebKit/537.51.1 (KHTML, like Gecko) Version/7.0 Mobile/11A465 Safari/9537.53 ydr-utils/request/',
+        'user-agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 7_0 like Mac OS X; en-us) ' +
+        'AppleWebKit/537.51.1 (KHTML, like Gecko) Version/7.0 Mobile/11A465 Safari/9537.53 ' +
+        pkg.name + '/' + path.basename(__filename) + '/' + pkg.version,
         'cache-control': 'no-cache',
         connection: 'keep-alive',
         host: true,
         origin: true,
-        referrer: true
+        referrer: true,
+        cookie: true
     },
     // 是否调试模式
     debug: false
@@ -66,6 +70,7 @@ var Request = klass.extends(stream.Stream).create({
             };
         }
 
+        the.id = random.guid();
         options = the._options = dato.extend(true, {}, defaults, options);
         options.method = options.method.trim().toUpperCase();
         options.url = the._buildURL();
@@ -185,17 +190,20 @@ var Request = klass.extends(stream.Stream).create({
                         case 'referrer':
                             ret.headers[key] = ret.url;
                             break;
+
+                        case 'cookie':
+                            var cookieList = [];
+                            dato.each(the._cookies, function (key, val) {
+                                cookieList.push(key + '=' + val);
+                            });
+                            ret.headers.cookie = cookieList.join('; ');
+                            break;
                     }
                 }
             });
         }
 
         dato.extend(ret.headers, options.headers);
-        var cookieList = [];
-        dato.each(the._cookies, function (key, val) {
-            cookieList.push(key + '=' + val);
-        });
-        ret.headers.cookie = cookieList.join('; ');
 
         return ret;
     },
