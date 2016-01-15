@@ -39,7 +39,7 @@ var defaults = {
     // 响应编码
     encoding: 'utf8',
     // 最大 30x 跳转次数
-    maxRedirectTimes: 10,
+    maxRedirects: 10,
     // 超时时间：15 秒
     timeout: 15000,
     // 是否模拟浏览器
@@ -137,28 +137,6 @@ var Request = klass.extends(stream.Stream).create({
         options.url += query;
 
         return options.url;
-    },
-
-
-    /**
-     * 修正 url
-     * @param url
-     * @returns {*}
-     * @private
-     */
-    _fixURL: function (url) {
-        var the = this;
-        var ret = ur.parse(url);
-
-        if (!ret.protocol) {
-            ret.protocol = the._url.protocol;
-        }
-
-        if (!ret.host) {
-            ret.host = the._url.host;
-        }
-
-        return ur.format(ret);
     },
 
 
@@ -300,7 +278,7 @@ var Request = klass.extends(stream.Stream).create({
             // 30x redirect
             if (res.statusCode >= 300 && res.statusCode < 400) {
                 var redirectURL = res.headers.location || the._url.href;
-                redirectURL = the._fixURL(redirectURL);
+                redirectURL = ur.resolve(the._url.href, redirectURL)
                 the._urlList.push(redirectURL);
                 the._urlMap[redirectURL] = the._urlMap[redirectURL] || 0;
                 the._urlMap[redirectURL]++;
@@ -317,11 +295,11 @@ var Request = klass.extends(stream.Stream).create({
                     return;
                 }
 
-                if (the._requestTimes > options.maxRedirectTimes) {
-                    var maxRedirectTimesError = 'redirect times is over ' + options.maxRedirectTimes;
-                    the.debug(maxRedirectTimesError);
+                if (the._requestTimes > options.maxRedirects) {
+                    var maxRedirectsError = 'redirect times is over ' + options.maxRedirects;
+                    the.debug(maxRedirectsError);
                     controller.nextTick(function () {
-                        the.emit('error', new Error(maxRedirectTimesError));
+                        the.emit('error', new Error(maxRedirectsError));
                     });
                     return;
                 }
