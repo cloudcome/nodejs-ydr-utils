@@ -82,7 +82,19 @@ var Request = klass.extends(stream.Stream).create({
         the._cookies = the._options.cookie || {};
         the._pipeTo = null;
         the._reading = false;
+        the._initEvent();
         the._request();
+    },
+
+
+    /**
+     * 初始化事件
+     * @private
+     */
+    _initEvent: function () {
+        var the = this;
+
+        the.on('new-listener');
     },
 
 
@@ -443,6 +455,14 @@ var Request = klass.extends(stream.Stream).create({
         } catch (err) {
             // ignore
         }
+
+        return the;
+    },
+
+    write: function (chunk) {
+        var the = this;
+
+
 
         return the;
     }

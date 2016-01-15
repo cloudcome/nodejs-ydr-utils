@@ -72,6 +72,7 @@ var Emitter = klass.create({
 
             if (typeis.function(listener)) {
                 the._emitterListener[et].push(listener);
+                the.emit('newListener', eventType);
             }
         });
 
@@ -121,6 +122,7 @@ var Emitter = klass.create({
                 dato.each(the._emitterListener, function (index, _listener) {
                     if (listener === _listener) {
                         the._emitterListener.splice(index, 1);
+                        the.emit('removeListener', eventType);
                         return false;
                     }
                 });

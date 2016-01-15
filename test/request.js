@@ -67,7 +67,7 @@ describe('request', function () {
         });
     });
 
-    xit('pipe', function (done) {
+    xit('pipe to', function (done) {
         var url = 'https://ss0.bdstatic.com/5aV1bjqh_Q23odCf/static/superman/img/logo/bd_logo1_31bdc765.png';
         var file = path.join(__dirname, 'request1.png');
 
@@ -119,6 +119,18 @@ describe('request', function () {
         });
     });
 
+    xit('browser', function (done) {
+        var url = 'https://baidu.com';
+
+        request({
+            debug: true,
+            url: url,
+            browser: false
+        }).on('response', function (res) {
+            done();
+        });
+    });
+
     it('browser', function (done) {
         var url = 'https://baidu.com';
 
@@ -127,6 +139,20 @@ describe('request', function () {
             url: url,
             browser: false
         }).on('response', function (res) {
+            done();
+        });
+    });
+
+    it('pipe from', function (done) {
+        var url = 'https://baidu.com';
+        var readStream = fs.createReadStream(__filename);
+        var req = request({
+            debug: true,
+            url: url,
+            method: 'post'
+        });
+
+        readStream.pipe(req).on('response', function (res) {
             done();
         });
     });
