@@ -16,6 +16,7 @@ var ur = require('url');
 var zlib = require('zlib');
 
 
+var pkg = require('../package.json');
 var klass = require('./class.js');
 var dato = require('./dato.js');
 var typeis = require('./typeis.js');
@@ -31,12 +32,7 @@ var NO_BODY_REQUEST = {
     OPTIONS: true
 };
 var defaults = {
-    headers: {
-        'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-        'accept-encoding': 'gzip',
-        'accept-language': 'zh-CN,zh;q=0.8,en;q=0.6',
-        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.90 Safari/537.36'
-    },
+    headers: {},
     // 请求方法
     method: 'get',
     // 响应编码
@@ -46,7 +42,17 @@ var defaults = {
     // 超时时间：15 秒
     timeout: 15000,
     // 是否模拟浏览器
-    browser: true,
+    browser: {
+        accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+        'accept-encoding': 'gzip',
+        'accept-language': 'zh-CN,zh;q=0.8,en;q=0.6',
+        'user-agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 7_0 like Mac OS X; en-us) AppleWebKit/537.51.1 (KHTML, like Gecko) Version/7.0 Mobile/11A465 Safari/9537.53 ydr-utils/request/',
+        'cache-control': 'no-cache',
+        connection: 'keep-alive',
+        host: true,
+        origin: true,
+        referrer: true
+    },
     // 是否调试模式
     debug: false
 };
@@ -60,7 +66,7 @@ var Request = klass.extends(stream.Stream).create({
             };
         }
 
-        options = the._options = dato.extend(true, defaults, options);
+        options = the._options = dato.extend(true, {}, defaults, options);
         options.method = options.method.trim().toUpperCase();
         options.url = the._buildURL();
         the._url = ur.parse(options.url);
@@ -148,12 +154,43 @@ var Request = klass.extends(stream.Stream).create({
     _buildRequestOptions: function () {
         var the = this;
         var options = the._options;
-        var ret = {};
+        var ret = {
+            headers: {}
+        };
 
         ret.method = options.method;
         ret.url = the._url.href;
         dato.extend(ret, the._url);
-        ret.headers = dato.extend({}, options.headers);
+
+        if (!typeis.empty(options.browser)) {
+            var browserHeaders = options.browser;
+
+            if (browserHeaders === true) {
+                browserHeaders = defaults.browser;
+            }
+
+            dato.each(browserHeaders, function (key, val) {
+                if (typeis.String(val)) {
+                    ret.headers[key] = val;
+                } else if (val === true) {
+                    switch (key) {
+                        case 'host':
+                            ret.headers[key] = the._url.host;
+                            break;
+
+                        case 'origin':
+                            ret.headers[key] = the._url.host;
+                            break;
+
+                        case 'referrer':
+                            ret.headers[key] = ret.url;
+                            break;
+                    }
+                }
+            });
+        }
+
+        dato.extend(ret.headers, options.headers);
         var cookieList = [];
         dato.each(the._cookies, function (key, val) {
             cookieList.push(key + '=' + val);

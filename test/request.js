@@ -67,7 +67,7 @@ describe('request', function () {
         });
     });
 
-    it('pipe', function (done) {
+    xit('pipe', function (done) {
         var url = 'https://ss0.bdstatic.com/5aV1bjqh_Q23odCf/static/superman/img/logo/bd_logo1_31bdc765.png';
         var file = path.join(__dirname, 'request1.png');
 
@@ -125,9 +125,9 @@ describe('request', function () {
         request({
             debug: true,
             url: url,
-            browser: false
-        }).on('response', function () {
-
+            browser: true
+        }).on('response', function (res) {
+            done();
         });
     });
 });
