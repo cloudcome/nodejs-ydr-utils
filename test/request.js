@@ -119,12 +119,13 @@ describe('request', function () {
         });
     });
 
-    xit('simulateBrowser', function (done) {
+    it('browser', function (done) {
         var url = 'https://baidu.com';
 
         request({
             debug: true,
-            url: url
+            url: url,
+            browser: false
         }).on('response', function () {
 
         });

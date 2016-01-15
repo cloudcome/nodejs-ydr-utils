@@ -46,7 +46,7 @@ var defaults = {
     // 超时时间：15 秒
     timeout: 15000,
     // 是否模拟浏览器
-    simulateBrowser: true,
+    browser: true,
     // 是否调试模式
     debug: false
 };
