@@ -322,6 +322,7 @@ var Request = klass.extends(stream.Stream).create({
                 return;
             }
 
+            the._redirecting = false;
             // pipe event to instance
             dato.each(READABLE_STREAM_EVENTS, function (index, eventType) {
                 res.on(eventType, function () {
@@ -492,8 +493,12 @@ var Request = klass.extends(stream.Stream).create({
     write: function () {
         var the = this;
 
-        if (the._redirecting) {
+        if (the._redirecting || the._stop) {
             return;
+        }
+
+        if (!the._start) {
+            the._request();
         }
 
         if (the._reading) {

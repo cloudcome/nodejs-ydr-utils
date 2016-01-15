@@ -131,7 +131,7 @@ describe('request', function () {
         });
     });
 
-    it('browser', function (done) {
+    xit('browser', function (done) {
         var url = 'https://baidu.com';
 
         request({
