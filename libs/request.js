@@ -330,7 +330,9 @@ var Request = klass.extends(stream.Stream).create({
                 the._url = ur.parse(redirectURL);
                 the._redirecting = true;
                 the._buildCookies();
-                //the._request();
+
+
+                the._request();
 
                 return;
             }
@@ -568,7 +570,6 @@ var Request = klass.extends(stream.Stream).create({
     pause: function () {
         var the = this;
 
-        console.log('pppppppppppppppppppppppppppppppppppppppppppp');
         if (!the.resContent) {
             the._paused = true;
         } else {
@@ -583,7 +584,6 @@ var Request = klass.extends(stream.Stream).create({
     resume: function () {
         var the = this;
 
-        console.log('rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr');
         if (!the.resContent) {
             the._paused = false;
         } else {
