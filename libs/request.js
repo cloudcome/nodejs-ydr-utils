@@ -88,9 +88,11 @@ var Request = klass.extends(stream.Stream).create({
         // 是否正在重定向
         the._redirecting = false;
         // 是否开始请求
-        the._start = false;
+        the._started = false;
         // 是否已停止请求
-        the._stop = false;
+        the._stoped = false;
+        // 是否暂停数据流出
+        the._paused = false;
         the._initEvent();
     },
 
@@ -243,9 +245,10 @@ var Request = klass.extends(stream.Stream).create({
     _buildRequestEnd: function () {
         var the = this;
 
-        console.log('111111111111111111111111111111111111111111111111');
+        console.log('111111111111111111111111111111111111111111111111', the._writing);
 
         if (the._writing) {
+
             return;
         }
 
@@ -281,16 +284,21 @@ var Request = klass.extends(stream.Stream).create({
         var client = the._url.protocol === 'https:' ? https : http;
         var requestOptions = the._buildRequestOptions();
 
-        the._start = true;
+        the._started = true;
         the._requestTimes++;
         the.debug('will request', options.method, '\n', requestOptions);
 
-        var req = the.req = client.request(requestOptions, function (res) {
+        var req = the.req = client.request(requestOptions);
+
+        the.emit('request', req);
+
+        req.on('response', function (res) {
             the.res = res;
             the.debug('has response', res.statusCode, '\n', res.headers);
             the._buildCookies();
 
-            if (res.statusCode === 301 || res.statusCode === 302) {
+            // 30x redirect
+            if (res.statusCode >= 300 && res.statusCode < 400) {
                 var redirectURL = res.headers.location || the._url.href;
                 redirectURL = the._fixURL(redirectURL);
                 the._urlList.push(redirectURL);
@@ -324,24 +332,23 @@ var Request = klass.extends(stream.Stream).create({
                 return;
             }
 
-            the._redirecting = false;
             // pipe event to instance
-            dato.each(READABLE_STREAM_EVENTS, function (index, eventType) {
-                res.on(eventType, function () {
-                    if (the._ignoreError && eventType === 'error') {
-                        the._ignoreError = false;
-                        return;
-                    }
-
-                    if (eventType === 'abort' || eventType === 'end' || eventType === 'close') {
-                        the._stop = true;
-                    }
-
-                    var args = allocation.args(arguments);
-                    args.unshift(eventType);
-                    the.emit.apply(the, args);
-                });
-            });
+            //dato.each(READABLE_STREAM_EVENTS, function (index, eventType) {
+            //    res.on(eventType, function () {
+            //        if (the._ignoreError && eventType === 'error') {
+            //            the._ignoreError = false;
+            //            return;
+            //        }
+            //
+            //        if (eventType === 'abort' || eventType === 'end' || eventType === 'close') {
+            //            the._stoped = true;
+            //        }
+            //
+            //        var args = allocation.args(arguments);
+            //        args.unshift(eventType);
+            //        the.emit.apply(the, args);
+            //    });
+            //});
 
             the._receiveResponse();
         });
@@ -355,10 +362,6 @@ var Request = klass.extends(stream.Stream).create({
             the.emit('error', err);
         });
 
-        controller.nextTick(function () {
-            the._buildRequestEnd();
-        });
-
         if (options.timeout > 0) {
             req.setTimeout(options.timeout, function () {
                 the._ignoreError = true;
@@ -370,6 +373,8 @@ var Request = klass.extends(stream.Stream).create({
                 });
             });
         }
+
+        the._buildRequestEnd();
     },
 
 
@@ -408,6 +413,7 @@ var Request = klass.extends(stream.Stream).create({
         var req = the.req;
         var res = the.res;
 
+        the._redirecting = false;
         the.emit('response', res);
 
         if (options.method === 'HEAD') {
@@ -433,6 +439,11 @@ var Request = klass.extends(stream.Stream).create({
 
         var isUTF8 = options.encoding === 'utf8';
 
+        if (the._paused) {
+            resContent.pause();
+        }
+
+        the.resContent = resContent;
         resContent.setEncoding(options.encoding);
         resContent.on('data', function (chunk) {
             the._reading = true;
@@ -497,14 +508,10 @@ var Request = klass.extends(stream.Stream).create({
     write: function () {
         var the = this;
 
-        console.log('0000000000000000000000000000000000000000000000000');
+        console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', the._stoped);
 
-        if (the._redirecting || the._stop) {
+        if (the._stoped) {
             return;
-        }
-
-        if (!the._start) {
-            the._request();
         }
 
         if (the._reading) {
@@ -515,12 +522,65 @@ var Request = klass.extends(stream.Stream).create({
             throw new Error('You can not write after pipe to target.');
         }
 
-        if (!the.req) {
-            throw new Error('request is undefined.');
+        the._writing = true;
+
+        if (!the._started) {
+            the._request();
         }
 
-        the._writing = true;
+        console.log('0000000000000000000000000000000000000000000000000');
         return the.req.write.apply(the.req, arguments);
+    },
+
+
+    /**
+     * 写，接收流
+     * @param chunk
+     */
+    end: function (chunk) {
+        var the = this;
+
+        if (the._stoped) {
+            return;
+        }
+
+        if (!the._started) {
+            the._request();
+        }
+
+        if (chunk) {
+            the.write(chunk);
+        }
+
+        the.req.end();
+    },
+
+
+    /**
+     * pause
+     */
+    pause: function () {
+        var the = this;
+
+        if (!the.resContent) {
+            the._paused = true;
+        } else {
+            the.resContent.pause.apply(the.resContent, arguments);
+        }
+    },
+
+
+    /**
+     * resume
+     */
+    resume: function () {
+        var the = this;
+
+        if (!the.resContent) {
+            the._paused = false;
+        } else {
+            the.resContent.resume.apply(the.resContent, arguments);
+        }
     }
 });
 

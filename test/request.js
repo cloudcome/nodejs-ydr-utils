@@ -5,6 +5,7 @@ var fs = require('fs');
 var path = require('path');
 
 var request = require('../libs/request.js');
+var request2 = require('request');
 
 describe('request', function () {
     xit('get nogzip', function (done) {
@@ -144,15 +145,16 @@ describe('request', function () {
     });
 
     it('pipe from', function (done) {
-        var url = 'http://192.168.0.172:10000/2/';
+        var url = 'http://192.168.0.215:10000/2/';
         var readStream = fs.createReadStream(__filename);
-        var req = request({
+        var req = request2({
             debug: true,
             url: url,
             method: 'post'
         });
 
         readStream.pipe(req).on('response', function (res) {
+            console.log(res.headers);
             done();
         });
     });
