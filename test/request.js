@@ -150,7 +150,8 @@ describe('request', function () {
         var req = request({
             debug: true,
             url: url,
-            method: 'post'
+            method: 'post',
+            timeout: 2000
         });
 
         readStream.pipe(req).on('response', function (res) {

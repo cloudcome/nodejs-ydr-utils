@@ -81,6 +81,7 @@ var Request = klass.extends(stream.Stream).create({
         the._requestTimes = 0;
         the._cookies = the._options.cookie || {};
         the._pipeTo = null;
+        the._pipeFrom = null;
         // 是否正在读数据流
         the._reading = false;
         // 是否正在写数据流
@@ -217,23 +218,19 @@ var Request = klass.extends(stream.Stream).create({
 
 
     /**
-     * 构建请求 body
+     * 构建请求长度
      * @private
      */
-    _buildRequestBody: function (requestOptions) {
+    _buildRequestContentLength: function (requestOptions) {
         var the = this;
+        var options = the._options;
 
-        console.log('111111111111111111111111111111111111111111111111', the._writing);
-
-        if (the._writing) {
+        if (the._pipeFrom) {
             return;
         }
 
-        var options = the._options;
-
         if (NO_BODY_REQUEST[options.method]) {
             requestOptions.headers['content-length'] = 0;
-            the.req.end();
             return;
         }
 
@@ -247,11 +244,33 @@ var Request = klass.extends(stream.Stream).create({
             }
         }
 
+        the._requestBody = requestBody;
         requestOptions.headers['content-length'] = Buffer.byteLength(requestBody);
         the.debug('request body', '\n', requestBody);
-        the.req.end(requestBody);
     },
 
+
+    /**
+     * 发送请求
+     * @private
+     */
+    _buildRequestSend: function () {
+        var the = this;
+        var options = the._options;
+
+        the.req.requestId = random.guid();
+
+        if (the._pipeFrom) {
+            return;
+        }
+
+        if (NO_BODY_REQUEST[options.method]) {
+            the.req.end();
+            return;
+        }
+
+        the.req.end(the._requestBody);
+    },
 
     /**
      * 实际请求
@@ -263,19 +282,20 @@ var Request = klass.extends(stream.Stream).create({
         var client = the._url.protocol === 'https:' ? https : http;
         var requestOptions = the._buildRequestOptions();
 
-        the._buildRequestBody(requestOptions);
+        the._buildRequestContentLength(requestOptions);
         the._started = true;
         the._requestTimes++;
-        the.debug('will request', options.method, '\n', requestOptions);
+        the.debug(options.method, requestOptions.url, '\n', requestOptions);
 
         var req = the.req = client.request(requestOptions);
+
+        the._buildRequestSend();
 
         the.emit('request', req);
 
         req.on('response', function (res) {
             the.res = res;
-            the.debug('has response', res.statusCode, '\n', res.headers);
-            the._buildCookies();
+            the.debug('response', res.statusCode, '\n', res.headers);
 
             // 30x redirect
             if (res.statusCode >= 300 && res.statusCode < 400) {
@@ -285,7 +305,7 @@ var Request = klass.extends(stream.Stream).create({
                 the._urlMap[redirectURL] = the._urlMap[redirectURL] || 0;
                 the._urlMap[redirectURL]++;
                 the._ignoreError = true;
-                //req.abort();
+                req.abort();
                 the.debug('request redirect to', redirectURL);
 
                 if (the._urlMap[redirectURL] > 2) {
@@ -308,7 +328,10 @@ var Request = klass.extends(stream.Stream).create({
 
                 the._url = ur.parse(redirectURL);
                 the._redirecting = true;
+                the._buildCookies();
+                console.log('666666666666666666666666666666666666666666');
                 the._request();
+
                 return;
             }
 
@@ -342,19 +365,22 @@ var Request = klass.extends(stream.Stream).create({
             the.emit('error', err);
         });
 
+        req.on('drain', function () {
+            console.log('777777777777777777777777777777777777777777');
+            the.emit('drain');
+        });
+
         if (options.timeout > 0) {
             req.setTimeout(options.timeout, function () {
                 the._ignoreError = true;
                 req.abort();
                 controller.nextTick(function () {
-                    var requestTimeoutError = 'request timeout ' + options.timeout + 'ms';
+                    var requestTimeoutError = ' request timeout ' + options.timeout + 'ms';
                     the.debug(requestTimeoutError);
                     the.emit('error', new Error(requestTimeoutError));
                 });
             });
         }
-
-
     },
 
 
@@ -393,12 +419,11 @@ var Request = klass.extends(stream.Stream).create({
         var req = the.req;
         var res = the.res;
 
-        the._redirecting = false;
+        //the._redirecting = false;
         the.emit('response', res);
 
         if (options.method === 'HEAD') {
             the._ignoreError = true;
-            req.abort();
             return;
         }
 
@@ -489,6 +514,7 @@ var Request = klass.extends(stream.Stream).create({
         var the = this;
 
         console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', the._stoped);
+        the._pipeFrom = true;
 
         if (the._stoped) {
             return;
@@ -519,13 +545,13 @@ var Request = klass.extends(stream.Stream).create({
      */
     end: function (chunk) {
         var the = this;
-        console.log('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<');
+        console.log('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<', the._redirecting);
 
         if (the._stoped) {
             return;
         }
 
-        if (!the._started) {
+        if (the._redirecting) {
             the._request();
         }
 
