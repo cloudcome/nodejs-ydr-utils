@@ -81,9 +81,17 @@ var Request = klass.extends(stream.Stream).create({
         the._requestTimes = 0;
         the._cookies = the._options.cookie || {};
         the._pipeTo = null;
+        // 是否正在读数据流
         the._reading = false;
+        // 是否正在写数据流
+        the._writing = false;
+        // 是否正在重定向
+        the._redirecting = false;
+        // 是否开始请求
+        the._start = false;
+        // 是否已停止请求
+        the._stop = false;
         the._initEvent();
-        the._request();
     },
 
 
@@ -94,7 +102,13 @@ var Request = klass.extends(stream.Stream).create({
     _initEvent: function () {
         var the = this;
 
-        the.on('new-listener');
+        the.on('newListener', function () {
+            if (the._start || the._stop) {
+                return;
+            }
+
+            the._request();
+        });
     },
 
 
@@ -227,6 +241,11 @@ var Request = klass.extends(stream.Stream).create({
      */
     _buildRequestEnd: function () {
         var the = this;
+
+        if (the._writing) {
+            return;
+        }
+
         var options = the._options;
 
         if (NO_BODY_REQUEST[options.method]) {
@@ -259,6 +278,7 @@ var Request = klass.extends(stream.Stream).create({
         var client = the._url.protocol === 'https:' ? https : http;
         var requestOptions = the._buildRequestOptions();
 
+        the._start = true;
         the._requestTimes++;
         the.debug('will request', options.method, requestOptions);
 
@@ -297,6 +317,7 @@ var Request = klass.extends(stream.Stream).create({
                 }
 
                 the._url = ur.parse(redirectURL);
+                the._redirecting = true;
                 the._request();
                 return;
             }
@@ -307,6 +328,10 @@ var Request = klass.extends(stream.Stream).create({
                     if (the._ignoreError && eventType === 'error') {
                         the._ignoreError = false;
                         return;
+                    }
+
+                    if (eventType === 'abort' || eventType === 'end' || eventType === 'close') {
+                        the._stop = true;
                     }
 
                     var args = allocation.args(arguments);
@@ -459,12 +484,32 @@ var Request = klass.extends(stream.Stream).create({
         return the;
     },
 
-    write: function (chunk) {
+
+    /**
+     * 写，接收流
+     * @returns {*}
+     */
+    write: function () {
         var the = this;
 
+        if (the._redirecting) {
+            return;
+        }
 
+        if (the._reading) {
+            throw new Error('You cannot write after data has been emitted from the response.');
+        }
 
-        return the;
+        if (the._pipeTo) {
+            throw new Error('You can not write after pipe to target.');
+        }
+
+        if (!the.req) {
+            throw new Error('request is undefined.');
+        }
+
+        the._writing = true;
+        return the.req.write.apply(the.req, arguments);
     }
 });
 
