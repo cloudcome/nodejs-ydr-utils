@@ -18,7 +18,7 @@ var delay = function (callback) {
 
 
 describe('request', function () {
-    xit('get nogzip', function (done) {
+    it('get nogzip', function (done) {
         var url = 'https://sp0.baidu.com/5a1Fazu8AA54nxGko9WTAnF6hhy/su?wd=&json=1&p=3';
 
         request({
@@ -38,7 +38,7 @@ describe('request', function () {
         });
     });
 
-    xit('get gzip', function (done) {
+    it('get gzip', function (done) {
         var url = 'https://www.baidu.com';
 
         request({
@@ -58,7 +58,7 @@ describe('request', function () {
         });
     });
 
-    xit('get 30x', function (done) {
+    it('get 30x', function (done) {
         var url = 'https://baidu.com';
 
         request({
@@ -78,7 +78,7 @@ describe('request', function () {
         });
     });
 
-    xit('download', function (done) {
+    it('download', function (done) {
         var url = 'https://ss0.bdstatic.com/5aV1bjqh_Q23odCf/static/superman/img/logo/bd_logo1_31bdc765.png';
         var file = path.join(__dirname, 'request2.png');
 
@@ -91,7 +91,7 @@ describe('request', function () {
         });
     });
 
-    xit('tmall', function (done) {
+    it('tmall', function (done) {
         var url = 'https://detail.tmall.com/item.htm?id=525112500172';
 
         request({
@@ -111,7 +111,7 @@ describe('request', function () {
         });
     });
 
-    xit('browser false', function (done) {
+    it('browser false', function (done) {
         var url = 'https://baidu.com';
 
         request({
@@ -123,7 +123,7 @@ describe('request', function () {
         });
     });
 
-    xit('pipe to', function (done) {
+    it('pipe to', function (done) {
         var url = 'https://ss0.bdstatic.com/5aV1bjqh_Q23odCf/static/superman/img/logo/bd_logo1_31bdc765.png';
         var file = path.join(__dirname, 'request1.png');
 
@@ -137,7 +137,7 @@ describe('request', function () {
 
     it('pipe from 1', function (done) {
         var file = path.join(__dirname, 'image.png');
-        var url = 'http://192.168.0.162:10000/2/';
+        var url = 'http://baidu.com/';
         var req = request({
             debug: true,
             url: url,
@@ -156,7 +156,7 @@ describe('request', function () {
         });
     });
 
-    xit('pipe from 2', function (done) {
+    it('pipe from 2', function (done) {
         var file = path.join(__dirname, 'image.png');
         var fd = new FormData();
 
@@ -178,7 +178,7 @@ describe('request', function () {
         delay(done);
     });
 
-    xit('callback', function (done) {
+    it('callback', function (done) {
         var url = 'https://detail.tmall.com/item.htm?id=525112500172';
 
         request({
