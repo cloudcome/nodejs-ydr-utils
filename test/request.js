@@ -12,7 +12,7 @@ var ur = require('url');
 
 
 describe('request', function () {
-    it('get nogzip', function (done) {
+    xit('get nogzip', function (done) {
         var url = 'https://sp0.baidu.com/5a1Fazu8AA54nxGko9WTAnF6hhy/su?wd=&json=1&p=3';
 
         request({
@@ -32,7 +32,7 @@ describe('request', function () {
         });
     });
 
-    it('get gzip', function (done) {
+    xit('get gzip', function (done) {
         var url = 'https://www.baidu.com';
 
         request({
@@ -52,7 +52,7 @@ describe('request', function () {
         });
     });
 
-    it('get 30x', function (done) {
+    xit('get 30x', function (done) {
         var url = 'https://baidu.com';
 
         request({
@@ -72,7 +72,7 @@ describe('request', function () {
         });
     });
 
-    it('pipe to', function (done) {
+    xit('pipe to', function (done) {
         var url = 'https://ss0.bdstatic.com/5aV1bjqh_Q23odCf/static/superman/img/logo/bd_logo1_31bdc765.png';
         var file = path.join(__dirname, 'request1.png');
 
@@ -84,7 +84,7 @@ describe('request', function () {
         });
     });
 
-    it('download', function (done) {
+    xit('download', function (done) {
         var url = 'https://ss0.bdstatic.com/5aV1bjqh_Q23odCf/static/superman/img/logo/bd_logo1_31bdc765.png';
         var file = path.join(__dirname, 'request2.png');
 
@@ -97,7 +97,7 @@ describe('request', function () {
         });
     });
 
-    it('tmall', function (done) {
+    xit('tmall', function (done) {
         var url = 'https://detail.tmall.com/item.htm?id=525112500172';
 
         request({
@@ -117,7 +117,7 @@ describe('request', function () {
         });
     });
 
-    it('browser false', function (done) {
+    xit('browser false', function (done) {
         var url = 'https://baidu.com';
 
         request({
@@ -129,7 +129,7 @@ describe('request', function () {
         });
     });
 
-    it('pipe from', function (done) {
+    xit('pipe from 1', function (done) {
         var file = path.join(__dirname, 'image.png');
         var url = 'http://192.168.0.162:10000/3/';
         var req = request({
@@ -143,6 +143,30 @@ describe('request', function () {
         req.form('file', fs.createReadStream(file), 'image.png');
 
         req.on('body', function (body) {
+            console.log(body);
+            done();
+        });
+    });
+
+    it('pipe from 2', function (done) {
+        var file = path.join(__dirname, 'image.png');
+        var fd = new request.FormData();
+
+        fd.append('user', 'cloudcome');
+        fd.append('file', fs.createReadStream(file), {
+            contentType: 'image/png'
+        });
+
+        var url = 'http://192.168.0.162:10000/3/';
+        var req = request({
+            debug: true,
+            url: url,
+            method: 'post',
+            timeout: 2000,
+            headers: fd.getHeaders({})
+        });
+
+        fd.pipe(req).on('body', function (body) {
             console.log(body);
             done();
         });

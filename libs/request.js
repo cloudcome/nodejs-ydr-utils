@@ -402,24 +402,6 @@ var Request = klass.extends(stream.Stream).create({
                 return;
             }
 
-            // pipe event to instance
-            //dato.each(READABLE_STREAM_EVENTS, function (index, eventType) {
-            //    res.on(eventType, function () {
-            //        if (the._ignoreError && eventType === 'error') {
-            //            the._ignoreError = false;
-            //            return;
-            //        }
-            //
-            //        if (eventType === 'abort' || eventType === 'end' || eventType === 'close') {
-            //            the._stoped = true;
-            //        }
-            //
-            //        var args = allocation.args(arguments);
-            //        args.unshift(eventType);
-            //        the.emit.apply(the, args);
-            //    });
-            //});
-
             the._receiveResponse();
         });
 
@@ -629,6 +611,61 @@ var Request = klass.extends(stream.Stream).create({
         the._forms.push([key, val, options]);
 
         return the;
+    },
+
+
+    /**
+     * 写，接收流
+     * @returns {*}
+     */
+    write: function () {
+        var the = this;
+
+        the._pipeFrom = true;
+
+        if (the._stoped) {
+            return;
+        }
+
+        if (the._reading) {
+            throw new Error('You cannot write after data has been emitted from the response.');
+        }
+
+        if (the._pipeTo) {
+            throw new Error('You can not write after pipe to target.');
+        }
+
+        the._writing = true;
+
+        if (!the._started) {
+            the._request();
+        }
+
+        return the.req.write.apply(the.req, arguments);
+    },
+
+
+    /**
+     * 写，接收流
+     * @param chunk
+     */
+    end: function (chunk) {
+        var the = this;
+
+        if (the._stoped) {
+            return;
+        }
+
+        if (!the._started) {
+            the._pipeFrom = true;
+            the._request();
+        }
+
+        if (chunk) {
+            the.write(chunk);
+        }
+
+        the.req.end.apply(the.req, arguments);
     }
 });
 
