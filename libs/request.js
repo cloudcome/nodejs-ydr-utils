@@ -289,7 +289,7 @@ var Request = klass.extends(stream.Stream).create({
             var streamHeaders = the._stream.getHeaders({});
             the.debug('request stream', '\n', the._stream);
             dato.extend(requestOptions.headers, streamHeaders);
-        } else if (!the._stream) {
+        } else {
             var requestBody = options.body;
 
             if (typeis.plainObject(options.body)) {
@@ -331,6 +331,7 @@ var Request = klass.extends(stream.Stream).create({
         }
 
         if (the._stream) {
+            console.log('========================================== stream pipe');
             the._stream.pipe(the.req);
         } else {
             the.req.end(the._requestBody);
@@ -397,10 +398,12 @@ var Request = klass.extends(stream.Stream).create({
                     return;
                 }
 
+                the._buildCookies();
                 the._url = ur.parse(redirectURL);
                 the._redirecting = true;
-                the._buildCookies();
                 the._started = false;
+                the.req = null;
+                the.res = null;
                 the._request();
 
                 return;

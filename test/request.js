@@ -134,14 +134,14 @@ describe('request', function () {
         });
     });
 
-    xit('pipe from 1', function (done) {
+    it('pipe from 1', function (done) {
         var file = path.join(__dirname, 'image.png');
-        var url = 'http://192.168.0.162:10000/3/';
+        var url = 'http://192.168.0.162:10000/2/';
         var req = request({
             debug: true,
             url: url,
             method: 'post',
-            timeout: 2000
+            timeout: 3000
         });
 
         req.form('user', 'cloudcome');
@@ -175,7 +175,7 @@ describe('request', function () {
         delay(done);
     });
 
-    it('callback', function (done) {
+    xit('callback', function (done) {
         var url = 'https://detail.tmall.com/item.htm?id=525112500172';
 
         request({
