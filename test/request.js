@@ -72,7 +72,7 @@ describe('request', function () {
         });
     });
 
-    xit('pipe to', function (done) {
+    it('pipe to', function (done) {
         var url = 'https://ss0.bdstatic.com/5aV1bjqh_Q23odCf/static/superman/img/logo/bd_logo1_31bdc765.png';
         var file = path.join(__dirname, 'request1.png');
 
@@ -82,7 +82,9 @@ describe('request', function () {
             console.log('closed');
         }).on('end', function () {
             console.log('end');
-        }).pipe(fs.createWriteStream(file));
+        }).pipe(fs.createWriteStream(file)).on('end', function () {
+            done();
+        });
     });
 
     xit('download', function (done) {
@@ -95,12 +97,6 @@ describe('request', function () {
         }).on('body', function (body) {
             fs.writeFileSync(file, body);
             done();
-        }).on('data', function (chunk) {
-            console.log('data', chunk.length);
-        }).on('close', function () {
-            console.log('closed');
-        }).on('end', function () {
-            console.log('end');
         });
     });
 

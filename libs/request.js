@@ -69,13 +69,17 @@ var defaults = {
     debug: false
 };
 var Request = klass.extends(stream.Stream).create({
-    constructor: function (options) {
+    constructor: function (options, callback) {
         var the = this;
 
         if (typeis.String(options)) {
             options = {
                 url: options
             };
+        }
+
+        if (typeis.Function(callback)) {
+            the._callback = callback;
         }
 
         the.id = random.guid();
@@ -121,6 +125,17 @@ var Request = klass.extends(stream.Stream).create({
                 });
             }
         });
+
+        if (the._callback) {
+            controller.nextTick(function () {
+                the.on('error', function (err) {
+                    the._callback.call(the, err);
+                });
+                the.on('body', function (body) {
+                    the._callback.call(the, null, body, the.res);
+                });
+            });
+        }
     },
 
 
@@ -504,12 +519,7 @@ var Request = klass.extends(stream.Stream).create({
         resContent.setEncoding(options.encoding);
         the.emit('response', resContent);
 
-        resContent.on('data', function (chunk) {
-            the._reading = true;
-            bfList.push(new Buffer(chunk, options.encoding));
-            the.emit('data', chunk);
-        }).on('end', function () {
-            the.emit('end');
+        var callbackResponse = controller.once(function () {
             var bfCollection = Buffer.concat(bfList);
 
             if (isUTF8) {
@@ -517,12 +527,18 @@ var Request = klass.extends(stream.Stream).create({
             } else {
                 the.emit('body', new Buffer(bfCollection));
             }
+        });
+
+        resContent.on('data', function (chunk) {
+            the._reading = true;
+            bfList.push(new Buffer(chunk, options.encoding));
+            the.emit('data', chunk);
+        }).on('end', function () {
+            the.emit('end');
+            callbackResponse();
         }).on('close', function () {
             the.emit('close');
-            var responseCloseError = 'response is closed';
-            the.debug(responseCloseError);
-            the.emit('error', new Error(responseCloseError));
-            bfList = null;
+            callbackResponse();
         });
     },
 
