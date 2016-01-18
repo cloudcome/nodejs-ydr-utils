@@ -94,6 +94,7 @@ var Request = klass.extends(stream.Stream).create({
         the._stoped = false;
         // 是否暂停数据流出
         the._paused = false;
+        the._onData = false;
         the._initEvent();
     },
 
@@ -105,14 +106,11 @@ var Request = klass.extends(stream.Stream).create({
     _initEvent: function () {
         var the = this;
 
-        //the.on('newListener', function (et) {
-        //    console.log('22222222222222222222222222222222222222', et);
-        //    if (the._start || the._stop) {
-        //        return;
-        //    }
-        //
-        //    the._request();
-        //});
+        the.on('newListener', function (et) {
+            if (et === 'data') {
+                the._onData = true;
+            }
+        });
     },
 
 
@@ -422,10 +420,10 @@ var Request = klass.extends(stream.Stream).create({
         var res = the.res;
 
         //the._redirecting = false;
-        the.emit('response', res);
 
         if (options.method === 'HEAD') {
             the._ignoreError = true;
+            the.emit('response', res);
             return;
         }
 
@@ -441,6 +439,7 @@ var Request = klass.extends(stream.Stream).create({
 
         if (the._pipeTo) {
             resContent.pipe(the._pipeTo);
+            the.emit('response', resContent);
             return;
         }
 
@@ -452,18 +451,22 @@ var Request = klass.extends(stream.Stream).create({
 
         the.resContent = resContent;
         resContent.setEncoding(options.encoding);
-        resContent.on('data', function (chunk) {
-            the._reading = true;
-            bfList.push(new Buffer(chunk, options.encoding));
-        }).on('end', function () {
-            var bfCollection = Buffer.concat(bfList);
+        the.emit('response', resContent);
 
-            if (isUTF8) {
-                the.emit('body', bfCollection.toString());
-            } else {
-                the.emit('body', new Buffer(bfCollection));
-            }
-        });
+        if (!the._onData) {
+            resContent.on('data', function (chunk) {
+                the._reading = true;
+                bfList.push(new Buffer(chunk, options.encoding));
+            }).on('end', function () {
+                var bfCollection = Buffer.concat(bfList);
+
+                if (isUTF8) {
+                    the.emit('body', bfCollection.toString());
+                } else {
+                    the.emit('body', new Buffer(bfCollection));
+                }
+            });
+        }
     },
 
 
@@ -553,6 +556,12 @@ var Request = klass.extends(stream.Stream).create({
         }
 
         if (the._redirecting) {
+            the._request();
+            return;
+        }
+
+        if (!the._started) {
+            the._pipeFrom = true;
             the._request();
         }
 
