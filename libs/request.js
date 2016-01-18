@@ -61,7 +61,6 @@ var defaults = {
         'AppleWebKit/537.51.1 (KHTML, like Gecko) Version/7.0 Mobile/11A465 Safari/9537.53 ' +
         moduleName,
         'cache-control': 'no-cache',
-        connection: 'keep-alive',
         host: true,
         origin: true,
         referrer: true,
@@ -443,7 +442,7 @@ var Request = klass.extends(stream.Stream).create({
                 the._ignoreError = true;
                 req.abort();
                 controller.nextTick(function () {
-                    var requestTimeoutError = ' request timeout ' + options.timeout + 'ms';
+                    var requestTimeoutError = 'request timeout ' + options.timeout + 'ms';
                     the.debug(requestTimeoutError);
                     the.emit('error', new Error(requestTimeoutError));
                 });

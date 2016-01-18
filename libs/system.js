@@ -124,7 +124,7 @@ exports.remoteIP = function (req, callback) {
 
         // 任务结束条件
         .until(function (ip) {
-            return ip !== '';
+            return ip && ip !== '';
         })
         .together(function (err, ip) {
             callback(null, ip);

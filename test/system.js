@@ -21,7 +21,7 @@ describe('system', function () {
 
     it('remoteIP', function (done) {
         system.remoteIP(function (err, ip) {
-            console.log(ip.replace(/\./g, '。'));
+            console.log(ip);
             assert.equal(ip !== '', true);
             done();
         });
