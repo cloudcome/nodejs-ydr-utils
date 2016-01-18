@@ -434,6 +434,15 @@ var Request = klass.extends(stream.Stream).create({
             the.emit('error', err);
         });
 
+        req.on('close', function () {
+            if (the._ignoreError) {
+                the._ignoreError = false;
+                return;
+            }
+
+            the.emit('error', new Error('request is closed'));
+        });
+
         req.on('drain', function () {
             the.emit('drain');
         });
@@ -533,13 +542,12 @@ var Request = klass.extends(stream.Stream).create({
         resContent.on('data', function (chunk) {
             the._reading = true;
             bfList.push(new Buffer(chunk, options.encoding));
-            the.emit('data', chunk);
         }).on('end', function () {
-            the.emit('end');
             callbackResponse();
         }).on('close', function () {
-            the.emit('close');
-            callbackResponse();
+            the.emit('error', new Error('response is closed'));
+        }).on('error', function (err) {
+            the.emit('error', err);
         });
     },
 
