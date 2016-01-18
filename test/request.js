@@ -88,6 +88,9 @@ describe('request', function () {
         }).on('body', function (body) {
             fs.writeFileSync(file, body);
             done();
+        }).on('error', function () {
+            console.log('error');
+            done();
         });
     });
 
@@ -127,6 +130,9 @@ describe('request', function () {
             browser: false
         }).on('response', function (res) {
             done();
+        }).on('error', function () {
+            console.log('error');
+            done();
         });
     });
 
@@ -138,6 +144,9 @@ describe('request', function () {
             url: url,
             debug: true
         }).pipe(fs.createWriteStream(file)).on('close', function () {
+            done();
+        }).on('error', function () {
+            console.log('error');
             done();
         });
     });
@@ -182,7 +191,9 @@ describe('request', function () {
             headers: fd.getHeaders({})
         });
 
-        fd.pipe(req);
+        fd.pipe(req).on('error', function () {
+            console.log('error');
+        });
         delay(done);
     });
 

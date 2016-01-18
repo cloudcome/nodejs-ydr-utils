@@ -388,7 +388,6 @@ var Request = klass.extends(stream.Stream).create({
                 the._urlMap[redirectURL] = the._urlMap[redirectURL] || 0;
                 the._urlMap[redirectURL]++;
                 the._ignoreError = true;
-                req.abort();
                 the.debug('request redirect to', redirectURL);
 
                 if (the._urlMap[redirectURL] > 2) {
