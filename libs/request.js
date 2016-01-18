@@ -542,9 +542,12 @@ var Request = klass.extends(stream.Stream).create({
         resContent.on('data', function (chunk) {
             the._reading = true;
             bfList.push(new Buffer(chunk, options.encoding));
+            the.emit('data', chunk);
         }).on('end', function () {
             callbackResponse();
+            the.emit('end');
         }).on('close', function () {
+            the.emit('close');
             the.emit('error', new Error('response is closed'));
         }).on('error', function (err) {
             the.emit('error', err);
