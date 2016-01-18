@@ -115,7 +115,9 @@ var Request = klass.extends(stream.Stream).create({
 
         the.on('newListener', function (et) {
             if (autoStartEventTypes[et]) {
-                the._request();
+                controller.nextTick(function () {
+                    the._request();
+                });
             }
         });
     },
@@ -230,7 +232,7 @@ var Request = klass.extends(stream.Stream).create({
         var the = this;
         var options = the._options;
 
-        if (the._pipeFrom || the._stream) {
+        if (the._pipeFrom) {
             return;
         }
 
@@ -240,11 +242,9 @@ var Request = klass.extends(stream.Stream).create({
         }
 
         if (the._stream) {
-            if (the._stream instanceof stream.Stream && the._stream instanceof FormData) {
-                var streamHeaders = the._stream.getHeaders({});
-                the.debug('request stream', '\n', streamHeaders);
-                dato.extend(requestOptions, streamHeaders);
-            }
+            var streamHeaders = the._stream.getHeaders({});
+            the.debug('request stream', '\n', streamHeaders);
+            dato.extend(requestOptions, streamHeaders);
         } else {
             var requestBody = options.body;
 
@@ -277,7 +277,6 @@ var Request = klass.extends(stream.Stream).create({
             if (the._redirecting) {
                 throw new Error('do not support redirect stream, please us `#stream` method instead');
             }
-
             return;
         }
 

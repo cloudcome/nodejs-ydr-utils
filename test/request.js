@@ -168,6 +168,8 @@ describe('request', function () {
             timeout: 2000
         });
 
+        req.stream(fd);
+
         req.on('response', function (res) {
             console.log(res.headers);
         }).on('body', function (body) {
