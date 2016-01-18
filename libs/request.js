@@ -683,31 +683,31 @@ Request.defaults = defaults;
 Request.FormData = FormData;
 
 
-var request = function (options) {
-    return new Request(options);
+var request = function (options, callback) {
+    return new Request(options, callback);
 };
 
 request.defaults = defaults;
 request.Request = Request;
 request.FormData = FormData;
-request.get = function (url) {
+request.get = function (url, callback) {
     return new Request({
         url: url,
         method: 'get'
-    });
+    }, callback);
 };
-request.post = function (url) {
+request.post = function (url, callback) {
     return new Request({
         url: url,
         method: 'post'
-    });
+    }, callback);
 };
-request.down = request.download = function (url) {
+request.down = request.download = function (url, callback) {
     return new Request({
         url: url,
         method: 'get',
         encoding: 'binary'
-    });
+    }, callback);
 };
 
 module.exports = request;
