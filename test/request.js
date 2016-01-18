@@ -5,7 +5,7 @@ var fs = require('fs');
 var path = require('path');
 
 var request = require('../libs/request.js');
-//var request2 = require('request');
+var request2 = require('request');
 //var request3 = require('superagent');
 var http = require('http');
 var ur = require('url');
@@ -151,6 +151,27 @@ describe('request', function () {
 
     it('pipe from1', function (done) {
         var file = fs.readFileSync(path.join(__dirname, 'image.png'));
+        var url = 'http://192.168.0.162:10000/3/';
+        var req = request({
+            debug: true,
+            url: url,
+            method: 'post',
+            timeout: 2000
+        });
+
+        req.form('user', 'cloudcome');
+        req.form('file', file);
+
+        //req.stream(fd);
+
+        req.on('body', function (body) {
+            console.log(body);
+            done();
+        });
+    });
+
+    xit('pipe from2', function (done) {
+        var file = fs.readFileSync(path.join(__dirname, 'image.png'));
         var fd = new FormData();
 
         fd.append('file', file, {
@@ -160,21 +181,24 @@ describe('request', function () {
         fd.append('user', 'cloudcome');
 
         var url = 'http://192.168.0.162:10000/3/';
-        var req = request({
+        var req = request2({
             debug: true,
             url: url,
             method: 'post',
-            strean: fd,
-            timeout: 2000
+            timeout: 2000,
+            headers: fd.getHeaders({})
         });
 
-        req.stream(fd);
+        //req.stream(fd);
 
-        req.on('response', function (res) {
-            console.log(res.headers);
-        }).on('body', function (body) {
-            console.log(body);
-            done();
+        fd.pipe(req).on('response', function (res) {
+            var body = '';
+            res.on('data', function (chunk) {
+                body += chunk;
+            }).on('end', function () {
+                console.log(body);
+                done();
+            });
         });
     });
 });

@@ -25,6 +25,7 @@ var typeis = require('./typeis.js');
 var random = require('./random.js');
 var allocation = require('./allocation.js');
 var controller = require('./controller.js');
+var mime = require('./mime.js');
 
 // @link https://nodejs.org/api/stream.html#stream_class_stream_readable
 var READABLE_STREAM_EVENTS = ['close', 'data', 'end', 'error', 'readable'];
@@ -101,7 +102,7 @@ var Request = klass.extends(stream.Stream).create({
         the._stoped = false;
         // 是否暂停数据流出
         the._paused = false;
-        the._stream = null;
+        the._forms = [];
         the._initEvent();
     },
 
@@ -225,6 +226,26 @@ var Request = klass.extends(stream.Stream).create({
 
 
     /**
+     * 构建 form-data 表单
+     * @returns {FormData|exports|module.exports|*}
+     * @private
+     */
+    _buildForms: function () {
+        var the = this;
+
+        var fd = new FormData();
+        dato.each(the._forms, function (index, item) {
+            if(item[1])
+
+
+            fd.append.apply(fd, item);
+        });
+
+        return fd;
+    },
+
+
+    /**
      * 构建请求头
      * @private
      */
@@ -241,7 +262,8 @@ var Request = klass.extends(stream.Stream).create({
             return;
         }
 
-        if (the._stream) {
+        if (the._forms.length) {
+            the._stream = the._buildForms();
             var streamHeaders = the._stream.getHeaders({});
             the.debug('request stream', '\n', streamHeaders);
             dato.extend(requestOptions, streamHeaders);
@@ -291,6 +313,7 @@ var Request = klass.extends(stream.Stream).create({
             the.req.end(the._requestBody);
         }
     },
+
 
     /**
      * 实际请求
@@ -476,6 +499,7 @@ var Request = klass.extends(stream.Stream).create({
         the.resContent = resContent;
         resContent.setEncoding(options.encoding);
         the.emit('response', resContent);
+
         resContent.on('data', function (chunk) {
             the._reading = true;
             bfList.push(new Buffer(chunk, options.encoding));
@@ -541,66 +565,6 @@ var Request = klass.extends(stream.Stream).create({
 
 
     /**
-     * 写，接收流
-     * @returns {*}
-     */
-    write: function () {
-        var the = this;
-
-        the._pipeFrom = true;
-
-        if (the._stoped) {
-            return;
-        }
-
-        if (the._reading) {
-            throw new Error('You cannot write after data has been emitted from the response.');
-        }
-
-        if (the._pipeTo) {
-            throw new Error('You can not write after pipe to target.');
-        }
-
-        the._writing = true;
-
-        if (!the._started) {
-            the._request();
-        }
-
-        return the.req.write.apply(the.req, arguments);
-    },
-
-
-    /**
-     * 写，接收流
-     * @param chunk
-     */
-    end: function (chunk) {
-        var the = this;
-
-        if (the._stoped) {
-            return;
-        }
-
-        if (the._redirecting) {
-            the._request();
-            return;
-        }
-
-        if (!the._started) {
-            the._pipeFrom = true;
-            the._request();
-        }
-
-        if (chunk) {
-            the.write(chunk);
-        }
-
-        the.req.end.apply(the.req, arguments);
-    },
-
-
-    /**
      * pause
      */
     pause: function () {
@@ -629,16 +593,16 @@ var Request = klass.extends(stream.Stream).create({
 
 
     /**
-     * 添加 stream
-     * @param _stream
+     * 添加 form-data
+     * @param key
+     * @param val
+     * @param [options]
      * @returns {Request}
      */
-    stream: function (_stream) {
+    form: function (key, val, options) {
         var the = this;
 
-        if (_stream && _stream instanceof stream.Stream && _stream instanceof FormData) {
-            the._stream = _stream;
-        }
+        the._forms.push([key, val, options]);
 
         return the;
     }
@@ -646,6 +610,7 @@ var Request = klass.extends(stream.Stream).create({
 
 Request.defaults = defaults;
 Request.FormData = FormData;
+
 
 var request = function (options) {
     return new Request(options);
