@@ -27,12 +27,11 @@ var req = request({
     timeout: 3000
 });
 
-req.form('user', 'cloudcome');
-req.form('file', fs.createReadStream(file), 'image.png');
+req.data('user', 'cloudcome');
+req.file('file', file);
 
 req.on('body', function (body) {
     console.log(body);
-    done();
 });
 
 return;

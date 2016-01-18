@@ -13,6 +13,7 @@ var https = require('https');
 var stream = require('stream');
 var qs = require('querystring');
 var ur = require('url');
+var fs = require('fs');
 var zlib = require('zlib');
 var path = require('path');
 var FormData = require('form-data');
@@ -249,10 +250,10 @@ var Request = klass.extends(stream.Stream).create({
      * @returns {FormData|exports|module.exports|*}
      * @private
      */
-    _buildForms: function () {
+    _buildStream: function () {
         var the = this;
-
         var fd = new FormData();
+
         dato.each(the._forms, function (index, item) {
             if (typeis.String(item[2])) {
                 item[2] = {
@@ -286,7 +287,7 @@ var Request = klass.extends(stream.Stream).create({
         }
 
         if (the._forms.length) {
-            the._stream = the._buildForms();
+            the._stream = the._buildStream();
             var streamHeaders = the._stream.getHeaders({});
             the.debug('request stream', '\n', the._stream);
             dato.extend(requestOptions.headers, streamHeaders);
@@ -340,6 +341,7 @@ var Request = klass.extends(stream.Stream).create({
             //    console.log('---------------------------------- end');
             //    the.req.end();
             //});
+            //the._stream.resume();
             the._stream.pipe(the.req);
         } else {
             the.req.end(the._requestBody);
