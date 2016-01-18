@@ -235,8 +235,12 @@ var Request = klass.extends(stream.Stream).create({
 
         var fd = new FormData();
         dato.each(the._forms, function (index, item) {
-            if(item[1])
-
+            if (typeis.String(item[2])) {
+                item[2] = {
+                    contentType: mime.get(path.basename(item[2])),
+                    filename: item[2]
+                };
+            }
 
             fd.append.apply(fd, item);
         });
