@@ -724,23 +724,62 @@ module.exports = function (options, callback) {
 module.exports.defaults = defaults;
 module.exports.Request = Request;
 module.exports.FormData = FormData;
+
+
+/**
+ * get 请求
+ * @param url
+ * @param callback
+ * @returns {Error|Domain|Suite}
+ */
 module.exports.get = function (url, callback) {
-    return new Request({
-        url: url,
-        method: 'get'
-    }, callback);
+    var options = url;
+
+    if (typeis.String(options)) {
+        options = {
+            url: url
+        };
+    }
+
+    options.method = 'GET';
+    return new Request(options, callback);
 };
+
+
+/**
+ * post 请求
+ * @param url
+ * @param callback
+ * @returns {Error|Domain|Suite}
+ */
 module.exports.post = function (url, callback) {
-    return new Request({
-        url: url,
-        method: 'post'
-    }, callback);
+    var options = url;
+
+    if (typeis.String(options)) {
+        options = {
+            url: url
+        };
+    }
+
+    options.method = 'GET';
+    return new Request(options, callback);
 };
+
+/**
+ * 下载
+ * @type {exports.download}
+ */
 module.exports.down = module.exports.download = function (url, callback) {
-    return new Request({
-        url: url,
-        method: 'get',
-        encoding: 'binary'
-    }, callback);
+    var options = url;
+
+    if (typeis.String(options)) {
+        options = {
+            url: url
+        };
+    }
+
+    options.method = 'GET';
+    options.encoding = 'binary';
+    return new Request(options, callback);
 };
 
