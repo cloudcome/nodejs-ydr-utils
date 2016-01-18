@@ -624,19 +624,6 @@ var Request = klass.extends(stream.Stream).create({
     },
 
 
-    stream: function (readStream) {
-        var the = this;
-
-        the._stream = readStream;
-
-        if (!the._started) {
-            the._request();
-        }
-
-        return the;
-    },
-
-
     /**
      * 写，接收流
      * @returns {*}
