@@ -27,8 +27,6 @@ var allocation = require('./allocation.js');
 var controller = require('./controller.js');
 var mime = require('./mime.js');
 
-// @link https://nodejs.org/api/stream.html#stream_class_stream_readable
-var READABLE_STREAM_EVENTS = ['close', 'data', 'end', 'error', 'readable'];
 var NO_BODY_REQUEST = {
     GET: true,
     HEAD: true,
@@ -119,6 +117,7 @@ var Request = klass.extends(stream.Stream).create({
         var the = this;
 
         the.on('newListener', function (et) {
+            console.log('----------------------------- new Listener', et);
             if (autoStartEventTypes[et]) {
                 controller.nextTick(function () {
                     the._request();
@@ -576,10 +575,10 @@ var Request = klass.extends(stream.Stream).create({
     pause: function () {
         var the = this;
 
-        if (!the.resContent) {
-            the._paused = true;
-        } else {
+        if (the.resContent) {
             the.resContent.pause.apply(the.resContent, arguments);
+        } else {
+            the._paused = true;
         }
     },
 
@@ -590,10 +589,10 @@ var Request = klass.extends(stream.Stream).create({
     resume: function () {
         var the = this;
 
-        if (!the.resContent) {
-            the._paused = false;
-        } else {
+        if (the.resContent) {
             the.resContent.resume.apply(the.resContent, arguments);
+        } else {
+            the._paused = false;
         }
     },
 
@@ -614,6 +613,7 @@ var Request = klass.extends(stream.Stream).create({
     },
 
 
+
     /**
      * 写，接收流
      * @returns {*}
@@ -624,7 +624,7 @@ var Request = klass.extends(stream.Stream).create({
         the._pipeFrom = true;
 
         if (the._stoped) {
-            return;
+            return false;
         }
 
         if (the._reading) {
@@ -639,8 +639,10 @@ var Request = klass.extends(stream.Stream).create({
 
         if (!the._started) {
             the._request();
+            return false;
         }
 
+        console.log('0----------------------------0')
         return the.req.write.apply(the.req, arguments);
     },
 
@@ -650,22 +652,24 @@ var Request = klass.extends(stream.Stream).create({
      * @param chunk
      */
     end: function (chunk) {
+        console.log('------------------------------------------------ end');
         var the = this;
 
         if (the._stoped) {
-            return;
+            return false;
         }
 
         if (!the._started) {
             the._pipeFrom = true;
             the._request();
+            return false;
         }
 
         if (chunk) {
             the.write(chunk);
         }
 
-        the.req.end.apply(the.req, arguments);
+        the.req.end();
     }
 });
 
