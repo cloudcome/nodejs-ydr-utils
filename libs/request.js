@@ -343,15 +343,6 @@ var Request = klass.extends(stream.Stream).create({
         }
 
         if (the._stream) {
-            console.log('========================================== stream pipe');
-            //the._stream.on('data', function (chunk) {
-            //    console.log('---------------------------------- chunk', chunk);
-            //    the.req.write(chunk);
-            //}).on('end', function () {
-            //    console.log('---------------------------------- end');
-            //    the.req.end();
-            //});
-            //the._stream.resume();
             the._stream.pipe(the.req);
         } else {
             the.req.end(the._requestBody);

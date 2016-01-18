@@ -17,28 +17,6 @@ var delay = function (callback) {
 };
 
 
-var file = path.join(__dirname, 'image.png');
-var url = 'http://192.168.0.162:10000/2/';
-var req = request({
-    //debug: true,
-    url: url,
-    method: 'post',
-    timeout: 3000
-});
-
-
-req.form('user', 'cloudcome');
-req.form('file', function () {
-    return fs.readFileSync(path.join(__dirname, 'image.png'));
-}, 'image.png');
-
-req.on('body', function (body) {
-    console.log(body);
-});
-
-return;
-
-
 describe('request', function () {
     xit('get nogzip', function (done) {
         var url = 'https://sp0.baidu.com/5a1Fazu8AA54nxGko9WTAnF6hhy/su?wd=&json=1&p=3';
@@ -168,7 +146,9 @@ describe('request', function () {
         });
 
         req.form('user', 'cloudcome');
-        req.form('file', fs.createReadStream(file), 'image.png');
+        req.form('file', function () {
+            return fs.createReadStream(file);
+        }, 'image.png');
 
         req.on('body', function (body) {
             console.log(body);
