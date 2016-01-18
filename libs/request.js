@@ -339,6 +339,7 @@ var Request = klass.extends(stream.Stream).create({
      * @private
      */
     _request: function () {
+        console.log('rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr');
         var the = this;
 
         if (the._started) {
@@ -561,6 +562,10 @@ var Request = klass.extends(stream.Stream).create({
 
         if (writeStream && writeStream.writable && writeStream instanceof stream.Stream) {
             the._pipeTo = writeStream;
+
+            if (!the._started) {
+                the._request();
+            }
         }
 
         return writeStream;

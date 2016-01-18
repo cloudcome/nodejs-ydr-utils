@@ -76,13 +76,7 @@ describe('request', function () {
         var url = 'https://ss0.bdstatic.com/5aV1bjqh_Q23odCf/static/superman/img/logo/bd_logo1_31bdc765.png';
         var file = path.join(__dirname, 'request1.png');
 
-        request(url).on('data', function (chunk) {
-            console.log('data', chunk.length);
-        }).on('close', function () {
-            console.log('closed');
-        }).on('end', function () {
-            console.log('end');
-        }).pipe(fs.createWriteStream(file)).on('end', function () {
+        request(url).pipe(fs.createWriteStream(file)).on('end', function () {
             done();
         });
     });
