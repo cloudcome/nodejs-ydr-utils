@@ -434,15 +434,6 @@ var Request = klass.extends(stream.Stream).create({
             the.emit('error', err);
         });
 
-        req.on('close', function () {
-            if (the._ignoreError) {
-                the._ignoreError = false;
-                return;
-            }
-
-            the.emit('error', new Error('request is closed'));
-        });
-
         req.on('drain', function () {
             the.emit('drain');
         });
