@@ -5,10 +5,14 @@ var fs = require('fs');
 var path = require('path');
 
 var request = require('../libs/request.js');
-//var request2 = require('request');
+var request2 = require('request');
 //var request3 = require('superagent');
 var http = require('http');
 var ur = require('url');
+
+var delay = function (callback) {
+    setTimeout(callback, 500);
+};
 
 
 describe('request', function () {
@@ -158,7 +162,7 @@ describe('request', function () {
         });
 
         var url = 'http://192.168.0.162:10000/3/';
-        var req = request({
+        var req = request2({
             debug: true,
             url: url,
             method: 'post',
@@ -166,10 +170,8 @@ describe('request', function () {
             headers: fd.getHeaders({})
         });
 
-        fd.pipe(req).on('body', function (body) {
-            console.log(body);
-            done();
-        });
+        fd.pipe(req);
+        delay(done);
     });
 
     //xit('pipe from2', function (done) {
