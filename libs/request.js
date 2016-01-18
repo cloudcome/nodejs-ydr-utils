@@ -630,7 +630,7 @@ var Request = klass.extends(stream.Stream).create({
      * @param [options]
      * @returns {Request}
      */
-    form: function (key, val, options) {
+    formData: function (key, val, options) {
         var the = this;
 
         the._forms.push([key, val, options]);
