@@ -15,6 +15,7 @@ var qs = require('querystring');
 var ur = require('url');
 var zlib = require('zlib');
 var path = require('path');
+var FormData = require('form-data');
 
 
 var pkg = require('../package.json');
@@ -32,7 +33,13 @@ var NO_BODY_REQUEST = {
     HEAD: true,
     OPTIONS: true
 };
+var autoStartEventTypes = {
+    response: true,
+    body: true
+};
 var defaults = {
+    query: {},
+    body: {},
     headers: {},
     // 请求方法
     method: 'get',
@@ -94,7 +101,7 @@ var Request = klass.extends(stream.Stream).create({
         the._stoped = false;
         // 是否暂停数据流出
         the._paused = false;
-        the._onData = false;
+        the._stream = null;
         the._initEvent();
     },
 
@@ -107,8 +114,8 @@ var Request = klass.extends(stream.Stream).create({
         var the = this;
 
         the.on('newListener', function (et) {
-            if (et === 'data') {
-                the._onData = true;
+            if (autoStartEventTypes[et]) {
+                the._request();
             }
         });
     },
@@ -216,14 +223,14 @@ var Request = klass.extends(stream.Stream).create({
 
 
     /**
-     * 构建请求长度
+     * 构建请求头
      * @private
      */
-    _buildRequestContentLength: function (requestOptions) {
+    _buildRequestHeaders: function (requestOptions) {
         var the = this;
         var options = the._options;
 
-        if (the._pipeFrom) {
+        if (the._pipeFrom || the._stream) {
             return;
         }
 
@@ -232,19 +239,27 @@ var Request = klass.extends(stream.Stream).create({
             return;
         }
 
-        var requestBody = options.body;
-
-        if (typeis.plainObject(options.body)) {
-            try {
-                requestBody = JSON.stringify(options.body);
-            } catch (err) {
-                requestBody = '';
+        if (the._stream) {
+            if (the._stream instanceof stream.Stream && the._stream instanceof FormData) {
+                var streamHeaders = the._stream.getHeaders({});
+                the.debug('request stream', '\n', streamHeaders);
+                dato.extend(requestOptions, streamHeaders);
             }
-        }
+        } else {
+            var requestBody = options.body;
 
-        the._requestBody = requestBody;
-        requestOptions.headers['content-length'] = Buffer.byteLength(requestBody);
-        the.debug('request body', '\n', requestBody);
+            if (typeis.plainObject(options.body)) {
+                try {
+                    requestBody = JSON.stringify(options.body);
+                } catch (err) {
+                    requestBody = '';
+                }
+            }
+
+            the._requestBody = requestBody;
+            requestOptions.headers['content-length'] = Buffer.byteLength(requestBody);
+            the.debug('request body', '\n', requestBody);
+        }
     },
 
 
@@ -258,10 +273,9 @@ var Request = klass.extends(stream.Stream).create({
 
         the.req.requestId = random.guid();
 
-        console.log('----------------------------- _buildRequestSend', the._pipeFrom, the._redirecting);
         if (the._pipeFrom) {
-            if(the._redirecting){
-
+            if (the._redirecting) {
+                throw new Error('do not support redirect stream, please us `#stream` method instead');
             }
 
             return;
@@ -272,7 +286,11 @@ var Request = klass.extends(stream.Stream).create({
             return;
         }
 
-        the.req.end(the._requestBody);
+        if (the._stream) {
+            the._stream.pipe(the.req);
+        } else {
+            the.req.end(the._requestBody);
+        }
     },
 
     /**
@@ -280,14 +298,18 @@ var Request = klass.extends(stream.Stream).create({
      * @private
      */
     _request: function () {
-        console.log('_request_request_request_request_request');
         var the = this;
+
+        if (the._started) {
+            return;
+        }
+
+        the._started = true;
         var options = the._options;
         var client = the._url.protocol === 'https:' ? https : http;
         var requestOptions = the._buildRequestOptions();
 
-        the._buildRequestContentLength(requestOptions);
-        the._started = true;
+        the._buildRequestHeaders(requestOptions);
         the._requestTimes++;
         the.debug(options.method, requestOptions.url, '\n', requestOptions);
 
@@ -333,8 +355,7 @@ var Request = klass.extends(stream.Stream).create({
                 the._url = ur.parse(redirectURL);
                 the._redirecting = true;
                 the._buildCookies();
-
-
+                the._started = false;
                 the._request();
 
                 return;
@@ -525,7 +546,6 @@ var Request = klass.extends(stream.Stream).create({
      * @returns {*}
      */
     write: function () {
-        console.log('wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww');
         var the = this;
 
         the._pipeFrom = true;
@@ -558,7 +578,6 @@ var Request = klass.extends(stream.Stream).create({
      */
     end: function (chunk) {
         var the = this;
-        console.log('eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee', the._redirecting);
 
         if (the._stoped) {
             return;
@@ -580,37 +599,54 @@ var Request = klass.extends(stream.Stream).create({
 
         the.req.end.apply(the.req, arguments);
     },
-    //
-    //
-    ///**
-    // * pause
-    // */
-    //pause: function () {
-    //    var the = this;
-    //
-    //    if (!the.resContent) {
-    //        the._paused = true;
-    //    } else {
-    //        the.resContent.pause.apply(the.resContent, arguments);
-    //    }
-    //},
-    //
-    //
-    ///**
-    // * resume
-    // */
-    //resume: function () {
-    //    var the = this;
-    //
-    //    if (!the.resContent) {
-    //        the._paused = false;
-    //    } else {
-    //        the.resContent.resume.apply(the.resContent, arguments);
-    //    }
-    //}
+
+
+    /**
+     * pause
+     */
+    pause: function () {
+        var the = this;
+
+        if (!the.resContent) {
+            the._paused = true;
+        } else {
+            the.resContent.pause.apply(the.resContent, arguments);
+        }
+    },
+
+
+    /**
+     * resume
+     */
+    resume: function () {
+        var the = this;
+
+        if (!the.resContent) {
+            the._paused = false;
+        } else {
+            the.resContent.resume.apply(the.resContent, arguments);
+        }
+    },
+
+
+    /**
+     * 添加 stream
+     * @param _stream
+     * @returns {Request}
+     */
+    stream: function (_stream) {
+        var the = this;
+
+        if (_stream && _stream instanceof stream.Stream && _stream instanceof FormData) {
+            the._stream = _stream;
+        }
+
+        return the;
+    }
 });
 
 Request.defaults = defaults;
+Request.FormData = FormData;
 
 var request = function (options) {
     return new Request(options);
@@ -618,6 +654,7 @@ var request = function (options) {
 
 request.defaults = defaults;
 request.Request = Request;
+request.FormData = FormData;
 request.get = function (url) {
     return new Request({
         url: url,

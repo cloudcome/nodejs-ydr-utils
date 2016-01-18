@@ -5,10 +5,12 @@ var fs = require('fs');
 var path = require('path');
 
 var request = require('../libs/request.js');
-var request2 = require('request');
+//var request2 = require('request');
+//var request3 = require('superagent');
 var http = require('http');
 var ur = require('url');
 var FormData = require('form-data');
+
 
 describe('request', function () {
     xit('get nogzip', function (done) {
@@ -157,55 +159,20 @@ describe('request', function () {
         });
         fd.append('user', 'cloudcome');
 
-        var url = 'http://192.168.0.162:10000/2/';
+        var url = 'http://192.168.0.162:10000/3/';
         var req = request({
             debug: true,
             url: url,
             method: 'post',
-            timeout: 2000,
-            headers: fd.getHeaders({})
+            strean: fd,
+            timeout: 2000
         });
 
-        fd.pipe(req).on('response', function (res) {
+        req.on('response', function (res) {
             console.log(res.headers);
         }).on('body', function (body) {
             console.log(body);
             done();
-        });
-    });
-
-    xit('pipe from2', function (done) {
-        var file = fs.readFileSync(path.join(__dirname, 'image.png'));
-        var fd = new FormData();
-
-        fd.append('file', file, {
-            contentType: 'image/png',
-            filename: 'image.png'
-        });
-        fd.append('user', 'cloudcome');
-
-        var url = 'http://192.168.0.162:10000/2/';
-        var req = request2({
-            debug: true,
-            url: url,
-            method: 'post',
-            timeout: 2000,
-            headers: fd.getHeaders({})
-        });
-
-        fd.pipe(req).on('response', function (res) {
-            console.log(res.headers);
-        }).on('response', function (res) {
-            var bfList = [];
-
-            res.on('data', function (chunk) {
-                bfList.push(chunk);
-            }).on('end', function () {
-                var str = Buffer.concat(bfList).toString();
-                console.log('[response] ----------------------------------');
-                console.log(str);
-                done();
-            });
         });
     });
 });
