@@ -339,7 +339,6 @@ var Request = klass.extends(stream.Stream).create({
      * @private
      */
     _request: function () {
-        console.log('rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr');
         var the = this;
 
         if (the._started) {
@@ -560,7 +559,7 @@ var Request = klass.extends(stream.Stream).create({
             throw new Error('You can not specify multiple targets');
         }
 
-        if (writeStream && writeStream.writable && writeStream instanceof stream.Stream) {
+        if (writeStream && writeStream instanceof stream.Stream) {
             the._pipeTo = writeStream;
 
             if (!the._started) {
