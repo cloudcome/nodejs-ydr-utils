@@ -15,8 +15,12 @@ describe('libs/npm.js', function () {
     it('.getLatestVersion', function (done) {
         var name = 'coolie';
         npm.getLatestVersion(name, function (err, version, packageJSON) {
+            if (err) {
+                console.log(err.message);
+                return;
+            }
+
             console.log(name, 'latest version is', version);
-            assert.equal(!err, true);
             assert.equal(version !== '', true);
             done();
         });
