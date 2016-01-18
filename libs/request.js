@@ -521,6 +521,11 @@ var Request = klass.extends(stream.Stream).create({
         the.emit('response', resContent);
 
         var callbackResponse = controller.once(function () {
+            if (the._finished) {
+                return;
+            }
+
+            the._finished = true;
             var bfCollection = Buffer.concat(bfList);
 
             if (isUTF8) {
@@ -528,6 +533,15 @@ var Request = klass.extends(stream.Stream).create({
             } else {
                 the.emit('body', new Buffer(bfCollection));
             }
+        });
+
+        var callbackError = controller.once(function (err) {
+            if (the._finished) {
+                return;
+            }
+
+            the._finished = true;
+            the.emit('error', err);
         });
 
         resContent.on('data', function (chunk) {
@@ -539,10 +553,8 @@ var Request = klass.extends(stream.Stream).create({
             the.emit('end');
         }).on('close', function () {
             the.emit('close');
-            the.emit('error', new Error('response is closed'));
-        }).on('error', function (err) {
-            the.emit('error', err);
-        });
+            callbackError(new Error('response is closed'));
+        }).on('error', callbackError);
     },
 
 
