@@ -196,11 +196,12 @@ exports.parseIP = function (ip, callback) {
                     ret = {};
                 }
 
-                ret.country = ret.country || '';
-                ret.province = ret.province || '';
-                ret.city = ret.city || '';
-                ret.ip = ip;
-                next(null, ret);
+                next(null, {
+                    country: ret.country || '',
+                    province: ret.province || '',
+                    city: ret.city || '',
+                    ip: ip
+                });
             });
         })
         .follow(callback);
