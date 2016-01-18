@@ -150,8 +150,8 @@ describe('request', function () {
     });
 
     it('pipe from1', function (done) {
-        var file = fs.readFileSync(path.join(__dirname, 'image.png'));
-        var url = 'http://192.168.0.162:10000/3/';
+        var file = path.join(__dirname, 'image.png');
+        var url = 'http://192.168.0.162:10000/2/';
         var req = request({
             debug: true,
             url: url,
@@ -160,7 +160,7 @@ describe('request', function () {
         });
 
         req.form('user', 'cloudcome');
-        req.form('file', file, 'image.png');
+        req.form('file', fs.createReadStream(file), 'image.png');
 
         //req.stream(fd);
 
