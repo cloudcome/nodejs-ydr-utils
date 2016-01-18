@@ -6,6 +6,7 @@ var path = require('path');
 
 var request = require('../libs/request.js');
 var request2 = require('request');
+var FormData = require('form-data');
 //var request3 = require('superagent');
 var http = require('http');
 var ur = require('url');
@@ -154,7 +155,7 @@ describe('request', function () {
 
     it('pipe from 2', function (done) {
         var file = path.join(__dirname, 'image.png');
-        var fd = new request.FormData();
+        var fd = new FormData();
 
         fd.append('user', 'cloudcome');
         fd.append('file', fs.createReadStream(file), {
@@ -162,7 +163,7 @@ describe('request', function () {
         });
 
         var url = 'http://192.168.0.162:10000/3/';
-        var req = request2({
+        var req = request({
             debug: true,
             url: url,
             method: 'post',

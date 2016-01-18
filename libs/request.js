@@ -527,10 +527,10 @@ var Request = klass.extends(stream.Stream).create({
 
     /**
      * 流导向
-     * @param target
+     * @param writeStream
      * @returns {Request}
      */
-    pipe: function (target) {
+    pipe: function (writeStream) {
         var the = this;
 
         if (the._reading) {
@@ -541,15 +541,15 @@ var Request = klass.extends(stream.Stream).create({
             throw new Error('You can not specify multiple targets');
         }
 
-        if (target && target instanceof stream.Stream) {
-            the._pipeTo = target;
+        if (writeStream && writeStream instanceof stream.Stream) {
+            the._pipeTo = writeStream;
 
             if (!the._started) {
                 the._request();
             }
         }
 
-        return target;
+        return writeStream;
     },
 
 
