@@ -27,6 +27,7 @@ var allocation = require('./allocation.js');
 var controller = require('./controller.js');
 var mime = require('./mime.js');
 
+
 var NO_BODY_REQUEST = {
     GET: true,
     HEAD: true,
@@ -255,7 +256,7 @@ var Request = klass.extends(stream.Stream).create({
         dato.each(the._forms, function (index, item) {
             if (typeis.String(item[2])) {
                 item[2] = {
-                    contentType: mime.get(path.basename(item[2])),
+                    contentType: mime.get(path.extname(item[2])),
                     filename: item[2]
                 };
             }
@@ -332,6 +333,13 @@ var Request = klass.extends(stream.Stream).create({
 
         if (the._stream) {
             console.log('========================================== stream pipe');
+            //the._stream.on('data', function (chunk) {
+            //    console.log('---------------------------------- chunk', chunk);
+            //    the.req.write(chunk);
+            //}).on('end', function () {
+            //    console.log('---------------------------------- end');
+            //    the.req.end();
+            //});
             the._stream.pipe(the.req);
         } else {
             the.req.end(the._requestBody);
@@ -404,6 +412,8 @@ var Request = klass.extends(stream.Stream).create({
                 the._started = false;
                 the.req = null;
                 the.res = null;
+                the._stream = null;
+                console.log(the);
                 the._request();
 
                 return;
