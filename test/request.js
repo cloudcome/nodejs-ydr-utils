@@ -147,7 +147,7 @@ describe('request', function () {
         });
     });
 
-    it('pipe from1', function (done) {
+    xit('pipe from1', function (done) {
         var file = fs.readFileSync(path.join(__dirname, 'image.png'));
         var fd = new FormData();
 
@@ -155,8 +155,9 @@ describe('request', function () {
             contentType: 'image/png',
             filename: 'image.png'
         });
+        fd.append('user', 'cloudcome');
 
-        var url = 'http://192.168.0.162:10000/3/';
+        var url = 'http://192.168.0.162:10000/2/';
         var req = request({
             debug: true,
             url: url,
@@ -167,17 +168,9 @@ describe('request', function () {
 
         fd.pipe(req).on('response', function (res) {
             console.log(res.headers);
-        }).on('response', function (res) {
-            var bfList = [];
-
-            res.on('data', function (chunk) {
-                bfList.push(chunk);
-            }).on('end', function () {
-                var str = Buffer.concat(bfList).toString();
-                console.log('[response] ----------------------------------');
-                console.log(str);
-                done();
-            });
+        }).on('body', function (body) {
+            console.log(body);
+            done();
         });
     });
 
@@ -189,8 +182,9 @@ describe('request', function () {
             contentType: 'image/png',
             filename: 'image.png'
         });
+        fd.append('user', 'cloudcome');
 
-        var url = 'http://192.168.0.162:10000/3/';
+        var url = 'http://192.168.0.162:10000/2/';
         var req = request2({
             debug: true,
             url: url,

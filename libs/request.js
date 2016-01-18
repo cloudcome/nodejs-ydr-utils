@@ -258,6 +258,7 @@ var Request = klass.extends(stream.Stream).create({
 
         the.req.requestId = random.guid();
 
+        console.log('----------------------------- _buildRequestSend', the._pipeFrom, the._redirecting);
         if (the._pipeFrom) {
             return;
         }
@@ -439,7 +440,6 @@ var Request = klass.extends(stream.Stream).create({
 
         if (the._pipeTo) {
             resContent.pipe(the._pipeTo);
-            the.emit('response', resContent);
             return;
         }
 
@@ -452,21 +452,26 @@ var Request = klass.extends(stream.Stream).create({
         the.resContent = resContent;
         resContent.setEncoding(options.encoding);
         the.emit('response', resContent);
+        resContent.on('data', function (chunk) {
+            the._reading = true;
+            bfList.push(new Buffer(chunk, options.encoding));
+            the.emit('data', chunk);
+        }).on('end', function () {
+            the.emit('end');
+            var bfCollection = Buffer.concat(bfList);
 
-        if (!the._onData) {
-            resContent.on('data', function (chunk) {
-                the._reading = true;
-                bfList.push(new Buffer(chunk, options.encoding));
-            }).on('end', function () {
-                var bfCollection = Buffer.concat(bfList);
-
-                if (isUTF8) {
-                    the.emit('body', bfCollection.toString());
-                } else {
-                    the.emit('body', new Buffer(bfCollection));
-                }
-            });
-        }
+            if (isUTF8) {
+                the.emit('body', bfCollection.toString());
+            } else {
+                the.emit('body', new Buffer(bfCollection));
+            }
+        }).on('close', function () {
+            the.emit('close');
+            var responseCloseError = 'response is closed';
+            the.debug(responseCloseError);
+            the.emit('error', new Error(responseCloseError));
+            bfList = null;
+        });
     },
 
 
@@ -516,6 +521,7 @@ var Request = klass.extends(stream.Stream).create({
      * @returns {*}
      */
     write: function () {
+        console.log('wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww');
         var the = this;
 
         the._pipeFrom = true;
@@ -538,7 +544,6 @@ var Request = klass.extends(stream.Stream).create({
             the._request();
         }
 
-        console.log('wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww');
         return the.req.write.apply(the.req, arguments);
     },
 
@@ -569,36 +574,36 @@ var Request = klass.extends(stream.Stream).create({
             the.write(chunk);
         }
 
-        the.req.end();
+        the.req.end.apply(the.req, arguments);
     },
-
-
-    /**
-     * pause
-     */
-    pause: function () {
-        var the = this;
-
-        if (!the.resContent) {
-            the._paused = true;
-        } else {
-            the.resContent.pause.apply(the.resContent, arguments);
-        }
-    },
-
-
-    /**
-     * resume
-     */
-    resume: function () {
-        var the = this;
-
-        if (!the.resContent) {
-            the._paused = false;
-        } else {
-            the.resContent.resume.apply(the.resContent, arguments);
-        }
-    }
+    //
+    //
+    ///**
+    // * pause
+    // */
+    //pause: function () {
+    //    var the = this;
+    //
+    //    if (!the.resContent) {
+    //        the._paused = true;
+    //    } else {
+    //        the.resContent.pause.apply(the.resContent, arguments);
+    //    }
+    //},
+    //
+    //
+    ///**
+    // * resume
+    // */
+    //resume: function () {
+    //    var the = this;
+    //
+    //    if (!the.resContent) {
+    //        the._paused = false;
+    //    } else {
+    //        the.resContent.resume.apply(the.resContent, arguments);
+    //    }
+    //}
 });
 
 Request.defaults = defaults;
