@@ -255,14 +255,24 @@ var Request = klass.extends(stream.Stream).create({
         var fd = new FormData();
 
         dato.each(the._forms, function (index, item) {
+            var args = [];
+
+            args[0] = item[0];
+
+            if (typeis.Function(item[1])) {
+                args[1] = item[1].call(the);
+            } else {
+                args[1] = item[1];
+            }
+
             if (typeis.String(item[2])) {
-                item[2] = {
+                args[2] = {
                     contentType: mime.get(path.extname(item[2])),
                     filename: item[2]
                 };
             }
 
-            fd.append.apply(fd, item);
+            fd.append.apply(fd, args);
         });
 
         return fd;
@@ -415,7 +425,6 @@ var Request = klass.extends(stream.Stream).create({
                 the.req = null;
                 the.res = null;
                 the._stream = null;
-                console.log(the);
                 the._request();
 
                 return;

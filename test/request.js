@@ -5,6 +5,7 @@ var fs = require('fs');
 var path = require('path');
 
 var request = require('../libs/request.js');
+var random = require('../libs/random.js');
 var request2 = require('request');
 var FormData = require('form-data');
 //var request3 = require('superagent');
@@ -16,19 +17,20 @@ var delay = function (callback) {
 };
 
 
-
-
 var file = path.join(__dirname, 'image.png');
 var url = 'http://192.168.0.162:10000/2/';
 var req = request({
-    debug: true,
+    //debug: true,
     url: url,
     method: 'post',
     timeout: 3000
 });
 
-req.data('user', 'cloudcome');
-req.file('file', file);
+
+req.form('user', 'cloudcome');
+req.form('file', function () {
+    return fs.readFileSync(path.join(__dirname, 'image.png'));
+}, 'image.png');
 
 req.on('body', function (body) {
     console.log(body);
