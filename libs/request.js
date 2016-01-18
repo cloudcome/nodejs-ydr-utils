@@ -117,12 +117,12 @@ var Request = klass.extends(stream.Stream).create({
         var the = this;
 
         the.on('newListener', function (et) {
-            console.log('----------------------------- new Listener', et);
-            if (autoStartEventTypes[et]) {
-                controller.nextTick(function () {
-                    the._request();
-                });
-            }
+            //if (autoStartEventTypes[et]) {
+            //    controller.nextTick(function () {
+            //        console.log('----------------------------- new Listener', et);
+            //        the._request();
+            //    });
+            //}
         });
 
         if (the._callback) {
@@ -313,6 +313,7 @@ var Request = klass.extends(stream.Stream).create({
 
         the.req.requestId = random.guid();
 
+        console.log('ssssssssssssssssssssssssssssssssssssssssss', the._pipeFrom);
         if (the._pipeFrom) {
             if (the._redirecting) {
                 throw new Error('do not support redirect stream, please us `#stream` method instead');
@@ -571,6 +572,7 @@ var Request = klass.extends(stream.Stream).create({
 
     /**
      * pause
+     * @returns {Request}
      */
     pause: function () {
         var the = this;
@@ -580,11 +582,14 @@ var Request = klass.extends(stream.Stream).create({
         } else {
             the._paused = true;
         }
+
+        return the;
     },
 
 
     /**
      * resume
+     * @returns {Request}
      */
     resume: function () {
         var the = this;
@@ -594,6 +599,8 @@ var Request = klass.extends(stream.Stream).create({
         } else {
             the._paused = false;
         }
+
+        return the;
     },
 
 
@@ -613,7 +620,6 @@ var Request = klass.extends(stream.Stream).create({
     },
 
 
-
     /**
      * 写，接收流
      * @returns {*}
@@ -621,10 +627,11 @@ var Request = klass.extends(stream.Stream).create({
     write: function () {
         var the = this;
 
+        console.log('------------------------------------------------ write');
         the._pipeFrom = true;
 
         if (the._stoped) {
-            return false;
+            throw new Error('You cannot write after rquest has been end.');
         }
 
         if (the._reading) {
@@ -642,7 +649,6 @@ var Request = klass.extends(stream.Stream).create({
             return false;
         }
 
-        console.log('0----------------------------0')
         return the.req.write.apply(the.req, arguments);
     },
 
@@ -662,7 +668,6 @@ var Request = klass.extends(stream.Stream).create({
         if (!the._started) {
             the._pipeFrom = true;
             the._request();
-            return false;
         }
 
         if (chunk) {
