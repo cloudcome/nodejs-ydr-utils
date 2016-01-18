@@ -107,6 +107,7 @@ var Request = klass.extends(stream.Stream).create({
         the._stoped = false;
         // 是否暂停数据流出
         the._paused = false;
+        the._finished = false;
         // 可读可写
         the.readable = true;
         the.writable = true;
@@ -394,6 +395,11 @@ var Request = klass.extends(stream.Stream).create({
                     var maxRedirectRepeatTimesError = 'make redirect loop';
                     the.debug(maxRedirectRepeatTimesError);
                     controller.nextTick(function () {
+                        if(the._finished){
+                            return;
+                        }
+
+                        the._finished = true;
                         the.emit('error', new Error(maxRedirectRepeatTimesError));
                     });
                     return;
@@ -403,6 +409,11 @@ var Request = klass.extends(stream.Stream).create({
                     var maxRedirectsError = 'redirect times is over ' + options.maxRedirects;
                     the.debug(maxRedirectsError);
                     controller.nextTick(function () {
+                        if(the._finished){
+                            return;
+                        }
+
+                        the._finished = true;
                         the.emit('error', new Error(maxRedirectsError));
                     });
                     return;
@@ -429,6 +440,11 @@ var Request = klass.extends(stream.Stream).create({
                 return;
             }
 
+            if(the._finished){
+                return;
+            }
+
+            the._finished = true;
             the.emit('error', err);
         });
 
@@ -443,6 +459,12 @@ var Request = klass.extends(stream.Stream).create({
                 controller.nextTick(function () {
                     var requestTimeoutError = 'request timeout ' + options.timeout + 'ms';
                     the.debug(requestTimeoutError);
+
+                    if(the._finished){
+                        return;
+                    }
+
+                    the._finished = true;
                     the.emit('error', new Error(requestTimeoutError));
                 });
             });
