@@ -260,6 +260,10 @@ var Request = klass.extends(stream.Stream).create({
 
         console.log('----------------------------- _buildRequestSend', the._pipeFrom, the._redirecting);
         if (the._pipeFrom) {
+            if(the._redirecting){
+
+            }
+
             return;
         }
 

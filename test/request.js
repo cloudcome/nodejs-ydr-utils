@@ -147,7 +147,7 @@ describe('request', function () {
         });
     });
 
-    xit('pipe from1', function (done) {
+    it('pipe from1', function (done) {
         var file = fs.readFileSync(path.join(__dirname, 'image.png'));
         var fd = new FormData();
 
