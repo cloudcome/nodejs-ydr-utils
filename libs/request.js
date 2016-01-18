@@ -104,6 +104,9 @@ var Request = klass.extends(stream.Stream).create({
         the._stoped = false;
         // 是否暂停数据流出
         the._paused = false;
+        // 可读可写
+        the.readable = true;
+        the.writable = true;
         the._forms = [];
         the._initEvent();
     },
@@ -117,12 +120,12 @@ var Request = klass.extends(stream.Stream).create({
         var the = this;
 
         the.on('newListener', function (et) {
-            //if (autoStartEventTypes[et]) {
-            //    controller.nextTick(function () {
-            //        console.log('----------------------------- new Listener', et);
-            //        the._request();
-            //    });
-            //}
+            if (autoStartEventTypes[et]) {
+                controller.nextTick(function () {
+                    console.log('----------------------------- new Listener', et);
+                    the._request();
+                });
+            }
         });
 
         if (the._callback) {
@@ -285,7 +288,7 @@ var Request = klass.extends(stream.Stream).create({
             var streamHeaders = the._stream.getHeaders({});
             the.debug('request stream', '\n', the._stream);
             dato.extend(requestOptions.headers, streamHeaders);
-        } else {
+        } else if (!the._stream) {
             var requestBody = options.body;
 
             if (typeis.plainObject(options.body)) {
@@ -313,11 +316,11 @@ var Request = klass.extends(stream.Stream).create({
 
         the.req.requestId = random.guid();
 
-        console.log('ssssssssssssssssssssssssssssssssssssssssss', the._pipeFrom);
         if (the._pipeFrom) {
             if (the._redirecting) {
-                throw new Error('do not support redirect stream, please us `#stream` method instead');
+                throw new Error('does not support redirect stream, please use `#stream` method instead');
             }
+
             return;
         }
 
@@ -325,6 +328,8 @@ var Request = klass.extends(stream.Stream).create({
             the.req.end();
             return;
         }
+
+        console.log('sssssssssssssssssssssssssssssssss', the._stream);
 
         if (the._stream) {
             the._stream.pipe(the.req);
@@ -415,7 +420,6 @@ var Request = klass.extends(stream.Stream).create({
         });
 
         req.on('drain', function () {
-            console.log('ddddddddddddddddddddddddddddddddddddd');
             the.emit('drain');
         });
 
@@ -615,6 +619,19 @@ var Request = klass.extends(stream.Stream).create({
         var the = this;
 
         the._forms.push([key, val, options]);
+
+        return the;
+    },
+
+
+    stream: function (readStream) {
+        var the = this;
+
+        the._stream = readStream;
+
+        if (!the._started) {
+            the._request();
+        }
 
         return the;
     },

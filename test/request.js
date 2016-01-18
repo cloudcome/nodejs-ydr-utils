@@ -16,6 +16,33 @@ var delay = function (callback) {
 };
 
 
+var file = path.join(__dirname, 'image.png');
+var fd = new FormData();
+
+fd.append('user', 'cloudcome');
+fd.append('file', fs.createReadStream(file), {
+    contentType: 'image/png'
+});
+
+var url = 'http://192.168.0.162:10000/2/';
+var req = request({
+    debug: true,
+    url: url,
+    method: 'post',
+    timeout: 2000,
+    headers: fd.getHeaders({})
+});
+
+//fd.pipe(req);
+req.stream(fd);
+
+delay(function () {
+    //
+});
+
+return;
+
+
 describe('request', function () {
     xit('get nogzip', function (done) {
         var url = 'https://sp0.baidu.com/5a1Fazu8AA54nxGko9WTAnF6hhy/su?wd=&json=1&p=3';
