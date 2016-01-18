@@ -36,6 +36,7 @@ var autoStartEventTypes = {
     response: true,
     body: true
 };
+var moduleName = pkg.name + '/' + path.basename(__filename) + '/' + pkg.version;
 var defaults = {
     query: {},
     body: {},
@@ -55,7 +56,7 @@ var defaults = {
         'accept-language': 'zh-CN,zh;q=0.8,en;q=0.6',
         'user-agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 7_0 like Mac OS X; en-us) ' +
         'AppleWebKit/537.51.1 (KHTML, like Gecko) Version/7.0 Mobile/11A465 Safari/9537.53 ' +
-        pkg.name + '/' + path.basename(__filename) + '/' + pkg.version,
+        moduleName,
         'cache-control': 'no-cache',
         connection: 'keep-alive',
         host: true,
@@ -122,7 +123,6 @@ var Request = klass.extends(stream.Stream).create({
         the.on('newListener', function (et) {
             if (autoStartEventTypes[et]) {
                 controller.nextTick(function () {
-                    console.log('----------------------------- new Listener', et);
                     the._request();
                 });
             }
@@ -177,8 +177,9 @@ var Request = klass.extends(stream.Stream).create({
             return the;
         }
 
-        console.log();
-        console.log('[REQUEST DEBUG]\n%s', util.format.apply(util, arguments));
+        console.log('');
+        console.log('[' + moduleName + ' DEBUG]');
+        console.log(util.format.apply(util, arguments));
 
         return the;
     },
@@ -328,8 +329,6 @@ var Request = klass.extends(stream.Stream).create({
             the.req.end();
             return;
         }
-
-        console.log('sssssssssssssssssssssssssssssssss', the._stream);
 
         if (the._stream) {
             the._stream.pipe(the.req);
@@ -631,7 +630,6 @@ var Request = klass.extends(stream.Stream).create({
     write: function () {
         var the = this;
 
-        console.log('------------------------------------------------ write');
         the._pipeFrom = true;
 
         if (the._stoped) {
@@ -662,7 +660,6 @@ var Request = klass.extends(stream.Stream).create({
      * @param chunk
      */
     end: function (chunk) {
-        console.log('------------------------------------------------ end');
         var the = this;
 
         if (the._stoped) {
