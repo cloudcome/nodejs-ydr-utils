@@ -717,26 +717,26 @@ Request.defaults = defaults;
 Request.FormData = FormData;
 
 
-var request = function (options, callback) {
+module.exports = function (options, callback) {
     return new Request(options, callback);
 };
 
-request.defaults = defaults;
-request.Request = Request;
-request.FormData = FormData;
-request.get = function (url, callback) {
+module.exports.defaults = defaults;
+module.exports.Request = Request;
+module.exports.FormData = FormData;
+module.exports.get = function (url, callback) {
     return new Request({
         url: url,
         method: 'get'
     }, callback);
 };
-request.post = function (url, callback) {
+module.exports.post = function (url, callback) {
     return new Request({
         url: url,
         method: 'post'
     }, callback);
 };
-request.down = request.download = function (url, callback) {
+module.exports.down = module.exports.download = function (url, callback) {
     return new Request({
         url: url,
         method: 'get',
@@ -744,4 +744,3 @@ request.down = request.download = function (url, callback) {
     }, callback);
 };
 
-module.exports = request;
