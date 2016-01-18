@@ -43,6 +43,7 @@ var defaults = {
     query: {},
     body: {},
     headers: {},
+    cookies: {},
     // 请求方法
     method: 'get',
     // 响应编码
@@ -92,7 +93,7 @@ var Request = klass.extends(stream.Stream).create({
         the._urlMap = {};
         the._urlMap[options.url] = 1;
         the._requestTimes = 0;
-        the._cookies = the._options.cookie || {};
+        the._cookies = the._options.cookies || {};
         the._pipeTo = null;
         the._pipeFrom = null;
         // 是否正在读数据流
@@ -691,6 +692,24 @@ var Request = klass.extends(stream.Stream).create({
         }
 
         the.req.end();
+    },
+
+
+    /**
+     * 跳转历史
+     * @returns {Array}
+     */
+    getRedirectHistory: function () {
+        return this._urlList;
+    },
+
+
+    /**
+     * 携带 cookie
+     * @returns {{}}
+     */
+    getCookies: function () {
+        return this._cookies;
     }
 });
 
