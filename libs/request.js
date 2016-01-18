@@ -268,9 +268,9 @@ var Request = klass.extends(stream.Stream).create({
 
         if (the._forms.length) {
             the._stream = the._buildForms();
-            var streamHeaders = the._stream.getHeaders({});
-            the.debug('request stream', '\n', streamHeaders);
-            dato.extend(requestOptions, streamHeaders);
+            var streamHeaders = the._stream.getCustomHeaders();
+            the.debug('request stream', '\n', the._stream);
+            dato.extend(requestOptions.headers, streamHeaders);
         } else {
             var requestBody = options.body;
 

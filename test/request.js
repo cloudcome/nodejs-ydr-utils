@@ -160,7 +160,7 @@ describe('request', function () {
         });
 
         req.form('user', 'cloudcome');
-        req.form('file', file);
+        req.form('file', file, 'image.png');
 
         //req.stream(fd);
 
