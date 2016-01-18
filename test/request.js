@@ -5,11 +5,10 @@ var fs = require('fs');
 var path = require('path');
 
 var request = require('../libs/request.js');
-var request2 = require('request');
+//var request2 = require('request');
 //var request3 = require('superagent');
 var http = require('http');
 var ur = require('url');
-var FormData = require('form-data');
 
 
 describe('request', function () {
@@ -125,7 +124,7 @@ describe('request', function () {
         });
     });
 
-    xit('browser', function (done) {
+    xit('browser false', function (done) {
         var url = 'https://baidu.com';
 
         request({
@@ -137,21 +136,9 @@ describe('request', function () {
         });
     });
 
-    xit('browser', function (done) {
-        var url = 'https://baidu.com';
-
-        request({
-            debug: true,
-            url: url,
-            browser: false
-        }).on('response', function (res) {
-            done();
-        });
-    });
-
-    it('pipe from1', function (done) {
+    xit('pipe from', function (done) {
         var file = path.join(__dirname, 'image.png');
-        var url = 'http://192.168.0.162:10000/2/';
+        var url = 'http://192.168.0.162:10000/3/';
         var req = request({
             debug: true,
             url: url,
@@ -162,44 +149,42 @@ describe('request', function () {
         req.form('user', 'cloudcome');
         req.form('file', fs.createReadStream(file), 'image.png');
 
-        //req.stream(fd);
-
         req.on('body', function (body) {
             console.log(body);
             done();
         });
     });
 
-    xit('pipe from2', function (done) {
-        var file = fs.readFileSync(path.join(__dirname, 'image.png'));
-        var fd = new FormData();
-
-        fd.append('file', file, {
-            contentType: 'image/png',
-            filename: 'image.png'
-        });
-        fd.append('user', 'cloudcome');
-
-        var url = 'http://192.168.0.162:10000/3/';
-        var req = request2({
-            debug: true,
-            url: url,
-            method: 'post',
-            timeout: 2000,
-            headers: fd.getHeaders({})
-        });
-
-        //req.stream(fd);
-
-        fd.pipe(req).on('response', function (res) {
-            var body = '';
-            res.on('data', function (chunk) {
-                body += chunk;
-            }).on('end', function () {
-                console.log(body);
-                done();
-            });
-        });
-    });
+    //xit('pipe from2', function (done) {
+    //    var file = fs.readFileSync(path.join(__dirname, 'image.png'));
+    //    var fd = new FormData();
+    //
+    //    fd.append('file', file, {
+    //        contentType: 'image/png',
+    //        filename: 'image.png'
+    //    });
+    //    fd.append('user', 'cloudcome');
+    //
+    //    var url = 'http://192.168.0.162:10000/3/';
+    //    var req = request2({
+    //        debug: true,
+    //        url: url,
+    //        method: 'post',
+    //        timeout: 2000,
+    //        headers: fd.getHeaders({})
+    //    });
+    //
+    //    //req.stream(fd);
+    //
+    //    fd.pipe(req).on('response', function (res) {
+    //        var body = '';
+    //        res.on('data', function (chunk) {
+    //            body += chunk;
+    //        }).on('end', function () {
+    //            console.log(body);
+    //            done();
+    //        });
+    //    });
+    //});
 });
 
