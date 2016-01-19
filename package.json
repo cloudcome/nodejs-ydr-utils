@@ -78,6 +78,7 @@
     "fs-extra": "^0.26.2",
     "glob": "^6.0.1",
     "howdo": "^3.3.0",
+    "later": "^1.2.0",
     "marked": "^0.3.5",
     "nodemailer": "^1.11.0",
     "promiseify": "^0.2.0",
