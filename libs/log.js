@@ -23,6 +23,7 @@ var log = function (wrapper, prefix, args) {
     try {
         str += wrapper(util.format.apply(util, args));
     } catch (err) {
+        err.mmmmm = 123;
         return exports.error(err);
     }
 
@@ -68,13 +69,20 @@ exports.warn = function () {
 
 exports.error = function () {
     var args = allocation.args(arguments);
+    var defaultErrorKey = {
+        type: true,
+        message: true,
+        name: true,
+        stack: true
+    };
 
     dato.each(args, function (index, arg) {
         if (arg && arg instanceof Error) {
             var msg = arg.stack || arg.message || String(arg);
+            var name = arg.name || 'Error';
             dato.each(arg, function (key, val) {
-                if (key !== 'stack' && key !== 'message') {
-                    msg += '\n' + key + ': ' + val;
+                if (!defaultErrorKey[key]) {
+                    msg += '\n' + name + ' ' + key + ': ' + val;
                 }
             });
             args[index] = msg;
