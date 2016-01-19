@@ -14,6 +14,13 @@ var allocation = require('../libs/allocation.js');
 var date = require('../libs/date.js');
 var dato = require('../libs/dato.js');
 
+
+/**
+ * 日志出口
+ * @param wrapper
+ * @param prefix
+ * @param args
+ */
 var log = function (wrapper, prefix, args) {
     args = allocation.args(args);
     args.unshift('%s');
@@ -103,6 +110,17 @@ exports.underline = makeColor('underline');
 // ==========================================
 // ================[ output ]================
 // ==========================================
+
+
+/**
+ * 普通日志
+ */
+exports.info = function () {
+    log(function (str) {
+        return str;
+    }, '[INFO]', arguments);
+};
+
 
 
 /**
