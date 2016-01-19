@@ -116,7 +116,11 @@ exports.underline = makeColor('underline');
  * @param args
  */
 var log = function (wrapper, prefix, args) {
-    args = allocation.args(args);
+    args = allocation.args(args).map(function (item) {
+        return util.inspect(item, {
+            depth: 3
+        });
+    });
     args.unshift('%s');
 
     var str = exports.cyan(util.format('\n\n[%s] %s\n', date.format('YYYY-MM-DD HH:mm:ss.SSS'), prefix));
@@ -177,7 +181,7 @@ exports.error = function () {
             var name = arg.name || 'Error';
             dato.each(arg, function (key, val) {
                 if (!defaultErrorKey[key]) {
-                    msg += '\n' + name + ' ' + key + ': ' + val;
+                    msg += '\n' + name + ' ' + key + ': ' + util.format('%s', val);
                 }
             });
             args[index] = msg;
@@ -196,6 +200,9 @@ exports.error = function () {
  */
 exports.__expressStart = function () {
     return function (req, res, next) {
+        exports.info(util.inspect(req.query, {
+            depth: 3
+        }));
         req.$fullURL = req.protocol + '://' + req.headers.host + req.url;
 
         next();
@@ -211,7 +218,6 @@ exports.__expressStart = function () {
 exports.__expressEnd = function () {
     return function (err, req, res, next) {
         if (err && err instanceof Error) {
-            err.express = true;
             err['request url'] = req.$fullURL;
             err['request headers'] = req.headers;
             err['request query'] = req.query;
