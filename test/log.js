@@ -11,7 +11,7 @@ var log = require('../libs/log.js');
 
 
 describe('log', function () {
-    xit('make color', function () {
+    it('make color', function () {
         console.log(log.red('呵呵', {a: {b: {c: {d: {e: 'f'}}}}}, '后悔'));
         console.log(log.cyan('呵呵', {a: {b: {c: {d: {e: 'f'}}}}}, '后悔'));
         console.log(log.green('呵呵', {a: {b: {c: {d: {e: 'f'}}}}}, '后悔'));
@@ -49,18 +49,18 @@ describe('log', function () {
         log.error('node version is ${node}');
     });
 
-    xit('info', function () {
-        log.info('1111', process.env);
-        log.info('22222', {a: {b: {c: {d: {e: 'f'}}}}}, '后悔');
+    it('info', function () {
+        log.info('info1', process.env);
+        log.info('info2', {a: {b: {c: {d: {e: 'f'}}}}}, '后悔');
     });
 
-    xit('warn', function () {
-        log.warn('1111', this);
-        log.warn('22222', {a: {b: {c: {d: {e: 'f'}}}}}, '后悔');
+    it('warn', function () {
+        log.warn('warn1', this);
+        log.warn('warn2', {a: {b: {c: {d: {e: 'f'}}}}}, '后悔');
     });
 
-    xit('error', function () {
-        log.error('1111', process.versions);
-        log.error('22222', {a: {b: {c: {d: {e: 'f'}}}}}, new Error('xxx'));
+    it('error', function () {
+        log.error('error1', process.versions);
+        log.error('error2', {a: {b: {c: {d: {e: 'f'}}}}}, new Error('xxx'));
     });
 });

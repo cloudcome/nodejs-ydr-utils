@@ -123,9 +123,19 @@ var pretty = function (obj) {
         return obj;
     }
 
-    return util.inspect(obj, {
-        depth: 3
-    });
+    try {
+        return util.inspect(obj, {
+            depth: 3
+        });
+    } catch (err) {
+        var o = {};
+        dato.each(obj, function (key, val) {
+            o[key] = val;
+        });
+        return util.inspect(o, {
+            depth: 3
+        });
+    }
 };
 
 /**
@@ -135,7 +145,12 @@ var pretty = function (obj) {
  * @param args
  */
 var log = function (wrapper, prefix, args) {
-    args = allocation.args(args).map(pretty);
+    try {
+        args = allocation.args(args).map(pretty);
+    } catch (err) {
+        return exports.error(err);
+    }
+
     args.unshift('%s');
 
     var str = exports.cyan(util.format('\n\n[%s] %s\n', date.format('YYYY-MM-DD HH:mm:ss.SSS'), prefix));
@@ -143,7 +158,6 @@ var log = function (wrapper, prefix, args) {
     try {
         str += wrapper(util.format.apply(util, args));
     } catch (err) {
-        err.mmmmm = 123;
         return exports.error(err);
     }
 
