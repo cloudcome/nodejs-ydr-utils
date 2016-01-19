@@ -189,10 +189,36 @@ exports.error = function () {
 };
 
 
-
-
-exports.__express = function () {
+/**
+ * express 日志系统，尽可能的放在中间的最开始
+ * @returns {Function}
+ * @private
+ */
+exports.__expressStart = function () {
     return function (req, res, next) {
+        req.$fullURL = req.protocol + '://' + req.headers.host + req.url;
+
+        next();
+    };
+};
+
+
+/**
+ * express 日志系统，尽可能的放在中间的末尾
+ * @returns {Function}
+ * @private
+ */
+exports.__expressEnd = function () {
+    return function (err, req, res, next) {
+        if (err && err instanceof Error) {
+            err['request url'] = req.$fullURL;
+            err['request headers'] = req.headers;
+            err['request query'] = req.query;
+            err['request body'] = req.body;
+            err['request file'] = req.file;
+            err['request files'] = req.files;
+        }
+
         next();
     };
 };
