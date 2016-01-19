@@ -12,6 +12,7 @@ var colors = require('colors/safe.js');
 
 var allocation = require('../libs/allocation.js');
 var date = require('../libs/date.js');
+var dato = require('../libs/dato.js');
 
 var log = function (wrapper, prefix, args) {
     args = allocation.args(args);
@@ -66,5 +67,20 @@ exports.warn = function () {
 
 
 exports.error = function () {
-    log(colors.red, '[ERROR]', arguments);
+    var args = allocation.args(arguments);
+
+    dato.each(args, function (index, arg) {
+        if (arg && arg instanceof Error) {
+            var msg = arg.stack || arg.message || String(arg);
+            dato.each(arg, function (key, val) {
+                if (key !== 'stack' && key !== 'message') {
+                    msg += '\n' + key + ': ' + val;
+                }
+            });
+            args[index] = msg;
+            return false;
+        }
+    });
+
+    log(colors.red, '[ERROR]', args);
 };
