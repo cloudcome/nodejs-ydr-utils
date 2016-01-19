@@ -39,7 +39,11 @@ describe('log', function () {
     });
 
     it('placeholder', function () {
-        log.placeholder('node', process.env.versions.node);
+        log.placeholder('node', process.versions.node);
+        log.info('node version is ${node}');
+        log.warn('node version is ${node}');
+        log.success('node version is ${node}');
+        log.error('node version is ${node}');
     });
 
     xit('info', function () {

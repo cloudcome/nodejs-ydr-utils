@@ -129,12 +129,23 @@ var log = function (wrapper, prefix, args) {
         return exports.error(err);
     }
 
+    str = string.assign(str, configs.placeholders);
     process.stdout.write(str + '\n');
 };
 
 
 /**
  * 普通日志
+ */
+exports.info = function () {
+    log(function (str) {
+        return str;
+    }, '[INFO]', arguments);
+};
+
+
+/**
+ * 成功日志
  */
 exports.info = function () {
     log(function (str) {
