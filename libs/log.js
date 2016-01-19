@@ -139,7 +139,7 @@ var log = function (wrapper, prefix, args) {
 exports.info = function () {
     log(function (str) {
         return str;
-    }, '[INFORMATION]', arguments);
+    }, '[INFO]', arguments);
 };
 
 
@@ -187,3 +187,13 @@ exports.error = function () {
 
     log(exports.red, '[ERROR]', args);
 };
+
+
+
+
+exports.__express = function () {
+    return function (req, res, next) {
+        next();
+    };
+};
+
