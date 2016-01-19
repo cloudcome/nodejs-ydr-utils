@@ -13,6 +13,6 @@ var log = require('../libs/log.js');
 describe('log', function () {
     it('warn', function () {
         log.warn('1111', this);
-        log.warn('22222', {a: {b: {c: {d: 'e'}}}});
+        log.warn('22222', {a: {b: {c: {d: {e: 'f'}}}}}, '后悔');
     });
 });

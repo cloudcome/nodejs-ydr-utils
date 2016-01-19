@@ -15,9 +15,9 @@ var date = require('../libs/date.js');
 
 var log = function (wrapper, prefix, args) {
     args = allocation.args(args);
-    args.unshift('%s\n');
+    args.unshift('%s');
 
-    var str = colors.cyan(util.format('[%s] %s\n', date.format('YYYY-MM-DD HH:mm:ss.SSS'), prefix));
+    var str = colors.cyan(util.format('\n\n[%s] %s\n', date.format('YYYY-MM-DD HH:mm:ss.SSS'), prefix));
 
     try {
         str += wrapper(util.format.apply(util, args));
@@ -26,7 +26,7 @@ var log = function (wrapper, prefix, args) {
         return exports.error(str);
     }
 
-    process.stdout.write(str);
+    process.stdout.write(str + '\n');
 };
 
 
