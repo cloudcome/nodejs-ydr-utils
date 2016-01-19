@@ -35,6 +35,6 @@ exports.warn = function () {
 };
 
 
-exports.warn = function () {
-    log(colors.yellow, '[WARN]', arguments);
+exports.error = function () {
+    log(colors.red, '[ERROR]', arguments);
 };
