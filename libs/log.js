@@ -286,7 +286,10 @@ exports.__expressStart = function (options) {
  * @returns {Function}
  * @private
  */
-exports.__expressEnd = function () {
+exports.__expressEnd = function (options) {
+    options = dato.extend({
+        inject: {}
+    }, options);
     return function (err, req, res, next) {
         if (err && err instanceof Error) {
             err['request url'] = req.$fullURL;
@@ -308,6 +311,14 @@ exports.__expressEnd = function () {
             if (req.files) {
                 err['request files'] = req.files;
             }
+
+            dato.each(options.inject, function (key, val) {
+                if (typeis.Function(val)) {
+                    err[key] = val(req, res);
+                } else {
+                    err[key] = val;
+                }
+            });
 
             exports.error(err);
         }
