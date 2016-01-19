@@ -39,6 +39,9 @@ describe('log', function () {
     });
 
     it('placeholder', function () {
+        log.config({
+            whiteList: ['error', 'warn']
+        });
         log.placeholder('node', process.versions.node);
         log.info('node version is ${node}');
         log.warn('node version is ${node}');
@@ -46,7 +49,7 @@ describe('log', function () {
         log.error('node version is ${node}');
     });
 
-    it('info', function () {
+    xit('info', function () {
         log.info('1111', process.env);
         log.info('22222', {a: {b: {c: {d: {e: 'f'}}}}}, '后悔');
     });
