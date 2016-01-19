@@ -211,12 +211,14 @@ exports.__expressStart = function () {
 exports.__expressEnd = function () {
     return function (err, req, res, next) {
         if (err && err instanceof Error) {
+            err.express = true;
             err['request url'] = req.$fullURL;
             err['request headers'] = req.headers;
             err['request query'] = req.query;
             err['request body'] = req.body;
             err['request file'] = req.file;
             err['request files'] = req.files;
+            exports.error(err);
         }
 
         next();
