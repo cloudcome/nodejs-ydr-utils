@@ -22,10 +22,18 @@ var log = function (wrapper, prefix, args) {
     try {
         str += wrapper(util.format.apply(util, args));
     } catch (err) {
-        str = err.stack;
-        return exports.error(str);
+        return exports.error(err);
     }
 
+    process.stdout.write(str + '\n');
+};
+
+
+exports.red = function () {
+    var args = allocation.args(arguments);
+
+    args.unshift('\x1b[' + util.inspect.colors.red[0] + 'm%s\x1b[' + util.inspect.colors.red[1] + 'm');
+    var str = util.format.apply(util, args);
     process.stdout.write(str + '\n');
 };
 
