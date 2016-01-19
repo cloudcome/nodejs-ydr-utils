@@ -344,7 +344,7 @@ typeis.file = function (_path) {
 typeis.localIP = function (ip) {
     ip = String(ip).toUpperCase().trim();
 
-    if (ip === '::1' || ip === '[::1]' || ip === 'localhost' || ip.indexOf('127.0.0.1') > -1) {
+    if (ip.indexOf('::') > -1 || ip === 'localhost' || ip.indexOf('127.0.0.1') > -1) {
         return true;
     }
 
