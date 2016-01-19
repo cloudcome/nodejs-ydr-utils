@@ -49,8 +49,38 @@ var makeColor = function (color) {
 };
 
 
+var configs = {
+    whiteList: ['log', 'warn', 'success', 'error'],
+    whiteMap: {}
+};
+
+var buildWhiteMap = function () {
+    configs.whiteMap = {};
+    dato.each(configs.whiteList, function (index, key) {
+        configs.whiteMap[key] = true;
+    });
+};
 
 
+/**
+ * 配置
+ * @returns {*}
+ */
+exports.config = function () {
+    return allocation.getset({
+        get: function (key) {
+            return configs[key];
+        },
+        set: function (key, val) {
+            configs[key] = val;
+
+            if (key === 'whiteList') {
+                buildWhiteMap();
+            }
+        }
+    }, arguments);
+};
+buildWhiteMap();
 
 
 // ==========================================
@@ -68,8 +98,6 @@ exports.magenta = makeColor('magenta');
 exports.bold = makeColor('bold');
 exports.italic = makeColor('italic');
 exports.underline = makeColor('underline');
-
-
 
 
 // ==========================================
