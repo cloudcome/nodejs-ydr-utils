@@ -13,6 +13,8 @@ var allocation = require('../libs/allocation.js');
 var date = require('../libs/date.js');
 var dato = require('../libs/dato.js');
 var string = require('../libs/string.js');
+var typeis = require('../libs/typeis.js');
+var system = require('../libs/system.js');
 
 
 // ==========================================
@@ -108,6 +110,20 @@ exports.underline = makeColor('underline');
 // ================[ output ]================
 // ==========================================
 
+/**
+ * 美化对象输出
+ * @param obj
+ * @returns {*}
+ */
+var pretty = function (obj) {
+    if (typeis.String(obj)) {
+        return obj;
+    }
+
+    return util.inspect(obj, {
+        depth: 3
+    });
+};
 
 /**
  * 日志出口
@@ -116,11 +132,7 @@ exports.underline = makeColor('underline');
  * @param args
  */
 var log = function (wrapper, prefix, args) {
-    args = allocation.args(args).map(function (item) {
-        return util.inspect(item, {
-            depth: 3
-        });
-    });
+    args = allocation.args(args).map(pretty);
     args.unshift('%s');
 
     var str = exports.cyan(util.format('\n\n[%s] %s\n', date.format('YYYY-MM-DD HH:mm:ss.SSS'), prefix));
@@ -181,7 +193,7 @@ exports.error = function () {
             var name = arg.name || 'Error';
             dato.each(arg, function (key, val) {
                 if (!defaultErrorKey[key]) {
-                    msg += '\n' + name + ' ' + key + ': ' + util.format('%s', val);
+                    msg += '\n' + name + ' ' + key + ': ' + pretty(val);
                 }
             });
             args[index] = msg;
@@ -219,6 +231,7 @@ exports.__expressEnd = function () {
     return function (err, req, res, next) {
         if (err && err instanceof Error) {
             err['request url'] = req.$fullURL;
+            err['request ip'] = req.$fullURL;
             err['request headers'] = req.headers;
             err['request query'] = req.query;
             err['request body'] = req.body;
