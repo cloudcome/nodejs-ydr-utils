@@ -8,7 +8,6 @@
 'use strict';
 
 var util = require('util');
-var colors = require('colors/safe.js');
 
 var allocation = require('../libs/allocation.js');
 var date = require('../libs/date.js');
@@ -120,7 +119,7 @@ var log = function (wrapper, prefix, args) {
     args = allocation.args(args);
     args.unshift('%s');
 
-    var str = colors.cyan(util.format('\n\n[%s] %s\n', date.format('YYYY-MM-DD HH:mm:ss.SSS'), prefix));
+    var str = exports.cyan(util.format('\n\n[%s] %s\n', date.format('YYYY-MM-DD HH:mm:ss.SSS'), prefix));
 
     try {
         str += wrapper(util.format.apply(util, args));
@@ -147,10 +146,8 @@ exports.info = function () {
 /**
  * 成功日志
  */
-exports.info = function () {
-    log(function (str) {
-        return str;
-    }, '[INFO]', arguments);
+exports.success = function () {
+    log(exports.green, '[SUCCESS]', arguments);
 };
 
 
@@ -158,7 +155,7 @@ exports.info = function () {
  * 警告日志
  */
 exports.warn = function () {
-    log(colors.yellow, '[WARN]', arguments);
+    log(exports.yellow, '[WARNING]', arguments);
 };
 
 
@@ -188,5 +185,5 @@ exports.error = function () {
         }
     });
 
-    log(colors.red, '[ERROR]', args);
+    log(exports.red, '[ERROR]', args);
 };
