@@ -66,7 +66,7 @@ var debug = function (type, event, msg, options) {
 
     options = dato.extend({}, configs, options);
 
-    var eventArrow = log.gray(options.eventArrow);
+    var eventArrow = log.grey(options.eventArrow);
     var eventAlign = options.eventAlign;
 
     if (options.alignInverse) {
