@@ -252,7 +252,7 @@ exports.__expressEnd = function () {
             exports.error(err);
         }
 
-        next();
+        next(err);
     };
 };
 
