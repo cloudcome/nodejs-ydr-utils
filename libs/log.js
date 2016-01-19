@@ -47,11 +47,17 @@ var makeColor = function (color) {
 };
 
 
+// color
 exports.red = makeColor('red');
 exports.cyan = makeColor('cyan');
 exports.green = makeColor('green');
 exports.yellow = makeColor('yellow');
 exports.magenta = makeColor('magenta');
+
+// style
+exports.bold = makeColor('bold');
+exports.italic = makeColor('italic');
+exports.underline = makeColor('underline');
 
 
 exports.warn = function () {
