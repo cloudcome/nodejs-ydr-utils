@@ -262,7 +262,7 @@ exports.__expressStart = function (options) {
 
         var log = function (ip) {
             if (!options.exclude.test(req.url)) {
-                exports.info(req.method, ip, req.$fullURL);
+                exports.info(ip, req.method, req.$fullURL);
             }
         };
 
