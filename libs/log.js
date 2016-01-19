@@ -212,12 +212,9 @@ exports.error = function () {
  */
 exports.__expressStart = function () {
     return function (req, res, next) {
-        exports.info(util.inspect(req.query, {
-            depth: 3
-        }));
         req.$fullURL = req.protocol + '://' + req.headers.host + req.url;
         system.remoteIP(req, function (err, ip) {
-            req.$ip =ip;
+            req.$ip = ip || '';
             next();
         });
     };
@@ -233,7 +230,7 @@ exports.__expressEnd = function () {
     return function (err, req, res, next) {
         if (err && err instanceof Error) {
             err['request url'] = req.$fullURL;
-            err['request ip'] = req.$fullURL;
+            err['request ip'] = req.$ip;
             err['request headers'] = req.headers;
             err['request query'] = req.query;
             err['request body'] = req.body;
