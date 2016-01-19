@@ -29,14 +29,29 @@ var log = function (wrapper, prefix, args) {
 };
 
 
-exports.red = function () {
-    var msg = util.format.apply(util, arguments);
-    var args = [];
-    args.push('\x1b[' + util.inspect.colors.red[0] + 'm%s\x1b[' + util.inspect.colors.red[1] + 'm');
-    args.push(msg);
-    var str = util.format.apply(util, args);
-    process.stdout.write(str + '\n');
+/**
+ * 颜色包装器
+ * @param color
+ * @returns {Function}
+ */
+var makeColor = function (color) {
+    return function () {
+        var msg = util.format.apply(util, arguments);
+        var args = [];
+
+        args.push('\x1b[' + util.inspect.colors[color][0] + 'm%s\x1b[' + util.inspect.colors[color][1] + 'm');
+        args.push(msg);
+
+        return util.format.apply(util, args);
+    };
 };
+
+
+exports.red = makeColor('red');
+exports.cyan = makeColor('cyan');
+exports.green = makeColor('green');
+exports.yellow = makeColor('yellow');
+exports.magenta = makeColor('magenta');
 
 
 exports.warn = function () {

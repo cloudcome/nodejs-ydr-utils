@@ -12,7 +12,7 @@ var log = require('../libs/log.js');
 
 describe('log', function () {
     it('log', function () {
-        log.red('呵呵', {a: {b: {c: {d: {e: 'f'}}}}}, '后悔');
+        console.log(log.red('呵呵', {a: {b: {c: {d: {e: 'f'}}}}}, '后悔'));
     });
 
     it('warn', function () {
