@@ -216,8 +216,10 @@ exports.__expressStart = function () {
             depth: 3
         }));
         req.$fullURL = req.protocol + '://' + req.headers.host + req.url;
-
-        next();
+        system.remoteIP(req, function (err, ip) {
+            req.$ip =ip;
+            next();
+        });
     };
 };
 
