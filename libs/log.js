@@ -11,16 +11,16 @@ var util = require('util');
 var colors = require('colors/safe.js');
 
 var allocation = require('../libs/allocation.js');
+var date = require('../libs/date.js');
 
 var log = function (wrapper, prefix, args) {
     args = allocation.args(args);
-    args.unshift(prefix);
-    args.unshift('prefix');
-    args.unshift('%s %s\n%s\n');
+    args.unshift('%s\n');
 
-    var str = '';
+    var str = colors.cyan(util.format('[%s] %s\n', date.format('YYYY-MM-DD HH:mm:ss.SSS'), prefix));
+
     try {
-        str = wrapper(util.format.apply(util, args));
+        str += wrapper(util.format.apply(util, args));
     } catch (err) {
         str = err.stack;
         return exports.error(str);
