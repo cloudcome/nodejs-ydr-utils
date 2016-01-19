@@ -128,17 +128,7 @@ var pretty = function (obj) {
             depth: 3
         });
     } catch (err) {
-        var o = {};
-        dato.each(obj, function (key, val) {
-            o[key] = val;
-        });
-        try {
-            return util.inspect(o, {
-                depth: 3
-            });
-        } catch (err) {
-            return formatError(err);
-        }
+        return formatError(err);
     }
 };
 
@@ -180,12 +170,7 @@ var formatError = function (err) {
  * @param args
  */
 var log = function (wrapper, prefix, args) {
-    try {
-        args = allocation.args(args).map(pretty);
-    } catch (err) {
-        return exports.error(err);
-    }
-
+    args = allocation.args(args).map(pretty);
     args.unshift('%s');
 
     var str = exports.cyan(util.format('\n\n[%s] %s\n', date.format('YYYY-MM-DD HH:mm:ss.SSS'), prefix));
