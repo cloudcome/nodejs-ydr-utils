@@ -11,7 +11,7 @@ var log = require('../libs/log.js');
 
 
 describe('log', function () {
-    it('make color', function () {
+    xit('make color', function () {
         console.log(log.red('呵呵', {a: {b: {c: {d: {e: 'f'}}}}}, '后悔'));
         console.log(log.cyan('呵呵', {a: {b: {c: {d: {e: 'f'}}}}}, '后悔'));
         console.log(log.green('呵呵', {a: {b: {c: {d: {e: 'f'}}}}}, '后悔'));
@@ -41,5 +41,10 @@ describe('log', function () {
     it('warn', function () {
         log.warn('1111', this);
         log.warn('22222', {a: {b: {c: {d: {e: 'f'}}}}}, '后悔');
+    });
+
+    it('error', function () {
+        log.error('1111', process);
+        log.error('22222', {a: {b: {c: {d: {e: 'f'}}}}}, new Error('xxx'));
     });
 });
