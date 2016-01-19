@@ -10,13 +10,17 @@
 var util = require('util');
 var colors = require('colors/safe.js');
 
-var log = function (prefix, args) {
+var allocation = require('../libs/allocation.js');
+
+var log = function (wrapper, prefix, args) {
+    args = allocation.args(args);
     args.unshift(prefix);
-    args.unshift('%s %s\n');
-    process.stdout.write(util.format.apply(util, args));
+    args.unshift('prefix');
+    args.unshift('%s %s\n%s\n');
+    process.stdout.write(wrapper(util.format.apply(util, args)));
 };
 
 
 exports.warn = function () {
-    log('[WARN]', arguments);
+    log(colors.yellow, '[WARN]', arguments);
 };

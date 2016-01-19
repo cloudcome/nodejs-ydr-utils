@@ -10,4 +10,8 @@
 var log = require('../libs/log.js');
 
 
-
+describe('log', function () {
+    it('warn', function () {
+        log.warn('呵呵', global);
+    });
+});
