@@ -20,7 +20,7 @@ var string = require('../libs/string.js');
 // ==========================================
 
 var configs = {
-    whiteList: ['log', 'warn', 'success', 'error'],
+    whiteList: ['info', 'warn', 'success', 'error'],
     whiteMap: {},
     placeholders: {}
 };
@@ -139,7 +139,7 @@ var log = function (wrapper, prefix, args) {
 exports.info = function () {
     log(function (str) {
         return str;
-    }, '[INFO]', arguments);
+    }, '[INFORMATION]', arguments);
 };
 
 
