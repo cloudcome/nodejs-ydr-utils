@@ -232,10 +232,23 @@ exports.__expressEnd = function () {
             err['request url'] = req.$fullURL;
             err['request ip'] = req.$ip;
             err['request headers'] = req.headers;
-            err['request query'] = req.query;
-            err['request body'] = req.body;
-            err['request file'] = req.file;
-            err['request files'] = req.files;
+
+            if (req.query) {
+                err['request query'] = req.query;
+            }
+
+            if (req.body) {
+                err['request body'] = req.body;
+            }
+
+            if (req.file) {
+                err['request file'] = req.file;
+            }
+
+            if (req.files) {
+                err['request files'] = req.files;
+            }
+
             exports.error(err);
         }
 
