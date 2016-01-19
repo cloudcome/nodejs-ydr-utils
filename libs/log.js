@@ -154,6 +154,10 @@ var log = function (wrapper, prefix, args) {
  * 普通日志
  */
 exports.info = function () {
+    if (!configs.whiteMap.info) {
+        return;
+    }
+
     log(function (str) {
         return str;
     }, '[INFO]', arguments);
@@ -164,6 +168,10 @@ exports.info = function () {
  * 成功日志
  */
 exports.success = function () {
+    if (!configs.whiteMap.success) {
+        return;
+    }
+
     log(exports.green, '[SUCCESS]', arguments);
 };
 
@@ -172,6 +180,10 @@ exports.success = function () {
  * 警告日志
  */
 exports.warn = function () {
+    if (!configs.whiteMap.warn) {
+        return;
+    }
+
     log(exports.yellow, '[WARNING]', arguments);
 };
 
@@ -180,6 +192,10 @@ exports.warn = function () {
  * 错误日志
  */
 exports.error = function () {
+    if (!configs.whiteMap.error) {
+        return;
+    }
+
     var args = allocation.args(arguments);
     var defaultErrorKey = {
         type: true,
@@ -207,7 +223,7 @@ exports.error = function () {
 
 
 /**
- * express 日志系统，尽可能的放在中间的最开始
+ * express 日志系统，尽可能的放在中间件的最开始
  * @returns {Function}
  * @private
  */
@@ -223,7 +239,7 @@ exports.__expressStart = function () {
 
 
 /**
- * express 日志系统，尽可能的放在中间的末尾
+ * express 日志系统，尽可能的放在中间件的末尾
  * @returns {Function}
  * @private
  */

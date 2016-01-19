@@ -46,7 +46,7 @@ describe('log', function () {
         log.error('node version is ${node}');
     });
 
-    xit('info', function () {
+    it('info', function () {
         log.info('1111', process.env);
         log.info('22222', {a: {b: {c: {d: {e: 'f'}}}}}, '后悔');
     });
