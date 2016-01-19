@@ -61,6 +61,8 @@ describe('log', function () {
 
     it('error', function () {
         log.error('error1', process.versions);
-        log.error('error2', {a: {b: {c: {d: {e: 'f'}}}}}, new Error('xxx'));
+        var err = new Error('xxx');
+        err.x1312312 = 312312;
+        log.error('error2', {a: {b: {c: {d: {e: 'f'}}}}}, err);
     });
 });

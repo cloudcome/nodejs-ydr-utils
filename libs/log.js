@@ -132,11 +132,46 @@ var pretty = function (obj) {
         dato.each(obj, function (key, val) {
             o[key] = val;
         });
-        return util.inspect(o, {
-            depth: 3
-        });
+        try {
+            return util.inspect(o, {
+                depth: 3
+            });
+        } catch (err) {
+            return formatError(err);
+        }
     }
 };
+
+
+/**
+ * 格式错误对象
+ * @param err
+ * @returns {*}
+ */
+var formatError = function (err) {
+    if (!err || !(err instanceof Error)) {
+        return err;
+    }
+
+    var defaultErrorKey = {
+        type: true,
+        message: true,
+        name: true,
+        stack: true
+    };
+
+    var msg = err.stack || err.message || String(err);
+    var name = err.name || 'Error';
+
+    dato.each(err, function (key, val) {
+        if (!defaultErrorKey[key]) {
+            msg += '\n' + name + ' ' + key + ': ' + pretty(val);
+        }
+    });
+
+    return msg;
+};
+
 
 /**
  * 日志出口
@@ -212,27 +247,7 @@ exports.error = function () {
         return;
     }
 
-    var args = allocation.args(arguments);
-    var defaultErrorKey = {
-        type: true,
-        message: true,
-        name: true,
-        stack: true
-    };
-
-    dato.each(args, function (index, arg) {
-        if (arg && arg instanceof Error) {
-            var msg = arg.stack || arg.message || String(arg);
-            var name = arg.name || 'Error';
-            dato.each(arg, function (key, val) {
-                if (!defaultErrorKey[key]) {
-                    msg += '\n' + name + ' ' + key + ': ' + pretty(val);
-                }
-            });
-            args[index] = msg;
-            return false;
-        }
-    });
+    var args = allocation.args(arguments).map(formatError);
 
     log(exports.red, '[ERROR]', args);
 };
