@@ -17,7 +17,21 @@ var log = function (wrapper, prefix, args) {
     args.unshift(prefix);
     args.unshift('prefix');
     args.unshift('%s %s\n%s\n');
-    process.stdout.write(wrapper(util.format.apply(util, args)));
+
+    var str = '';
+    try {
+        str = wrapper(util.format.apply(util, args));
+    } catch (err) {
+        str = err.stack;
+        return exports.error(str);
+    }
+
+    process.stdout.write(str);
+};
+
+
+exports.warn = function () {
+    log(colors.yellow, '[WARN]', arguments);
 };
 
 
