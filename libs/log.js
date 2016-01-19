@@ -9,7 +9,9 @@
 
 var util = require('util');
 var later = require('later');
+var path = require('path');
 
+var pkg = require('../package.json');
 var allocation = require('../libs/allocation.js');
 var date = require('../libs/date.js');
 var dato = require('../libs/dato.js');
@@ -222,16 +224,39 @@ exports.error = function () {
 };
 
 
+// ==========================================
+// ===============[ express ]================
+// ==========================================
+var namespace = path.basename(__filename) + ' of ' + pkg.name + '@' + pkg.version;
 /**
  * express 日志系统，尽可能的放在中间件的最开始
  * @returns {Function}
  * @private
  */
-exports.__expressStart = function () {
+exports.__expressStart = function (options) {
+    var ipKey = namespace + 'ip';
+    options = dato.extend({
+        exclude: /^\/static\//
+    }, options);
+
     return function (req, res, next) {
         req.$fullURL = req.protocol + '://' + req.headers.host + req.url;
+
+        var log = function (ip) {
+            if (!options.exclude.test(req.url)) {
+                exports.info('ACCESS', req.method, ip, req.$fullURL);
+            }
+        };
+
+        if (req.session[ipKey]) {
+            log(req.session[ipKey]);
+            next();
+            return;
+        }
+
         system.remoteIP(req, function (err, ip) {
-            req.$ip = ip;
+            req.session[ipKey] = req.$ip = ip;
+            log();
             next();
         });
     };
