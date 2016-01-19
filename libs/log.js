@@ -13,52 +13,17 @@ var colors = require('colors/safe.js');
 var allocation = require('../libs/allocation.js');
 var date = require('../libs/date.js');
 var dato = require('../libs/dato.js');
+var string = require('../libs/string.js');
 
 
-/**
- * 日志出口
- * @param wrapper
- * @param prefix
- * @param args
- */
-var log = function (wrapper, prefix, args) {
-    args = allocation.args(args);
-    args.unshift('%s');
-
-    var str = colors.cyan(util.format('\n\n[%s] %s\n', date.format('YYYY-MM-DD HH:mm:ss.SSS'), prefix));
-
-    try {
-        str += wrapper(util.format.apply(util, args));
-    } catch (err) {
-        err.mmmmm = 123;
-        return exports.error(err);
-    }
-
-    process.stdout.write(str + '\n');
-};
-
-
-/**
- * 颜色包装器
- * @param color
- * @returns {Function}
- */
-var makeColor = function (color) {
-    return function () {
-        var msg = util.format.apply(util, arguments);
-        var args = [];
-
-        args.push('\x1b[' + util.inspect.colors[color][0] + 'm%s\x1b[' + util.inspect.colors[color][1] + 'm');
-        args.push(msg);
-
-        return util.format.apply(util, args);
-    };
-};
-
+// ==========================================
+// ================[ configs ]===============
+// ==========================================
 
 var configs = {
     whiteList: ['log', 'warn', 'success', 'error'],
-    whiteMap: {}
+    whiteMap: {},
+    placeholders: {}
 };
 
 var buildWhiteMap = function () {
@@ -90,9 +55,42 @@ exports.config = function () {
 buildWhiteMap();
 
 
+/**
+ * 配置 placeholder
+ * @returns {*}
+ */
+exports.placeholder = function () {
+    return allocation.getset({
+        get: function (key) {
+            return configs.placeholders[key];
+        },
+        set: function (key, val) {
+            configs.placeholders[key] = val;
+        }
+    }, arguments);
+};
+
+
 // ==========================================
 // ================[ wrapper ]===============
 // ==========================================
+/**
+ * 颜色包装器
+ * @param color
+ * @returns {Function}
+ */
+var makeColor = function (color) {
+    return function () {
+        var msg = util.format.apply(util, arguments);
+        var args = [];
+
+        args.push('\x1b[' + util.inspect.colors[color][0] + 'm%s\x1b[' + util.inspect.colors[color][1] + 'm');
+        args.push(msg);
+
+        return util.format.apply(util, args);
+    };
+};
+
 
 // color
 exports.red = makeColor('red');
@@ -113,6 +111,29 @@ exports.underline = makeColor('underline');
 
 
 /**
+ * 日志出口
+ * @param wrapper
+ * @param prefix
+ * @param args
+ */
+var log = function (wrapper, prefix, args) {
+    args = allocation.args(args);
+    args.unshift('%s');
+
+    var str = colors.cyan(util.format('\n\n[%s] %s\n', date.format('YYYY-MM-DD HH:mm:ss.SSS'), prefix));
+
+    try {
+        str += wrapper(util.format.apply(util, args));
+    } catch (err) {
+        err.mmmmm = 123;
+        return exports.error(err);
+    }
+
+    process.stdout.write(str + '\n');
+};
+
+
+/**
  * 普通日志
  */
 exports.info = function () {
@@ -120,7 +141,6 @@ exports.info = function () {
         return str;
     }, '[INFO]', arguments);
 };
-
 
 
 /**

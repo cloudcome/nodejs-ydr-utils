@@ -38,17 +38,21 @@ describe('log', function () {
         console.log(log.underline(log.bold(log.magenta('呵呵', {a: {b: {c: {d: {e: 'f'}}}}}, '后悔'))));
     });
 
-    it('info', function () {
+    it('placeholder', function () {
+        log.placeholder('node', process.env.versions.node);
+    });
+
+    xit('info', function () {
         log.info('1111', process.env);
         log.info('22222', {a: {b: {c: {d: {e: 'f'}}}}}, '后悔');
     });
 
-    it('warn', function () {
+    xit('warn', function () {
         log.warn('1111', this);
         log.warn('22222', {a: {b: {c: {d: {e: 'f'}}}}}, '后悔');
     });
 
-    it('error', function () {
+    xit('error', function () {
         log.error('1111', process.versions);
         log.error('22222', {a: {b: {c: {d: {e: 'f'}}}}}, new Error('xxx'));
     });
