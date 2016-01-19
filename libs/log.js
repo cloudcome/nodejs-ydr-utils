@@ -49,6 +49,14 @@ var makeColor = function (color) {
 };
 
 
+
+
+
+
+// ==========================================
+// ================[ wrapper ]===============
+// ==========================================
+
 // color
 exports.red = makeColor('red');
 exports.cyan = makeColor('cyan');
@@ -62,11 +70,24 @@ exports.italic = makeColor('italic');
 exports.underline = makeColor('underline');
 
 
+
+
+// ==========================================
+// ================[ output ]================
+// ==========================================
+
+
+/**
+ * 警告日志
+ */
 exports.warn = function () {
     log(colors.yellow, '[WARN]', arguments);
 };
 
 
+/**
+ * 错误日志
+ */
 exports.error = function () {
     var args = allocation.args(arguments);
     var defaultErrorKey = {
