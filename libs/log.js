@@ -244,7 +244,7 @@ exports.__expressStart = function (options) {
 
         var log = function (ip) {
             if (!options.exclude.test(req.url)) {
-                exports.info('ACCESS', req.method, ip, req.$fullURL);
+                exports.info(req.method, ip, req.$fullURL);
             }
         };
 
