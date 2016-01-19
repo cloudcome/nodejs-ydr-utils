@@ -7,13 +7,13 @@
 
 'use strict';
 
-var colors = require('colors');
 
 var allocation = require('./allocation.js');
 var dato = require('./dato.js');
 var typeis = require('./typeis.js');
 var date = require('./date.js');
 var string = require('./string.js');
+var log = require('./log.js');
 
 
 var pros = ['log', 'info', 'warn', 'error'];
@@ -24,12 +24,10 @@ var defaults = {
     }
 };
 var colorMap = {
-    log: function (item) {
-        return item;
-    },
-    info: colors.cyan,
-    warn: colors.yellow,
-    error: colors.red
+    log: log.normal,
+    info: log.cyan,
+    warn: log.yellow,
+    error: log.red
 };
 
 
