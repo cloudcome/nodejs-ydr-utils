@@ -8,50 +8,10 @@
 'use strict';
 
 
-var colors = require('colors/safe.js');
-
 var typeis = require('./typeis.js');
 var dato = require('./dato.js');
 var string = require('./string.js');
-
-
-//console.log(colors.black('black'));
-//console.log(colors.red('red'));
-//console.log(colors.green('green'));
-//console.log(colors.yellow('yellow'));
-//console.log(colors.blue('blue'));
-//console.log(colors.magenta('magenta'));
-//console.log(colors.cyan('cyan'));
-//console.log(colors.white('white'));
-//console.log(colors.gray('gray'));
-//console.log(colors.grey('grey'));
-//
-//
-//console.log(colors.bgBlack('bgBlack'));
-//console.log(colors.bgRed('bgRed'));
-//console.log(colors.bgGreen('bgGreen'));
-//console.log(colors.bgYellow('bgYellow'));
-//console.log(colors.bgBlue('bgBlue'));
-//console.log(colors.bgMagenta('bgMagenta'));
-//console.log(colors.bgCyan('bgCyan'));
-//console.log(colors.bgWhite('bgWhite'));
-//
-//
-//console.log(colors.reset('reset'));
-//console.log(colors.bold('bold'));
-//console.log(colors.dim('dim'));
-//console.log(colors.italic('italic'));
-//console.log(colors.underline('underline'));
-//console.log(colors.inverse('inverse'));
-//console.log(colors.hidden('hidden'));
-//console.log(colors.strikethrough('strikethrough'));
-//
-//
-//console.log(colors.rainbow('rainbow'));
-//console.log(colors.zebra('zebra'));
-//console.log(colors.america('america'));
-//console.log(colors.trap('trap'));
-//console.log(colors.random('random'));
+var log = require('./log.js');
 
 var REG_BREAK_LINE = /[\n\r]/g;
 var configs = {
