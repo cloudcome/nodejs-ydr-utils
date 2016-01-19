@@ -30,9 +30,10 @@ var log = function (wrapper, prefix, args) {
 
 
 exports.red = function () {
-    var args = allocation.args(arguments);
-
-    args.unshift('\x1b[' + util.inspect.colors.red[0] + 'm%s\x1b[' + util.inspect.colors.red[1] + 'm');
+    var msg = util.format.apply(util, arguments);
+    var args = [];
+    args.push('\x1b[' + util.inspect.colors.red[0] + 'm%s\x1b[' + util.inspect.colors.red[1] + 'm');
+    args.push(msg);
     var str = util.format.apply(util, args);
     process.stdout.write(str + '\n');
 };
