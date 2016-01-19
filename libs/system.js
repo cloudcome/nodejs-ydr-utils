@@ -127,7 +127,7 @@ exports.remoteIP = function (req, callback) {
             return ip && ip !== '';
         })
         .together(function (err, ip) {
-            callback(null, ip);
+            callback(null, ip || '127.0.0.1');
         });
 };
 

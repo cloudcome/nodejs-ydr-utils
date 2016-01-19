@@ -214,7 +214,7 @@ exports.__expressStart = function () {
     return function (req, res, next) {
         req.$fullURL = req.protocol + '://' + req.headers.host + req.url;
         system.remoteIP(req, function (err, ip) {
-            req.$ip = ip || '';
+            req.$ip = ip;
             next();
         });
     };
