@@ -98,8 +98,12 @@ var makeColor = function (color) {
 
 // color
 exports.red = makeColor('red');
+exports.grey = makeColor('grey');
 exports.cyan = makeColor('cyan');
 exports.green = makeColor('green');
+exports.normal = function () {
+    return util.format.apply(util, arguments);
+};
 exports.yellow = makeColor('yellow');
 exports.magenta = makeColor('magenta');
 

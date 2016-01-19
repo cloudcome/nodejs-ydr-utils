@@ -66,7 +66,7 @@ var debug = function (type, event, msg, options) {
 
     options = dato.extend({}, configs, options);
 
-    var eventArrow = colors.gray(options.eventArrow);
+    var eventArrow = log.gray(options.eventArrow);
     var eventAlign = options.eventAlign;
 
     if (options.alignInverse) {
@@ -79,31 +79,31 @@ var debug = function (type, event, msg, options) {
 
     var eventLength = event.length;
 
-    var event2 = colors.yellow(event);
+    var event2 = log.yellow(event);
     switch (type) {
         case 'error':
-            msg = alignMsg(eventLength, msg, colors.bgRed);
+            msg = alignMsg(eventLength, msg, log.red);
             break;
 
         case 'primary':
-            msg = alignMsg(eventLength, msg, colors.cyan);
+            msg = alignMsg(eventLength, msg, log.cyan);
             break;
 
         case 'warn':
-            msg = alignMsg(eventLength, msg, colors.magenta);
+            msg = alignMsg(eventLength, msg, log.magenta);
             break;
 
         case 'success':
-            msg = alignMsg(eventLength, msg, colors.green);
+            msg = alignMsg(eventLength, msg, log.green);
             break;
 
         case 'normal':
-            msg = alignMsg(eventLength, msg, colors.white);
+            msg = alignMsg(eventLength, msg, log.normal);
             break;
 
         default :
-            event2 = colors.grey(event);
-            msg = alignMsg(eventLength, msg, colors.grey);
+            event2 = log.grey(event);
+            msg = alignMsg(eventLength, msg, log.grey);
             break;
     }
 
