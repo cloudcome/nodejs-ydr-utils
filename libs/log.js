@@ -236,7 +236,7 @@ var namespace = path.basename(__filename) + ' of ' + pkg.name + '@' + pkg.versio
 exports.__expressStart = function (options) {
     var ipKey = namespace + 'ip';
     options = dato.extend({
-        exclude: /^\/static\//
+        exclude: /^\/(static\/|favicon\.ico)/
     }, options);
 
     return function (req, res, next) {
@@ -256,7 +256,7 @@ exports.__expressStart = function (options) {
 
         system.remoteIP(req, function (err, ip) {
             req.session[ipKey] = req.$ip = ip;
-            log();
+            log(ip);
             next();
         });
     };
