@@ -395,7 +395,7 @@ var Request = klass.extends(stream.Stream).create({
 
                 if (the._urlMap[redirectURL] > 2) {
                     var maxRedirectRepeatTimesError = 'make redirect loop';
-                    the.debug(maxRedirectRepeatTimesError);
+                    the.debug('redirect error',maxRedirectRepeatTimesError);
                     controller.nextTick(function () {
                         if (the._finished) {
                             return;
@@ -409,7 +409,7 @@ var Request = klass.extends(stream.Stream).create({
 
                 if (the._requestTimes > options.maxRedirects) {
                     var maxRedirectsError = 'redirect times is over ' + options.maxRedirects;
-                    the.debug(maxRedirectsError);
+                    the.debug('redirect error',maxRedirectsError);
                     controller.nextTick(function () {
                         if (the._finished) {
                             return;
@@ -460,7 +460,7 @@ var Request = klass.extends(stream.Stream).create({
                 req.abort();
                 controller.nextTick(function () {
                     var requestTimeoutError = 'request timeout ' + options.timeout + 'ms';
-                    the.debug(requestTimeoutError);
+                    the.debug('request error',requestTimeoutError);
 
                     if (the._finished) {
                         return;
