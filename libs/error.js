@@ -41,6 +41,7 @@ var config = function (errorCode, errorMeta) {
         }
 
         errorMap[args[0]] = errorMeta;
+        errorMeta.code = args[0];
     } else {
         errorMap = args[0];
     }
@@ -50,7 +51,7 @@ var config = function (errorCode, errorMeta) {
     });
     dato.extend(configs, errorMap);
 
-    return exports;
+    return errorMap;
 };
 
 

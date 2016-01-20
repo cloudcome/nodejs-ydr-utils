@@ -14,11 +14,16 @@ var log = require('../libs/log.js');
 
 
 describe('error', function () {
-    it(1, function () {
-        error.config(401, {
+    it('config', function () {
+        var ret = error.config(401, {
             message: '呵呵',
             abc: 123
         });
+
+        console.log(ret);
+    });
+
+    it('create', function () {
         var err = error(401);
 
         log.error(err);
