@@ -27,6 +27,8 @@ var random = require('./random.js');
 var allocation = require('./allocation.js');
 var controller = require('./controller.js');
 var mime = require('./mime.js');
+var log = require('./log.js');
+var debug = require('./debug.js');
 
 
 var NO_BODY_REQUEST = {
@@ -173,16 +175,15 @@ var Request = klass.extends(stream.Stream).create({
      * 调试
      * @returns {Request}
      */
-    debug: function () {
+    debug: function (event, msg) {
         var the = this;
 
         if (!the._options.debug) {
             return the;
         }
 
-        console.log('');
-        console.log('[' + moduleName + ' DEBUG]');
-        console.log(util.format.apply(util, arguments));
+        log.info(log.magenta('[' + the._options.method + the._urlList[the._urlList.length - 1] + ']'));
+        debug.info(event, msg);
 
         return the;
     },
@@ -369,7 +370,7 @@ var Request = klass.extends(stream.Stream).create({
 
         the._buildRequestHeaders(requestOptions);
         the._requestTimes++;
-        the.debug(options.method, requestOptions.url, '\n', requestOptions);
+        the.debug('request options', requestOptions);
 
         var req = the.req = client.request(requestOptions);
 
@@ -395,7 +396,7 @@ var Request = klass.extends(stream.Stream).create({
                     var maxRedirectRepeatTimesError = 'make redirect loop';
                     the.debug(maxRedirectRepeatTimesError);
                     controller.nextTick(function () {
-                        if(the._finished){
+                        if (the._finished) {
                             return;
                         }
 
@@ -409,7 +410,7 @@ var Request = klass.extends(stream.Stream).create({
                     var maxRedirectsError = 'redirect times is over ' + options.maxRedirects;
                     the.debug(maxRedirectsError);
                     controller.nextTick(function () {
-                        if(the._finished){
+                        if (the._finished) {
                             return;
                         }
 
@@ -440,7 +441,7 @@ var Request = klass.extends(stream.Stream).create({
                 return;
             }
 
-            if(the._finished){
+            if (the._finished) {
                 return;
             }
 
@@ -460,7 +461,7 @@ var Request = klass.extends(stream.Stream).create({
                     var requestTimeoutError = 'request timeout ' + options.timeout + 'ms';
                     the.debug(requestTimeoutError);
 
-                    if(the._finished){
+                    if (the._finished) {
                         return;
                     }
 

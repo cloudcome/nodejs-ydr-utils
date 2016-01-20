@@ -1,5 +1,5 @@
 /**
- * 命令行日志
+ * debug
  * @author ydr.me
  * @create 2015-10-22 10:21
  */
@@ -7,6 +7,7 @@
 
 'use strict';
 
+var util = require('util');
 
 var typeis = require('./typeis.js');
 var dato = require('./dato.js');
@@ -64,6 +65,7 @@ var debug = function (type, event, msg, options) {
         };
     }
 
+    msg = uti
     options = dato.extend({}, configs, options);
 
     var eventArrow = log.grey(options.eventArrow);
@@ -107,7 +109,7 @@ var debug = function (type, event, msg, options) {
             break;
     }
 
-    console.log(event2 + eventArrow + msg);
+    process.stdout.write(event2 + eventArrow + msg + '\n');
 };
 
 
