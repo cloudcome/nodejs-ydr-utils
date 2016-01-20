@@ -190,7 +190,7 @@ exports.table = function (trs, options) {
 
         ret.push('│' + tr.join('│') + '│');
 
-        if (options.thead && i === 0) {
+        if (options.thead && !options.tdBorder && i === 0) {
             ret.push('├' + trMiddleCenters.join('') + '┤');
         }
     });

@@ -47,11 +47,12 @@ describe('log', function () {
             thead: true
         }));
         console.log(log.table([
+            ['key', 'val'],
             ['user', 'cloudcome'],
             ['age', '21'],
             ['love', 'front-end development']
         ], {
-            thead: false,
+            thead: true,
             padding: 5,
             tdBorder: true
         }));
