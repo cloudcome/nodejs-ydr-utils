@@ -65,7 +65,7 @@ var debug = function (type, event, msg, options) {
         };
     }
 
-    msg = uti
+    msg = util.format(msg);
     options = dato.extend({}, configs, options);
 
     var eventArrow = log.grey(options.eventArrow);
