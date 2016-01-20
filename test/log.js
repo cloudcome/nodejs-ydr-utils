@@ -40,12 +40,21 @@ describe('log', function () {
 
     it('table', function () {
         console.log(log.table([
-            ['user', 'age', 'love'],
-            ['cloudcome', '21', 'front-end-dev'],
-            ['wang', '21', 'back-end-dev'],
-            ['TjHoow li backli', '21', 'go'],
-            ['A', '1', 'C']
-        ]));
+            ['App name', 'id', 'mode', 'pid', 'status', 'restart', 'uptimes', 'memory', 'watching'],
+            ['abc', 1, 'fork', 19312, 'online', 1, '14D', '19.123MB', 'disabled'],
+            ['abc-def-ghy-ioo', 22, 'cluster', 19312, 'offline', 999, '91D', '983.123MB', 'enabled']
+        ], {
+            thead: true
+        }));
+        console.log(log.table([
+            ['user', 'cloudcome'],
+            ['age', '21'],
+            ['love', 'front-end development']
+        ], {
+            thead: false,
+            padding: 5,
+            tdBorder: true
+        }));
     });
 
     xit('placeholder', function () {

@@ -136,21 +136,68 @@ exports.underline = makeColor('underline');
 exports.pretty = pretty;
 exports.table = function (trs, options) {
     options = dato.extend({
-        index: false
+        padding: 1,
+        thead: false,
+        tdBorder: false
     }, options);
     var maxTrLength = 0;
-    var maxTdLength = [];
-    var retTds = [];
-    var ret = '';
+    var maxTdsLength = [];
+    var ret = [];
+    var padding = new Array(options.padding + 1).join(' ');
 
     dato.each(trs, function (i, tds) {
         dato.each(tds, function (j, td) {
-            td = pretty(td);
-            var length = td.length;
+            tds[j] = td = pretty(td);
+            var tdLength = td.length + options.padding * 2;
+            maxTdsLength[j] = maxTdsLength[j] || 0;
+            maxTdsLength[j] = Math.max(maxTdsLength[j], tdLength);
         });
     });
 
-    return ret;
+    var trTopCenters = [];
+    var trMiddleCenters = [];
+    var trBottomCenters = [];
+    dato.each(maxTdsLength, function (k, max) {
+        maxTrLength += max;
+        var border = new Array(max + 1).join('─');
+
+        if (k) {
+            trTopCenters.push('┬' + border);
+            trMiddleCenters.push('┼' + border);
+            trBottomCenters.push('┴' + border);
+        } else {
+            trTopCenters.push(border);
+            trMiddleCenters.push(border);
+            trBottomCenters.push(border);
+        }
+    });
+
+    maxTrLength += maxTdsLength.length - 2;
+    ret.push('┌' + trTopCenters.join('') + '┐');
+
+    dato.each(trs, function (i, tds) {
+        var tr = [];
+
+        if (options.tdBorder && i > 0) {
+            ret.push('├' + trMiddleCenters.join('') + '┤');
+        }
+
+        dato.each(tds, function (j, td) {
+            td = padding + td;
+            td = string.padRight(td, maxTdsLength[j] - options.padding, ' ');
+            tr.push(td + padding);
+        });
+
+        ret.push('│' + tr.join('│') + '│');
+
+        if (options.thead && i === 0) {
+            ret.push('├' + trMiddleCenters.join('') + '┤');
+        }
+    });
+
+    ret.push('└' + trBottomCenters.join('') + '┘');
+
+    return ret.join('\n');
 };
 
 // ==========================================
