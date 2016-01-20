@@ -10,6 +10,7 @@
 var assert = require('assert');
 
 var error = require('../libs/error.js');
+var log = require('../libs/log.js');
 
 
 describe('error', function () {
@@ -18,8 +19,9 @@ describe('error', function () {
             message: '呵呵',
             abc: 123
         });
-        var err = error.create(401);
+        var err = error(401);
 
+        log.error(err);
         assert.equal(err.abc, 123);
         assert.equal(err.status, undefined);
         assert.equal(err.type, undefined);

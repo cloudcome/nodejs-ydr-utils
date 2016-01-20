@@ -29,7 +29,7 @@ var configs = {
  * @param errorCode {Number|String|Object} 错误序号
  * @param [errorMeta] {Object} 错误属性
  */
-exports.config = function (errorCode, errorMeta) {
+var config = function (errorCode, errorMeta) {
     var args = allocation.args(arguments);
     var errorMap = {};
 
@@ -60,7 +60,7 @@ exports.config = function (errorCode, errorMeta) {
  * @param [code.code] {Number} 错误号
  * @returns {Error}
  */
-exports.create = function (code) {
+module.exports = function (code) {
     if (typeis(code) === 'object') {
         code = code.code;
     }
@@ -74,14 +74,16 @@ exports.create = function (code) {
     var err = new Error(meta.message);
 
     try {
-        Error.captureStackTrace(err, exports.create);
+        Error.captureStackTrace(err, module.exports);
     } catch (err) {
         // ignore
     }
 
     dato.extend(err, meta);
-    err.time = new Date();
+    err.timeStamp = new Date();
     err.id = errorId++;
 
     return err;
 };
+
+module.exports.config = config;
