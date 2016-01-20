@@ -38,31 +38,36 @@ describe('log', function () {
         console.log(log.underline(log.bold(log.magenta('呵呵', {a: {b: {c: {d: {e: 'f'}}}}}, '后悔'))));
     });
 
-    //it('placeholder', function () {
-    //    log.config({
-    //        whiteList: ['error', 'warn']
-    //    });
-    //    log.placeholder('node', process.versions.node);
-    //    log.info('node version is ${node}');
-    //    log.warn('node version is ${node}');
-    //    log.success('node version is ${node}');
-    //    log.error('node version is ${node}');
-    //});
-    //
-    //it('info', function () {
-    //    log.info('info1', process.env);
-    //    log.info('info2', {a: {b: {c: {d: {e: 'f'}}}}}, '后悔');
-    //});
-    //
-    //it('warn', function () {
-    //    log.warn('warn1', this);
-    //    log.warn('warn2', {a: {b: {c: {d: {e: 'f'}}}}}, '后悔');
-    //});
-    //
-    //it('error', function () {
-    //    log.error('error1', process.versions);
-    //    var err = new Error('xxx');
-    //    err.x1312312 = 312312;
-    //    log.error('error2', {a: {b: {c: {d: {e: 'f'}}}}}, err);
-    //});
+    it('placeholder', function () {
+        log.config({
+            whiteList: ['info', 'error', 'warn', 'success']
+        });
+        log.placeholder('node', process.versions.node);
+        log.info('node version is ${node}');
+        log.warn('node version is ${node}');
+        log.success('node version is ${node}');
+        log.error('node version is ${node}');
+    });
+
+    it('info', function () {
+        log.info('info1', process.env);
+        log.info('info2', {a: {b: {c: {d: {e: 'f'}}}}}, '后悔');
+    });
+
+    it('success', function () {
+        log.success('success', process.env);
+        log.success('success', {a: {b: {c: {d: {e: 'f'}}}}}, '后悔');
+    });
+
+    it('warn', function () {
+        log.warn('warn1', this);
+        log.warn('warn2', {a: {b: {c: {d: {e: 'f'}}}}}, '后悔');
+    });
+
+    it('error', function () {
+        log.error('error1', process.versions);
+        var err = new Error('xxx');
+        err.x1312312 = 312312;
+        log.error('error2', {a: {b: {c: {d: {e: 'f'}}}}}, err);
+    });
 });
