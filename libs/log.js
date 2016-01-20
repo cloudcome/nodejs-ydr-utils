@@ -78,6 +78,27 @@ exports.placeholder = function () {
 // ==========================================
 // ================[ wrapper ]===============
 // ==========================================
+
+/**
+ * 美化对象输出
+ * @param obj
+ * @returns {*}
+ */
+var pretty = function (obj) {
+    if (typeis.String(obj)) {
+        return obj;
+    }
+
+    try {
+        return util.inspect(obj, {
+            depth: 3
+        });
+    } catch (err) {
+        return formatError(err);
+    }
+};
+
+
 /**
  * 颜色包装器
  * @param color
@@ -85,7 +106,8 @@ exports.placeholder = function () {
  */
 var makeColor = function (color) {
     return function () {
-        var msg = util.format.apply(util, arguments);
+        var msgs = allocation.args(arguments).map(pretty);
+        var msg = msgs.join(' ');
         var args = [];
 
         args.push('\x1b[' + util.inspect.colors[color][0] + 'm%s\x1b[' + util.inspect.colors[color][1] + 'm');
@@ -116,25 +138,6 @@ exports.underline = makeColor('underline');
 // ==========================================
 // ================[ output ]================
 // ==========================================
-
-/**
- * 美化对象输出
- * @param obj
- * @returns {*}
- */
-var pretty = function (obj) {
-    if (typeis.String(obj)) {
-        return obj;
-    }
-
-    try {
-        return util.inspect(obj, {
-            depth: 3
-        });
-    } catch (err) {
-        return formatError(err);
-    }
-};
 
 
 /**
@@ -174,17 +177,9 @@ var formatError = function (err) {
  * @param args
  */
 var log = function (wrapper, prefix, args) {
-    args = allocation.args(args).map(pretty);
-    args.unshift('%s');
-
     var str = exports.cyan(util.format('\n\n[%s] %s\n', date.format('YYYY-MM-DD HH:mm:ss.SSS'), prefix));
 
-    try {
-        str += wrapper(util.format.apply(util, args));
-    } catch (err) {
-        return exports.error(err);
-    }
-
+    str += wrapper.apply(exports, args);
     str = string.assign(str, configs.placeholders);
     process.stdout.write(str + '\n');
 };
