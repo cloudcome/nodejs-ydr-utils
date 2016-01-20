@@ -551,7 +551,9 @@ var Request = klass.extends(stream.Stream).create({
             var bfCollection = Buffer.concat(bfList);
 
             if (isUTF8) {
-                the.emit('body', bfCollection.toString());
+                var body = bfCollection.toString();
+                the.emit('body', body);
+                the.debug('response body', body);
             } else {
                 the.emit('body', new Buffer(bfCollection));
             }
