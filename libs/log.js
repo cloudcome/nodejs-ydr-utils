@@ -391,5 +391,7 @@ exports.__expressEnd = function (options) {
 // ==============[ functions ]===============
 // ==========================================
 exports.holdError = function (err) {
-    return exports.error(err);
+    if(err && err instanceof Error){
+        exports.error(err);
+    }
 };
