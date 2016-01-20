@@ -133,7 +133,25 @@ exports.magenta = makeColor('magenta');
 exports.bold = makeColor('bold');
 exports.italic = makeColor('italic');
 exports.underline = makeColor('underline');
+exports.pretty = pretty;
+exports.table = function (trs, options) {
+    options = dato.extend({
+        index: false
+    }, options);
+    var maxTrLength = 0;
+    var maxTdLength = [];
+    var retTds = [];
+    var ret = '';
 
+    dato.each(trs, function (i, tds) {
+        dato.each(tds, function (j, td) {
+            td = pretty(td);
+            var length = td.length;
+        });
+    });
+
+    return ret;
+};
 
 // ==========================================
 // ================[ output ]================

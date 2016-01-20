@@ -11,7 +11,7 @@ var log = require('../libs/log.js');
 
 
 describe('log', function () {
-    it('make color', function () {
+    xit('make color', function () {
         console.log(log.red('呵呵', {a: {b: {c: {d: {e: 'f'}}}}}, '后悔'));
         console.log(log.cyan('呵呵', {a: {b: {c: {d: {e: 'f'}}}}}, '后悔'));
         console.log(log.green('呵呵', {a: {b: {c: {d: {e: 'f'}}}}}, '后悔'));
@@ -38,7 +38,17 @@ describe('log', function () {
         console.log(log.underline(log.bold(log.magenta('呵呵', {a: {b: {c: {d: {e: 'f'}}}}}, '后悔'))));
     });
 
-    it('placeholder', function () {
+    it('table', function () {
+        console.log(log.table([
+            ['user', 'age', 'love'],
+            ['cloudcome', '21', 'front-end-dev'],
+            ['wang', '21', 'back-end-dev'],
+            ['TjHoow li backli', '21', 'go'],
+            ['A', '1', 'C']
+        ]));
+    });
+
+    xit('placeholder', function () {
         log.config({
             whiteList: ['info', 'error', 'warn', 'success']
         });
@@ -49,22 +59,22 @@ describe('log', function () {
         log.error('node version is ${node}');
     });
 
-    it('info', function () {
+    xit('info', function () {
         log.info('info1', process.env);
         log.info('info2', {a: {b: {c: {d: {e: 'f'}}}}}, '后悔');
     });
 
-    it('success', function () {
+    xit('success', function () {
         log.success('success', process.env);
         log.success('success', {a: {b: {c: {d: {e: 'f'}}}}}, '后悔');
     });
 
-    it('warn', function () {
+    xit('warn', function () {
         log.warn('warn1', this);
         log.warn('warn2', {a: {b: {c: {d: {e: 'f'}}}}}, '后悔');
     });
 
-    it('error', function () {
+    xit('error', function () {
         log.error('error1', process.versions);
         var err = new Error('xxx');
         err.x1312312 = 312312;
