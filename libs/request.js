@@ -301,7 +301,7 @@ var Request = klass.extends(stream.Stream).create({
         if (the._forms.length) {
             the._stream = the._buildStream();
             var streamHeaders = the._stream.getHeaders({});
-            the.debug('request stream', '\n', the._stream);
+            the.debug('request stream', the._stream);
             dato.extend(requestOptions.headers, streamHeaders);
         } else {
             var requestBody = options.body;
@@ -316,7 +316,7 @@ var Request = klass.extends(stream.Stream).create({
 
             the._requestBody = requestBody;
             requestOptions.headers['content-length'] = Buffer.byteLength(requestBody);
-            the.debug('request body', '\n', requestBody);
+            the.debug('request body', requestBody);
         }
     },
 
@@ -380,7 +380,8 @@ var Request = klass.extends(stream.Stream).create({
 
         req.on('response', function (res) {
             the.res = res;
-            the.debug('response', res.statusCode, '\n', res.headers);
+            the.debug('response code', res.statusCode);
+            the.debug('response headers', res.headers);
 
             // 30x redirect
             if (res.statusCode >= 300 && res.statusCode < 400) {
