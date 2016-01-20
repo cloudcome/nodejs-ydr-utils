@@ -257,7 +257,7 @@ exports.__expressStart = function (options) {
 
         var log = function (ip) {
             if (!options.exclude.test(req.url)) {
-                exports.info(ip, req.method, req.$fullURL);
+                exports.info(exports.magenta(ip, req.method, req.$fullURL));
             }
         };
 
