@@ -387,4 +387,9 @@ exports.__expressEnd = function (options) {
     };
 };
 
-
+// ==========================================
+// ==============[ functions ]===============
+// ==========================================
+exports.holdError = function (err) {
+    return exports.error(err);
+};
