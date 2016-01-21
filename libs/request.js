@@ -528,6 +528,7 @@ var Request = klass.extends(stream.Stream).create({
         }
 
         if (the._pipeTo) {
+            the.emit('response', resContent);
             resContent.pipe(the._pipeTo);
             return;
         }
