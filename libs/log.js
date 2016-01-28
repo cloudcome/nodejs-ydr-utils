@@ -419,15 +419,15 @@ exports.manage = function (options) {
             h: [0],
             m: [0]
         }],
-        // 只保留 30 天之内日志
+        // 只保留 15 天之内日志
         maxLength: 15
     }, options);
 
     var src = path.join(options.dirname, options.input);
     var output = 'node-' + date.format(STR_FORMAT) + '.log';
 
-    //later.date.localTime();
-    //later.setInterval(function () {
+    later.date.localTime();
+    later.setInterval(function () {
         // 传输日志
         var dest = fse.createWriteStream(path.join(options.dirname, output));
         var complete = function () {
@@ -473,7 +473,7 @@ exports.manage = function (options) {
                 }
             });
         });
-    //}, {
-    //    schedules: options.schedules
-    //});
+    }, {
+        schedules: options.schedules
+    });
 };
