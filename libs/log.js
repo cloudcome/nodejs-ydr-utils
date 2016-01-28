@@ -400,8 +400,12 @@ exports.holdError = function (err) {
 
 
 // ==========================================
-// ================[ later ]=================
+// ================[ manage ]=================
 // ==========================================
+/**
+ * 日志管理
+ * @param options
+ */
 exports.manage = function (options) {
     options = dato.extend({
         dirname: __dirname,
@@ -413,7 +417,7 @@ exports.manage = function (options) {
             m: [0]
         }],
         // 只保留 30 天之内日志
-        maxLength: 30
+        maxLength: 15
     }, options);
 
     var src = path.join(options.dirname, options.input);
@@ -421,6 +425,7 @@ exports.manage = function (options) {
 
     later.date.localTime();
     later.setInterval(function () {
+        // 传输日志
         var dest = fse.createWriteStream(path.join(options.dirname, output));
         var complete = function () {
             fse.writeFile(src, '', 'utf8', exports.holdError);
@@ -434,6 +439,9 @@ exports.manage = function (options) {
             .on('error', complete)
             .on('close', complete)
             .on('end', complete);
+
+        // 日志数量
+
     }, {
         schedules: options.schedules
     });
