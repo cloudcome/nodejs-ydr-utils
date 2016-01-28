@@ -9,15 +9,16 @@
 
 var util = require('util');
 var later = require('later');
-var path = require('path');
+var fse = require('fs-extra');
 
+var path = require('./path.js');
 var pkg = require('../package.json');
 var allocation = require('../libs/allocation.js');
-var date = require('../libs/date.js');
-var dato = require('../libs/dato.js');
-var string = require('../libs/string.js');
-var typeis = require('../libs/typeis.js');
-var system = require('../libs/system.js');
+var date = require('./date.js');
+var dato = require('./dato.js');
+var string = require('./string.js');
+var typeis = require('./typeis.js');
+var system = require('./system.js');
 
 
 // ==========================================
@@ -414,4 +415,26 @@ exports.manage = function (options) {
         // 只保留 30 天之内日志
         maxLength: 30
     }, options);
+
+    var src = path.join(options.dirname, options.input);
+    var output = date.format(options.output);
+
+    later.date.localTime();
+    later.setInterval(function () {
+        var dest = fse.createWriteStream(path.join(options.dirname, output));
+        var complete = function () {
+            fse.writeFile(src, '', 'utf8', exports.holdError);
+        };
+
+        fse.createReadStream(src)
+            .on('error', complete)
+            .on('close', complete)
+            .on('end', complete)
+            .pipe(dest)
+            .on('error', complete)
+            .on('close', complete)
+            .on('end', complete);
+    }, {
+        schedules: options.schedules
+    });
 };
