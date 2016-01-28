@@ -38,7 +38,7 @@ describe('log', function () {
         console.log(log.underline(log.bold(log.magenta('呵呵', {a: {b: {c: {d: {e: 'f'}}}}}, '后悔'))));
     });
 
-    it('table', function () {
+    xit('table', function () {
         console.log(log.table([
             ['App name', 'id', 'mode', 'pid', 'status', 'restart', 'uptimes', 'memory', 'watching'],
             ['abc', 1, 'fork', 19312, 'online', 1, '14D', '19.123MB', 'disabled'],
@@ -89,5 +89,12 @@ describe('log', function () {
         var err = new Error('xxx');
         err.x1312312 = 312312;
         log.error('error2', {a: {b: {c: {d: {e: 'f'}}}}}, err);
+    });
+
+    it('manage', function () {
+        log.manage({
+            dirname: __dirname,
+            maxLength: 5
+        });
     });
 });

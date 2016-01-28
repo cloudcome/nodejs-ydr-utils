@@ -8,6 +8,7 @@
 'use strict';
 
 var util = require('util');
+var glob = require('glob');
 var later = require('later');
 var fse = require('fs-extra');
 
@@ -402,6 +403,8 @@ exports.holdError = function (err) {
 // ==========================================
 // ================[ manage ]=================
 // ==========================================
+var REG_FORMAT = /\d{4}-\d{2}-\d{2}/;
+var STR_FORMAT = 'YYYY-MM-DD';
 /**
  * 日志管理
  * @param options
@@ -410,7 +413,7 @@ exports.manage = function (options) {
     options = dato.extend({
         dirname: __dirname,
         input: 'pm2.log',
-        output: 'node-YYYY-MM-DD.log',
+        //output: 'node-YYYY-MM-DD.log',
         // 每天 0 点切割日志
         schedules: [{
             h: [0],
@@ -421,10 +424,10 @@ exports.manage = function (options) {
     }, options);
 
     var src = path.join(options.dirname, options.input);
-    var output = date.format(options.output);
+    var output = 'node-' + date.format(STR_FORMAT) + '.log';
 
-    later.date.localTime();
-    later.setInterval(function () {
+    //later.date.localTime();
+    //later.setInterval(function () {
         // 传输日志
         var dest = fse.createWriteStream(path.join(options.dirname, output));
         var complete = function () {
@@ -441,8 +444,36 @@ exports.manage = function (options) {
             .on('end', complete);
 
         // 日志数量
+        var logs = path.join(options.dirname, 'node-*.log');
+        glob(logs, function (err, files) {
+            if(err){
+                return exports.error(err);
+            }
 
-    }, {
-        schedules: options.schedules
-    });
+            if(files.length <= options.maxLength){
+                return;
+            }
+
+            var now = Date.now();
+            var deadTime = now - options.maxLength * 24 * 60 * 60 * 1000;
+
+            files.forEach(function (file) {
+                var basename = path.basename(file);
+                var matches = basename.match(REG_FORMAT);
+
+                if(!matches){
+                    return;
+                }
+
+                var datestr = matches[0];
+                var time = new Date(datestr).getTime();
+
+                if(time < deadTime){
+                    fse.remove(file, exports.holdError);
+                }
+            });
+        });
+    //}, {
+    //    schedules: options.schedules
+    //});
 };
