@@ -387,6 +387,7 @@ exports.__expressEnd = function (options) {
     };
 };
 
+
 // ==========================================
 // ==============[ functions ]===============
 // ==========================================
@@ -394,4 +395,23 @@ exports.holdError = function (err) {
     if (err && err instanceof Error) {
         exports.error(err);
     }
+};
+
+
+// ==========================================
+// ================[ later ]=================
+// ==========================================
+exports.manage = function (options) {
+    options = dato.extend({
+        dirname: __dirname,
+        input: 'pm2.log',
+        output: 'node-YYYY-MM-DD.log',
+        // 每天 0 点切割日志
+        schedules: [{
+            h: [0],
+            m: [0]
+        }],
+        // 只保留 30 天之内日志
+        maxLength: 30
+    }, options);
 };
