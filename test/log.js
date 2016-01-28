@@ -11,7 +11,7 @@ var log = require('../libs/log.js');
 
 
 describe('log', function () {
-    xit('make color', function () {
+    it('make color', function () {
         console.log(log.red('呵呵', {a: {b: {c: {d: {e: 'f'}}}}}, '后悔'));
         console.log(log.cyan('呵呵', {a: {b: {c: {d: {e: 'f'}}}}}, '后悔'));
         console.log(log.green('呵呵', {a: {b: {c: {d: {e: 'f'}}}}}, '后悔'));
@@ -38,7 +38,7 @@ describe('log', function () {
         console.log(log.underline(log.bold(log.magenta('呵呵', {a: {b: {c: {d: {e: 'f'}}}}}, '后悔'))));
     });
 
-    xit('table', function () {
+    it('table', function () {
         console.log(log.table([
             ['App name', 'id', 'mode', 'pid', 'status', 'restart', 'uptimes', 'memory', 'watching'],
             ['abc', 1, 'fork', 19312, 'online', 1, '14D', '19.123MB', 'disabled'],
@@ -58,7 +58,7 @@ describe('log', function () {
         }));
     });
 
-    xit('placeholder', function () {
+    it('placeholder', function () {
         log.config({
             whiteList: ['info', 'error', 'warn', 'success']
         });
@@ -69,32 +69,32 @@ describe('log', function () {
         log.error('node version is ${node}');
     });
 
-    xit('info', function () {
+    it('info', function () {
         log.info('info1', process.env);
         log.info('info2', {a: {b: {c: {d: {e: 'f'}}}}}, '后悔');
     });
 
-    xit('success', function () {
+    it('success', function () {
         log.success('success', process.env);
         log.success('success', {a: {b: {c: {d: {e: 'f'}}}}}, '后悔');
     });
 
-    xit('warn', function () {
+    it('warn', function () {
         log.warn('warn1', this);
         log.warn('warn2', {a: {b: {c: {d: {e: 'f'}}}}}, '后悔');
     });
 
-    xit('error', function () {
+    it('error', function () {
         log.error('error1', process.versions);
         var err = new Error('xxx');
         err.x1312312 = 312312;
         log.error('error2', {a: {b: {c: {d: {e: 'f'}}}}}, err);
     });
 
-    it('manage', function () {
-        log.manage({
-            dirname: __dirname,
-            maxLength: 5
-        });
-    });
+    //it('manage', function () {
+    //    log.manage({
+    //        dirname: __dirname,
+    //        maxLength: 5
+    //    });
+    //});
 });
