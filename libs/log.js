@@ -423,21 +423,16 @@ exports.manage = function (options) {
         maxLength: 15
     }, options);
 
-    var outSrc = path.join(options.dirname, options.outLog);
-    var errSrc = path.join(options.dirname, options.errLog);
-    var outLog = 'node-out-' + date.format(STR_FORMAT) + '.log';
-    var errLog = 'node-err-' + date.format(STR_FORMAT) + '.log';
-
     var list = [];
 
     list.push({
-        src: outSrc,
-        dest: outLog
+        src: options.outLog,
+        dest: 'node-out-' + date.format(STR_FORMAT) + '.log'
     });
 
     list.push({
-        src: errSrc,
-        dest: errLog
+        src: options.errLog,
+        dest: 'node-err-' + date.format(STR_FORMAT) + '.log'
     });
 
     later.date.localTime();
