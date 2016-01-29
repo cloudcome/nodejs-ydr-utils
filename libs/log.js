@@ -427,12 +427,12 @@ exports.manage = function (options) {
 
     list.push({
         src: options.outLog,
-        dest: 'node-out-' + date.format(STR_FORMAT) + '.log'
+        dest: 'node-out-'
     });
 
     list.push({
         src: options.errLog,
-        dest: 'node-err-' + date.format(STR_FORMAT) + '.log'
+        dest: 'node-err-'
     });
 
     later.date.localTime();
@@ -442,9 +442,11 @@ exports.manage = function (options) {
             var complete = function () {
                 fse.writeFile(item.src, '', 'utf8', exports.holdError);
             };
-            var dest = fse.createWriteStream(path.join(options.dirname, item.dest));
+            var src = fse.createReadStream(path.join(options.dirname, item.src));
+            var name = item.dest + date.format(STR_FORMAT) + '.log';
+            var dest = fse.createWriteStream(path.join(options.dirname, name));
 
-            fse.createReadStream(item.src)
+            src
                 .on('error', complete)
                 .on('close', complete)
                 .on('end', complete)
