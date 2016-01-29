@@ -412,8 +412,8 @@ var STR_FORMAT = 'YYYY-MM-DD';
 exports.manage = function (options) {
     options = dato.extend({
         dirname: __dirname,
-        input: 'pm2.log',
-        //output: 'node-YYYY-MM-DD.log',
+        outLog: 'out.log',
+        errLog: 'err.log',
         // 每天 0 点切割日志
         schedules: [{
             h: [0],
@@ -423,18 +423,21 @@ exports.manage = function (options) {
         maxLength: 15
     }, options);
 
-    var src = path.join(options.dirname, options.input);
-    var output = 'node-' + date.format(STR_FORMAT) + '.log';
+    var outSrc = path.join(options.dirname, options.outLog);
+    var errSrc = path.join(options.dirname, options.errLog);
+    var outLog = 'node-out-' + date.format(STR_FORMAT) + '.log';
+    var errLog = 'node-err-' + date.format(STR_FORMAT) + '.log';
 
     later.date.localTime();
     later.setInterval(function () {
+        dato.each();
         // 传输日志
-        var dest = fse.createWriteStream(path.join(options.dirname, output));
+        var dest = fse.createWriteStream(path.join(options.dirname, outLog));
         var complete = function () {
-            fse.writeFile(src, '', 'utf8', exports.holdError);
+            fse.writeFile(outSrc, '', 'utf8', exports.holdError);
         };
 
-        fse.createReadStream(src)
+        fse.createReadStream(outSrc)
             .on('error', complete)
             .on('close', complete)
             .on('end', complete)
