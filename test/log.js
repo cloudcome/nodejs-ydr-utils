@@ -91,10 +91,10 @@ describe('log', function () {
         log.error('error2', {a: {b: {c: {d: {e: 'f'}}}}}, err);
     });
 
-    it('manage', function () {
-        log.manage({
-            dirname: __dirname,
-            maxLength: 5
-        });
-    });
+    //it('manage', function () {
+    //    log.manage({
+    //        dirname: __dirname,
+    //        maxLength: 5
+    //    });
+    //});
 });
