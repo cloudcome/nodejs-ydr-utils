@@ -428,32 +428,45 @@ exports.manage = function (options) {
     var outLog = 'node-out-' + date.format(STR_FORMAT) + '.log';
     var errLog = 'node-err-' + date.format(STR_FORMAT) + '.log';
 
+    var list = [];
+
+    list.push({
+        src: outSrc,
+        dest: outLog
+    });
+
+    list.push({
+        src: errSrc,
+        dest: errLog
+    });
+
     later.date.localTime();
     later.setInterval(function () {
-        dato.each();
         // 传输日志
-        var dest = fse.createWriteStream(path.join(options.dirname, outLog));
-        var complete = function () {
-            fse.writeFile(outSrc, '', 'utf8', exports.holdError);
-        };
+        dato.each(list, function (index, item) {
+            var complete = function () {
+                fse.writeFile(item.src, '', 'utf8', exports.holdError);
+            };
+            var dest = fse.createWriteStream(path.join(options.dirname, item.dest));
 
-        fse.createReadStream(outSrc)
-            .on('error', complete)
-            .on('close', complete)
-            .on('end', complete)
-            .pipe(dest)
-            .on('error', complete)
-            .on('close', complete)
-            .on('end', complete);
+            fse.createReadStream(item.src)
+                .on('error', complete)
+                .on('close', complete)
+                .on('end', complete)
+                .pipe(dest)
+                .on('error', complete)
+                .on('close', complete)
+                .on('end', complete);
+        });
 
         // 日志数量
         var logs = path.join(options.dirname, 'node-*.log');
         glob(logs, function (err, files) {
-            if(err){
+            if (err) {
                 return exports.error(err);
             }
 
-            if(files.length <= options.maxLength){
+            if (files.length <= options.maxLength) {
                 return;
             }
 
@@ -464,14 +477,14 @@ exports.manage = function (options) {
                 var basename = path.basename(file);
                 var matches = basename.match(REG_FORMAT);
 
-                if(!matches){
+                if (!matches) {
                     return;
                 }
 
                 var datestr = matches[0];
                 var time = new Date(datestr).getTime();
 
-                if(time < deadTime){
+                if (time < deadTime) {
                     fse.remove(file, exports.holdError);
                 }
             });
