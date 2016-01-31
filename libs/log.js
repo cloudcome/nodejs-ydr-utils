@@ -261,7 +261,7 @@ exports.info = function () {
     }
 
     log(function (str) {
-        return str;
+        return allocation.args(arguments).map(pretty).join(' ');
     }, '[INFO]', arguments);
 };
 
