@@ -61,6 +61,7 @@ exports.localIP = function () {
  */
 exports.remoteIP = function (req, callback) {
     var args = allocation.args(arguments);
+    var request = require('./request.js');
 
     if (args.length === 1) {
         callback = args[0];
@@ -77,7 +78,7 @@ exports.remoteIP = function (req, callback) {
     howdo
     // 从 ip138.com 处获取
         .task(function (done) {
-            request({
+            this.req = request({
                 url: IP_138
             }, function (err, body) {
                 if (err) {
@@ -94,13 +95,13 @@ exports.remoteIP = function (req, callback) {
                 done(null, matches[1].trim());
             });
         })
-        //.abort(function () {
-        //    this.req.abort();
-        //})
+        .abort(function () {
+            this.req.abort();
+        })
 
         // 从 ip.qq.com 处获取
         .task(function (done) {
-            request({
+            this.req = request({
                 url: IP_QQ
             }, function (err, body) {
                 if (err) {
@@ -117,14 +118,14 @@ exports.remoteIP = function (req, callback) {
                 done(null, matches[1].trim());
             });
         })
-        //.abort(function () {
-        //    this.req.abort();
-        //})
+        .abort(function () {
+            this.req.abort();
+        })
 
         // 任务结束条件
-        //.until(function (ip) {
-        //    return ip && ip !== '';
-        //})
+        .until(function (ip) {
+            return ip && ip !== '';
+        })
         .together(function (err, ip) {
             callback(null, ip || '127.0.0.1');
         });
@@ -161,6 +162,7 @@ exports.info = function (callback) {
  * @param callback
  */
 exports.parseIP = function (ip, callback) {
+    var request = require('./request.js');
     var args = allocation.args(arguments);
 
     if (args.length === 1) {

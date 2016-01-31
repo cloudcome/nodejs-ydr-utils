@@ -6,11 +6,8 @@ var path = require('path');
 
 var request = require('../libs/request.js');
 var random = require('../libs/random.js');
-//var request2 = require('request');
 var FormData = require('form-data');
-//var request3 = require('superagent');
 var http = require('http');
-var ur = require('url');
 
 var delay = function (callback) {
     setTimeout(callback, 500);
