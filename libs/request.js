@@ -757,69 +757,69 @@ Request.defaults = defaults;
 Request.FormData = FormData;
 
 
-module.exports = function (options, callback) {
+var request = module.exports = function (options, callback) {
     return new Request(options, callback);
 };
 
-//request.defaults = defaults;
-//request.Request = Request;
-//request.FormData = FormData;
-//
-//
-///**
-// * get 请求
-// * @param url
-// * @param callback
-// * @returns {Error|Domain|Suite}
-// */
-//request.get = function (url, callback) {
-//    var options = url;
-//
-//    if (typeis.String(options)) {
-//        options = {
-//            url: url
-//        };
-//    }
-//
-//    options.method = 'GET';
-//    return new Request(options, callback);
-//};
-//
-//
-///**
-// * post 请求
-// * @param url
-// * @param callback
-// * @returns {Error|Domain|Suite}
-// */
-//request.post = function (url, callback) {
-//    var options = url;
-//
-//    if (typeis.String(options)) {
-//        options = {
-//            url: url
-//        };
-//    }
-//
-//    options.method = 'GET';
-//    return new Request(options, callback);
-//};
-//
-///**
-// * 下载
-// * @type {exports.download}
-// */
-//request.down = module.exports.download = function (url, callback) {
-//    var options = url;
-//
-//    if (typeis.String(options)) {
-//        options = {
-//            url: url
-//        };
-//    }
-//
-//    options.method = 'GET';
-//    options.encoding = 'binary';
-//    return new Request(options, callback);
-//};
+request.defaults = defaults;
+request.Request = Request;
+request.FormData = FormData;
+
+
+/**
+ * get 请求
+ * @param url
+ * @param callback
+ * @returns {Error|Domain|Suite}
+ */
+request.get = function (url, callback) {
+    var options = url;
+
+    if (typeis.String(options)) {
+        options = {
+            url: url
+        };
+    }
+
+    options.method = 'GET';
+    return new Request(options, callback);
+};
+
+
+/**
+ * post 请求
+ * @param url
+ * @param callback
+ * @returns {Error|Domain|Suite}
+ */
+request.post = function (url, callback) {
+    var options = url;
+
+    if (typeis.String(options)) {
+        options = {
+            url: url
+        };
+    }
+
+    options.method = 'GET';
+    return new Request(options, callback);
+};
+
+/**
+ * 下载
+ * @type {exports.download}
+ */
+request.down = module.exports.download = function (url, callback) {
+    var options = url;
+
+    if (typeis.String(options)) {
+        options = {
+            url: url
+        };
+    }
+
+    options.method = 'GET';
+    options.encoding = 'binary';
+    return new Request(options, callback);
+};
 
