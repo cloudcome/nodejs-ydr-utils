@@ -757,7 +757,7 @@ Request.defaults = defaults;
 Request.FormData = FormData;
 
 
-var request = function (options, callback) {
+module.exports = function (options, callback) {
     return new Request(options, callback);
 };
 
@@ -822,8 +822,4 @@ var request = function (options, callback) {
 //    options.encoding = 'binary';
 //    return new Request(options, callback);
 //};
-
-
-
-module.exports = request;
 
