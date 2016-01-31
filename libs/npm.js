@@ -47,7 +47,7 @@ exports.getLatestVersion = function (moduleName, callback) {
         moduleName: moduleMeta.name
     });
 
-    request.get({
+    request({
         url: url,
         timeout: -1
     }, function (err, body) {

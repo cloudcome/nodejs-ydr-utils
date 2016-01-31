@@ -8,7 +8,6 @@
 'use strict';
 
 var os = require('os');
-var fse = require('fs-extra');
 var childProcess = require('child_process');
 var howdo = require('howdo');
 
@@ -78,7 +77,7 @@ exports.remoteIP = function (req, callback) {
     howdo
     // 从 ip138.com 处获取
         .task(function (done) {
-            this.req = request.get({
+            this.req = request({
                 url: IP_138
             }, function (err, body) {
                 if (err) {
@@ -101,7 +100,7 @@ exports.remoteIP = function (req, callback) {
 
         // 从 ip.qq.com 处获取
         .task(function (done) {
-            this.req = request.get({
+            this.req = request({
                 url: IP_QQ
             }, function (err, body) {
                 if (err) {
@@ -177,7 +176,7 @@ exports.parseIP = function (ip, callback) {
             exports.remoteIP(req, next);
         })
         .task(function (next, ip) {
-            request.get({
+            request({
                 url: IP_LOOKUP,
                 query: {
                     ip: ip,

@@ -47,7 +47,7 @@ var keys = [
 var REG_RP = /[^\w-]/g;
 var REG_LP = /-+/g;
 var REG_LR = /^-+|-+$/g;
-var url = 'http://fanyi.youdao.com/openapi.do?';
+var url = 'http://fanyi.youdao.com/openapi.do';
 var configs = {
     random: function () {
         var index = random.number(0, keys.length - 1);
@@ -86,8 +86,9 @@ var translate = function (word, callback) {
 
     query.q = String(word);
     query.random = undefined;
-    request.get({
-        url: url + qs.stringify(query)
+    request({
+        url: url,
+        query: query
     }, function (err, body) {
         if (err) {
             return callback(err);

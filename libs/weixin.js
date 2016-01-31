@@ -71,7 +71,7 @@ var getAccessToken = function (callback) {
         return callback(null, accessToken);
     }
 
-    request.get({
+    request({
         url: WEIXIN_TOKEN_URL,
         query: {
             grant_type: 'client_credential',
@@ -116,7 +116,7 @@ var getJSApiTicket = function (callback) {
     howdo
         .task(getAccessToken)
         .task(function (next, accessToken) {
-            request.get({
+            request({
                 url: WEIXIN_TICKET_URL,
                 query: {
                     access_token: accessToken,
