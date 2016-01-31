@@ -204,8 +204,9 @@ describe('request', function () {
             console.log('response error');
             console.error(err);
             done();
+        }).on('response', function () {
+            done();
         });
-        delay(done);
     });
 
     it('callback', function (done) {
