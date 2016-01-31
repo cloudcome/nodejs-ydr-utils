@@ -88,8 +88,10 @@ describe('request', function () {
         }).on('body', function (body) {
             fs.writeFileSync(file, body);
             done();
-        }).on('error', function () {
-            console.log('error');
+        }).on('error', function (err) {
+            console.log('\n\n-------------------------------------');
+            console.log('response error');
+            console.error(err);
             done();
         });
     });
@@ -130,8 +132,10 @@ describe('request', function () {
             browser: false
         }).on('response', function (res) {
             done();
-        }).on('error', function () {
-            console.log('error');
+        }).on('error', function (err) {
+            console.log('\n\n-------------------------------------');
+            console.log('response error');
+            console.error(err);
             done();
         });
     });
@@ -143,6 +147,11 @@ describe('request', function () {
         request({
             url: url,
             debug: true
+        }).on('error', function (err) {
+            console.log('\n\n-------------------------------------');
+            console.log('response error');
+            console.error(err);
+            done();
         }).pipe(fs.createWriteStream(file)).on('close', function () {
             done();
         }).on('error', function () {
@@ -168,8 +177,10 @@ describe('request', function () {
         req.on('body', function (body) {
             console.log(body);
             done();
-        }).on('error', function () {
-            console.log('error');
+        }).on('error', function (err) {
+            console.log('\n\n-------------------------------------');
+            console.log('response error');
+            console.error(err);
             done();
         });
     });
@@ -191,8 +202,11 @@ describe('request', function () {
             headers: fd.getHeaders({})
         });
 
-        fd.pipe(req).on('error', function () {
-            console.log('error');
+        fd.pipe(req).on('error', function (err) {
+            console.log('\n\n-------------------------------------');
+            console.log('response error');
+            console.error(err);
+            done();
         });
         delay(done);
     });

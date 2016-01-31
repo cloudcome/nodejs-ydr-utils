@@ -77,7 +77,7 @@ exports.remoteIP = function (req, callback) {
     howdo
     // 从 ip138.com 处获取
         .task(function (done) {
-            this.req = request({
+            request({
                 url: IP_138
             }, function (err, body) {
                 if (err) {
@@ -94,13 +94,13 @@ exports.remoteIP = function (req, callback) {
                 done(null, matches[1].trim());
             });
         })
-        .abort(function () {
-            this.req.abort();
-        })
+        //.abort(function () {
+        //    this.req.abort();
+        //})
 
         // 从 ip.qq.com 处获取
         .task(function (done) {
-            this.req = request({
+            request({
                 url: IP_QQ
             }, function (err, body) {
                 if (err) {
@@ -117,14 +117,14 @@ exports.remoteIP = function (req, callback) {
                 done(null, matches[1].trim());
             });
         })
-        .abort(function () {
-            this.req.abort();
-        })
+        //.abort(function () {
+        //    this.req.abort();
+        //})
 
         // 任务结束条件
-        .until(function (ip) {
-            return ip && ip !== '';
-        })
+        //.until(function (ip) {
+        //    return ip && ip !== '';
+        //})
         .together(function (err, ip) {
             callback(null, ip || '127.0.0.1');
         });
@@ -173,6 +173,7 @@ exports.parseIP = function (ip, callback) {
             var req = typeis.Object(ip) ? ip : {
                 ip: ip
             };
+
             exports.remoteIP(req, next);
         })
         .task(function (next, ip) {
