@@ -183,7 +183,7 @@ var Request = klass.extends(stream.Stream).create({
             return the;
         }
 
-        log.info(log.magenta('[' + the._options.method + ' ' + the._urlList[the._urlList.length - 1] + ']'));
+        console.log(log.magenta('[' + the._options.method + ' ' + the._urlList[the._urlList.length - 1] + ']'));
         debug.info(event, msg);
 
         return the;
