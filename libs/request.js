@@ -371,7 +371,7 @@ var Request = klass.extends(stream.Stream).create({
 
         the._buildRequestHeaders(requestOptions);
         the._requestTimes++;
-        the.debug('request hedaers', requestOptions.headers);
+        the.debug('request headers', requestOptions.headers);
 
         var req = the.req = client.request(requestOptions);
 
