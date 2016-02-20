@@ -801,7 +801,7 @@ request.post = function (url, callback) {
         };
     }
 
-    options.method = 'GET';
+    options.method = 'POST';
     return new Request(options, callback);
 };
 
