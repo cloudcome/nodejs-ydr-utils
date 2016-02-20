@@ -411,6 +411,7 @@ var STR_FORMAT = 'YYYY-MM-DD';
  */
 exports.manage = function (options) {
     options = dato.extend({
+        // 日志的保存目录
         dirname: __dirname,
         outLog: 'out.log',
         errLog: 'err.log',
