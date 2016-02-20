@@ -408,11 +408,16 @@ var STR_FORMAT = 'YYYY-MM-DD';
 /**
  * 日志管理
  * @param options
+ * @param options.dirname {String} 日志的保存目录
+ * @param [options.outLog=out.log] {String} out 日志
+ * @param [options.errLog=err.log] {String} error 日志
+ * @param [options.schedules] {Object} 定时器
+ * @param [options.maxLength=15] {Number} 保留天数
  */
 exports.manage = function (options) {
     options = dato.extend({
         // 日志的保存目录
-        dirname: __dirname,
+        dirname: null,
         outLog: 'out.log',
         errLog: 'err.log',
         // 每天 0 点切割日志
@@ -423,6 +428,10 @@ exports.manage = function (options) {
         // 只保留 15 天之内日志
         maxLength: 15
     }, options);
+
+    if (!options.dirname) {
+        throw new Error('log manage dirname option is EMPTY');
+    }
 
     var list = [];
 
