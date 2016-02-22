@@ -374,6 +374,10 @@ exports.__expressEnd = function (options) {
                 err['request files'] = req.files;
             }
 
+            if (req.session) {
+                err['request session'] = req.session;
+            }
+
             dato.each(options.inject, function (key, val) {
                 if (typeis.Function(val)) {
                     err[key] = val(req, res);
