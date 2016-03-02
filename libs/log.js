@@ -91,6 +91,10 @@ var pretty = function (obj) {
         return obj;
     }
 
+    if(obj && obj instanceof Error){
+        return formatError(obj);
+    }
+
     try {
         return util.inspect(obj, {
             depth: 3
@@ -264,10 +268,6 @@ exports.out = function () {
  * 普通日志
  */
 exports.info = function () {
-    if (!configs.whiteMap.info) {
-        return;
-    }
-
     log(function (str) {
         return allocation.args(arguments).map(pretty).join(' ');
     }, '[INFO]', arguments);
@@ -278,10 +278,6 @@ exports.info = function () {
  * 成功日志
  */
 exports.success = function () {
-    if (!configs.whiteMap.success) {
-        return;
-    }
-
     log(exports.green, '[SUCCESS]', arguments);
 };
 
@@ -290,10 +286,6 @@ exports.success = function () {
  * 警告日志
  */
 exports.warn = function () {
-    if (!configs.whiteMap.warn) {
-        return;
-    }
-
     log(exports.yellow, '[WARNING]', arguments);
 };
 
@@ -302,10 +294,6 @@ exports.warn = function () {
  * 错误日志
  */
 exports.error = function () {
-    if (!configs.whiteMap.error) {
-        return;
-    }
-
     var args = allocation.args(arguments).map(formatError);
 
     log(exports.red, '[ERROR]', args);
