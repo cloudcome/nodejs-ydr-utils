@@ -39,6 +39,11 @@ exports.config = function () {
 };
 
 
+/**
+ * 颜色包装
+ * @param color
+ * @returns {*}
+ */
 var wrapper = function (color) {
     if (configs.color) {
         return log[color];
@@ -80,66 +85,6 @@ console.error = function () {
 };
 
 
-//var pros = ['log', 'info', 'warn', 'error'];
-//var defaults = {
-//    whiteList: pros,
-//    prefix: function () {
-//        return '[' + date.format('YYYY-MM-DD HH:mm:ss:SSS') + ']';
-//    }
-//};
-//var colorMap = {
-//    log: log.normal,
-//    info: log.cyan,
-//    warn: log.yellow,
-//    error: log.red
-//};
-//
-//
-//module.exports = function (options) {
-//    if (typeis.Array(options)) {
-//        options = {
-//            whiteList: options
-//        };
-//    }
-//
-//    options = dato.extend({}, defaults, options);
-//    var whiteMap = {};
-//
-//    options.whiteList.forEach(function (can) {
-//        whiteMap[can] = true;
-//    });
-//
-//    var old = global.console.log;
-//    pros.forEach(function (pro) {
-//        if (whiteMap[pro]) {
-//            var pro2 = pro.toUpperCase();
-//            pro2 = '[' + pro2 + ']';
-//            pro2 = string.padRight(pro2, 8);
-//
-//            global.console[pro] = function () {
-//                var args = allocation.args(arguments);
-//
-//                if (typeis.Function(options.prefix)) {
-//                    args.unshift(options.prefix());
-//                }
-//
-//                args.unshift(pro2);
-//                args = args.map(function (item) {
-//                    return colorMap[pro](item);
-//                });
-//                old.apply(global.console, args);
-//            };
-//        } else {
-//            global.console[pro] = function () {
-//                // ignore
-//            };
-//        }
-//    });
-//
-//    return global.console;
-//};
-//
-//
 /**
  * 打点
  * @param str
