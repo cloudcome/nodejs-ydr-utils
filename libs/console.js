@@ -7,14 +7,16 @@
 
 'use strict';
 
+var util = require('util');
+
 
 var allocation = require('./allocation.js');
 var dato = require('./dato.js');
 var typeis = require('./typeis.js');
 var date = require('./date.js');
 var string = require('./string.js');
-var log = require('./log.js');
 var console = global.console;
+var oldLog = console.log;
 
 var configs = {
     // 是否颜色输出
@@ -40,16 +42,89 @@ exports.config = function () {
 
 
 /**
- * 颜色包装
- * @param color
+ * 格式错误对象
+ * @param err
  * @returns {*}
  */
-var wrapper = function (color) {
-    if (configs.color) {
-        return log[color];
+var formatError = function (err) {
+    if (!err || !(err instanceof Error)) {
+        return err;
     }
 
-    return log.normal;
+    var defaultErrorKey = {
+        type: true,
+        message: true,
+        name: true,
+        stack: true
+    };
+
+    var msg = err.stack || err.message || String(err);
+    var name = err.name || 'Error';
+
+    dato.each(err, function (key, val) {
+        if (!defaultErrorKey[key]) {
+            msg += '\n' + name + ' ' + key + ': ' + pretty(val);
+        }
+    });
+
+    return msg;
+};
+
+
+/**
+ * 美化对象输出
+ * @param obj
+ * @returns {*}
+ */
+var pretty = function (obj) {
+    if (typeis.String(obj)) {
+        return obj;
+    }
+
+    if (obj && obj instanceof Error) {
+        return formatError(obj);
+    }
+
+    try {
+        return util.inspect(obj, {
+            depth: 3
+        });
+    } catch (err) {
+        return formatError(err);
+    }
+};
+
+
+/**
+ * 颜色包装器
+ * @param color
+ * @returns {Function}
+ */
+var makeColor = function (color) {
+    return function () {
+        var msgs = allocation.args(arguments).map(pretty);
+        var msg = msgs.join(' ');
+
+        if (!configs.color || !color) {
+            return msg;
+        }
+
+        var args = [];
+
+        args.push('\x1b[' + util.inspect.colors[color][0] + 'm%s\x1b[' + util.inspect.colors[color][1] + 'm');
+        args.push(msg);
+
+        return util.format.apply(util, args);
+    };
+};
+
+
+/**
+ * 打印日志
+ * @param msg
+ */
+var printOut = function (msg) {
+    process.stdout.write(msg + '\n');
 };
 
 
@@ -57,7 +132,7 @@ var wrapper = function (color) {
  * 普通日志
  */
 console.log = function () {
-    log.out(wrapper('normal').apply(console, arguments));
+    printOut(makeColor().apply(global, arguments));
 };
 
 
@@ -65,7 +140,7 @@ console.log = function () {
  * 消息日志
  */
 console.info = function () {
-    log.out(wrapper('green').apply(console, arguments));
+    printOut(makeColor('green').apply(global, arguments));
 };
 
 
@@ -73,7 +148,7 @@ console.info = function () {
  * 警告日志
  */
 console.warn = function () {
-    log.out(wrapper('yellow').apply(console, arguments));
+    printOut(makeColor('yellow').apply(global, arguments));
 };
 
 
@@ -81,7 +156,74 @@ console.warn = function () {
  * 错误日志
  */
 console.error = function () {
-    log.out(wrapper('red').apply(console, arguments));
+    printOut(makeColor('red').apply(global, arguments));
+};
+
+
+console.table = function (trs, options) {
+    options = dato.extend({
+        padding: 1,
+        thead: false,
+        tdBorder: false
+    }, options);
+    var maxTrLength = 0;
+    var maxTdsLength = [];
+    var ret = [];
+    var padding = new Array(options.padding + 1).join(' ');
+
+    dato.each(trs, function (i, tds) {
+        dato.each(tds, function (j, td) {
+            tds[j] = td = pretty(td);
+            var tdLength = td.length + options.padding * 2;
+            maxTdsLength[j] = maxTdsLength[j] || 0;
+            maxTdsLength[j] = Math.max(maxTdsLength[j], tdLength);
+        });
+    });
+
+    var trTopCenters = [];
+    var trMiddleCenters = [];
+    var trBottomCenters = [];
+    dato.each(maxTdsLength, function (k, max) {
+        maxTrLength += max;
+        var border = new Array(max + 1).join('─');
+
+        if (k) {
+            trTopCenters.push('┬' + border);
+            trMiddleCenters.push('┼' + border);
+            trBottomCenters.push('┴' + border);
+        } else {
+            trTopCenters.push(border);
+            trMiddleCenters.push(border);
+            trBottomCenters.push(border);
+        }
+    });
+
+    maxTrLength += maxTdsLength.length - 2;
+    ret.push('┌' + trTopCenters.join('') + '┐');
+
+    dato.each(trs, function (i, tds) {
+        var tr = [];
+
+        if (options.tdBorder && i > 0) {
+            ret.push('├' + trMiddleCenters.join('') + '┤');
+        }
+
+        dato.each(tds, function (j, td) {
+            td = padding + td;
+            td = string.padRight(td, maxTdsLength[j] - options.padding, ' ');
+            tr.push(td + padding);
+        });
+
+        ret.push('│' + tr.join('│') + '│');
+
+        if (options.thead && !options.tdBorder && i === 0) {
+            ret.push('├' + trMiddleCenters.join('') + '┤');
+        }
+    });
+
+    ret.push('└' + trBottomCenters.join('') + '┘');
+
+    return ret.join('\n');
 };
 
 
