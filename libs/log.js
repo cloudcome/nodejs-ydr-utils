@@ -253,6 +253,14 @@ var log = function (wrapper, prefix, args) {
 
 
 /**
+ * 打印日志
+ */
+exports.out = function () {
+    process.stdout.write(allocation.args(arguments).map(pretty).join(' ') + '\n');
+};
+
+
+/**
  * 普通日志
  */
 exports.info = function () {
