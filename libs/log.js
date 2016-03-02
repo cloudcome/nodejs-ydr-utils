@@ -130,7 +130,7 @@ exports.grey = makeColor('grey');
 exports.cyan = makeColor('cyan');
 exports.green = makeColor('green');
 exports.normal = function () {
-    return util.format.apply(util, arguments);
+    return util.format.apply(util, allocation.args(arguments).map(pretty));
 };
 exports.yellow = makeColor('yellow');
 exports.magenta = makeColor('magenta');
