@@ -23,6 +23,8 @@ module.exports = {
     console: require('./libs/console.js'),
     // 定义常量
     constant: require('./libs/constant.js'),
+    // 控制器
+    controller: require('./libs/controller.js'),
     // csrf
     csrf: require('./libs/csrf.js'),
     // 日期
