@@ -23,10 +23,10 @@ describe('console', function () {
         console.warn('warn 日志', {a: 1}, new Error('b'));
         console.error('error 日志', {a: 1}, new Error('b'));
         console.table([
-            ['#', '姓名', '成绩'],
-            ['1', '小名', '99'],
-            ['2', '打不开了去我的期望', '919'],
-            ['3', '打不开了去我的期望打不开了去我的期望', '91119'],
+            ['#', 'dqwd', 'dqw'],
+            ['1', 'dqw', '99'],
+            ['2', 'dqwdqwdqwdqw', '919'],
+            ['3', '中文中文中文中文中文', '91119'],
         ], {
             color: 'red',
             style: 'bold'

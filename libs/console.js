@@ -53,7 +53,7 @@ var formatError = function (err) {
 
 
 /**
- * 美化对象输出
+ * 格式化
  * @param obj
  * @returns {*}
  */
@@ -239,6 +239,30 @@ console.error = function () {
 
 
 /**
+ * 右填充字符串
+ * @param str {String} 字符串
+ * @param [maxLength] {Number} 最大长度，默认为字符串长度
+ * @param [padding=" "] {String} 填充字符串
+ * @returns {String}
+ */
+var padRight = function (str, maxLength, padding) {
+    var length = string.bytes(str);
+
+    padding = padding || ' ';
+    maxLength = maxLength || length;
+
+    if (maxLength <= length) {
+        return str;
+    }
+
+    while ((++length) <= maxLength) {
+        str = str + padding;
+    }
+
+    return str;
+};
+
+/**
  * 表格
  * @param trs
  * @param options
@@ -256,10 +280,12 @@ console.table = function (trs, options) {
     var ret = [];
     var padding = new Array(options.padding + 1).join(' ');
 
+
     dato.each(trs, function (i, tds) {
         dato.each(tds, function (j, td) {
             tds[j] = td = format(td);
-            var tdLength = td.length + options.padding * 2;
+            var tdLength = string.bytes(td);
+            tdLength += options.padding * 2;
             maxTdsLength[j] = maxTdsLength[j] || 0;
             maxTdsLength[j] = Math.max(maxTdsLength[j], tdLength);
         });
@@ -295,7 +321,7 @@ console.table = function (trs, options) {
 
         dato.each(tds, function (j, td) {
             td = padding + td;
-            td = string.padRight(td, maxTdsLength[j] - options.padding, ' ');
+            td = padRight(td, maxTdsLength[j] - options.padding, ' ');
             tr.push(td + padding);
         });
 
