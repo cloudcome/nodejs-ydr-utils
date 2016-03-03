@@ -168,7 +168,7 @@ var configs = {
  * 配置
  * @returns {*}
  */
-exports.config = function () {
+console.config = function () {
     return allocation.getset({
         get: function (key) {
             return configs[key];
@@ -423,3 +423,5 @@ console.loadingEnd = function () {
     global.console.pointEnd();
 };
 
+
+module.exports = console;
