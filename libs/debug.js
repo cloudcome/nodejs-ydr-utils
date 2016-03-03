@@ -88,7 +88,7 @@ var debug = function (type, event, msg, options) {
             break;
 
         case 'primary':
-            msg = alignMsg(eventLength, msg, console.console.cyan);
+            msg = alignMsg(eventLength, msg, console.colors.cyan);
             break;
 
         case 'warn':

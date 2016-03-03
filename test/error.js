@@ -26,7 +26,7 @@ describe('error', function () {
     it('create', function () {
         var err = error(401);
 
-        log.error(err);
+        console.error(err);
         assert.equal(err.abc, 123);
         assert.equal(err.status, undefined);
         assert.equal(err.type, undefined);
