@@ -12,7 +12,7 @@ var util = require('util');
 var typeis = require('./typeis.js');
 var dato = require('./dato.js');
 var string = require('./string.js');
-var log = require('./log.js');
+var console = require('./console.js');
 
 var REG_BREAK_LINE = /[\n\r]/g;
 var configs = {
@@ -68,7 +68,7 @@ var debug = function (type, event, msg, options) {
     msg = util.format(msg);
     options = dato.extend({}, configs, options);
 
-    var eventArrow = log.grey(options.eventArrow);
+    var eventArrow = console.colors.grey(options.eventArrow);
     var eventAlign = options.eventAlign;
 
     if (options.alignInverse) {
@@ -81,31 +81,31 @@ var debug = function (type, event, msg, options) {
 
     var eventLength = event.length;
 
-    var event2 = log.yellow(event);
+    var event2 = console.colors.yellow(event);
     switch (type) {
         case 'error':
-            msg = alignMsg(eventLength, msg, log.red);
+            msg = alignMsg(eventLength, msg, console.colors.red);
             break;
 
         case 'primary':
-            msg = alignMsg(eventLength, msg, log.cyan);
+            msg = alignMsg(eventLength, msg, console.console.cyan);
             break;
 
         case 'warn':
-            msg = alignMsg(eventLength, msg, log.magenta);
+            msg = alignMsg(eventLength, msg, console.colors.magenta);
             break;
 
         case 'success':
-            msg = alignMsg(eventLength, msg, log.green);
+            msg = alignMsg(eventLength, msg, console.colors.green);
             break;
 
         case 'normal':
-            msg = alignMsg(eventLength, msg, log.normal);
+            msg = alignMsg(eventLength, msg, console.colors.original);
             break;
 
         default :
-            event2 = log.grey(event);
-            msg = alignMsg(eventLength, msg, log.grey);
+            event2 = console.colors.grey(event);
+            msg = alignMsg(eventLength, msg, console.colors.grey);
             break;
     }
 

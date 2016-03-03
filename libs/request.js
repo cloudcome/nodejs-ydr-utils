@@ -27,7 +27,7 @@ var random = require('./random.js');
 var allocation = require('./allocation.js');
 var controller = require('./controller.js');
 var mime = require('./mime.js');
-var log = require('./log.js');
+var console = require('./console.js');
 var debug = require('./debug.js');
 
 
@@ -183,7 +183,7 @@ var Request = klass.extends(stream.Stream).create({
             return the;
         }
 
-        console.log(log.magenta('[' + the._options.method + ' ' + the._urlList[the._urlList.length - 1] + ']'));
+        console.log(console.colors.magenta('[' + the._options.method + ' ' + the._urlList[the._urlList.length - 1] + ']'));
         debug.info(event, msg);
 
         return the;

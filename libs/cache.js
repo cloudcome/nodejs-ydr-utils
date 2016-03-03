@@ -10,7 +10,7 @@
 var dato = require('./dato.js');
 var number = require('./number.js');
 var typeis = require('./typeis.js');
-var log = require('./log.js');
+var console = require('./console.js');
 
 var cache = Object.create(null);
 var cacheLength = 0;
@@ -70,7 +70,7 @@ exports.set = function (key, val, expires, isOverride, callback) {
             cached.ot++;
 
             if (configs.debug) {
-                log.success('override', 'set', key, 'as', val, 'in', cached.ot, 'times');
+                console.info('override', 'set', key, 'as', val, 'in', cached.ot, 'times');
             }
         } else {
             return exports;
@@ -86,7 +86,7 @@ exports.set = function (key, val, expires, isOverride, callback) {
         };
 
         if (configs.debug) {
-            log.success('first', 'set', key, 'as', val);
+            console.info('first', 'set', key, 'as', val);
         }
 
         cacheLength++;

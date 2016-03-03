@@ -111,7 +111,8 @@ console.colors = {
     magenta: makeColor('magenta'),
     bold: makeColor('bold'),
     italic: makeColor('italic'),
-    underline: makeColor('underline')
+    underline: makeColor('underline'),
+    original: makeColor()
 };
 
 
