@@ -25,6 +25,7 @@ var defaults = {
     expires: 10 * 60 * 1000,
     mimeLimit: 'image/*'
 };
+var REG_START = /^\//;
 var REG_END = /\/$/;
 var configs = {
     accessKey: '',
@@ -83,6 +84,7 @@ exports.signature = function (options) {
     }
 
     var key = path.join(dirname, options.filename || random.guid());
+    key = key.replace(REG_START, '');
     var deadline = options.expires + Date.now();
     var encoded = urlsafeBase64Encode(JSON.stringify({
         scope: options.bucket + ':' + key,
