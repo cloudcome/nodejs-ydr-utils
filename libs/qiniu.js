@@ -69,6 +69,8 @@ exports.config = function () {
  * @param [options.mimeLimit] {String} MIME限制
  * @param [options.accessKey] {String} ak
  * @param [options.secretKey] {String} sk
+ * @param [options.callbackUrl] {String} 回调地址
+ * @param [options.callbackBodyType] {String} 回调类型
  * @returns {{key: string, token: string, url: *}}
  */
 exports.signature = function (options) {
@@ -101,7 +103,9 @@ exports.signature = function (options) {
         scope: options.bucket + ':' + key,
         // 有效期
         deadline: Math.floor(deadline / 1000),
-        mimeLimit: options.mimeLimit
+        mimeLimit: options.mimeLimit,
+        callbackUrl: options.callbackUrl,
+        callbackBodyType: options.callbackBodyType
     }));
     var encoded_signed = base64ToUrlSafe(hmacSha1(encoded, options.secretKey));
 
