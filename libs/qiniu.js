@@ -38,7 +38,10 @@ var configs = {
     dirname: '/',
     // 有效期，10分钟，单位秒
     expires: 10 * 60 * 1000,
-    mimeLimit: '*'
+    mimeLimit: '*',
+    callbackUrl: undefined,
+    callbackBody: undefined,
+    callbackBodyType: undefined
 };
 
 
@@ -70,6 +73,7 @@ exports.config = function () {
  * @param [options.accessKey] {String} ak
  * @param [options.secretKey] {String} sk
  * @param [options.callbackUrl] {String} 回调地址
+ * @param [options.callbackBody] {String} 回调内容
  * @param [options.callbackBodyType] {String} 回调类型
  * @returns {{key: string, token: string, url: *}}
  */
@@ -105,6 +109,7 @@ exports.signature = function (options) {
         deadline: Math.floor(deadline / 1000),
         mimeLimit: options.mimeLimit,
         callbackUrl: options.callbackUrl,
+        callbackBody: options.callbackBody,
         callbackBodyType: options.callbackBodyType
     }));
     var encoded_signed = base64ToUrlSafe(hmacSha1(encoded, options.secretKey));
