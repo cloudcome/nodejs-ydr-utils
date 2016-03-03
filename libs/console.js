@@ -105,7 +105,7 @@ var makeColor = function (color) {
         var msgs = allocation.args(arguments).map(pretty);
         var msg = msgs.join(' ');
 
-        if (!configs.color || !color) {
+        if (!color) {
             return msg;
         }
 
@@ -132,7 +132,7 @@ var printOut = function (msg) {
  * 普通日志
  */
 console.log = function () {
-    printOut(makeColor().apply(global, arguments));
+    oldLog.apply(console, allocation.args(arguments).map(pretty));
 };
 
 
@@ -140,7 +140,7 @@ console.log = function () {
  * 消息日志
  */
 console.info = function () {
-    printOut(makeColor('green').apply(global, arguments));
+    printOut(makeColor(configs.color ? 'green' : null).apply(global, arguments));
 };
 
 
@@ -148,7 +148,7 @@ console.info = function () {
  * 警告日志
  */
 console.warn = function () {
-    printOut(makeColor('yellow').apply(global, arguments));
+    printOut(makeColor(configs.color ? 'yellow' : null).apply(global, arguments));
 };
 
 
@@ -156,7 +156,7 @@ console.warn = function () {
  * 错误日志
  */
 console.error = function () {
-    printOut(makeColor('red').apply(global, arguments));
+    printOut(makeColor(configs.color ? 'red' : null).apply(global, arguments));
 };
 
 
