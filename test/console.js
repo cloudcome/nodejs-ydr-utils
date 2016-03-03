@@ -22,6 +22,15 @@ describe('console', function () {
         console.info('info 日志', {a: 1}, new Error('b'));
         console.warn('warn 日志', {a: 1}, new Error('b'));
         console.error('error 日志', {a: 1}, new Error('b'));
+        console.table([
+            ['#', '姓名', '成绩'],
+            ['1', '小名', '99'],
+            ['2', '打不开了去我的期望', '919'],
+            ['3', '打不开了去我的期望打不开了去我的期望', '91119'],
+        ], {
+            color: 'red',
+            style: 'bold'
+        });
     });
 
     //it('串行', function (done) {

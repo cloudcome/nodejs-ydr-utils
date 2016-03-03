@@ -20,9 +20,65 @@ var oldLog = console.log;
 
 
 /**********************************************
+ pretty
+ **********************************************/
+/**
+ * 格式错误对象
+ * @param err
+ * @returns {*}
+ */
+var formatError = function (err) {
+    if (!err || !(err instanceof Error)) {
+        return err;
+    }
+
+    var defaultErrorKey = {
+        type: true,
+        message: true,
+        name: true,
+        stack: true
+    };
+
+    var msg = err.stack || err.message || String(err);
+    var name = err.name || 'Error';
+
+    dato.each(err, function (key, val) {
+        if (!defaultErrorKey[key]) {
+            msg += '\n' + name + ' ' + key + ': ' + format(val);
+        }
+    });
+
+    return msg;
+};
+
+
+/**
+ * 美化对象输出
+ * @param obj
+ * @returns {*}
+ */
+var format = function (obj) {
+    if (typeis.String(obj)) {
+        return obj;
+    }
+
+    if (obj && obj instanceof Error) {
+        return formatError(obj);
+    }
+
+    try {
+        return util.inspect(obj, {
+            depth: 3
+        });
+    } catch (err) {
+        return formatError(err);
+    }
+};
+
+
+/**********************************************
  colors
  **********************************************/
-
 /**
  * 颜色包装器
  * @param color
@@ -30,8 +86,7 @@ var oldLog = console.log;
  */
 var makeColor = function (color) {
     return function () {
-        var msgs = allocation.args(arguments).map(pretty);
-        var msg = msgs.join(' ');
+        var msg = console.styles.format.apply(global, arguments);
 
         if (!color) {
             return msg;
@@ -53,14 +108,7 @@ console.colors = {
     green: makeColor('green'),
     yellow: makeColor('yellow'),
     inverse: makeColor('inverse'),
-    magenta: makeColor('magenta')
-};
-
-
-/**********************************************
- styles
- **********************************************/
-console.styles = {
+    magenta: makeColor('magenta'),
     bold: makeColor('bold'),
     italic: makeColor('italic'),
     underline: makeColor('underline')
@@ -68,10 +116,46 @@ console.styles = {
 
 
 /**********************************************
+ styles
+ **********************************************/
+console.styles = {
+    /**
+     * 格式化
+     * @returns {string}
+     */
+    format: function () {
+        return allocation.args(arguments).map(format).join(' ');
+    },
+
+    /**
+     * 美化
+     * @param out {String} 输出
+     * @param [colors] {Array} 颜色数组
+     * @returns {String}
+     */
+    pretty: function (out, colors) {
+        colors = colors || [];
+
+        if (!typeis.Array(colors)) {
+            colors = [colors];
+        }
+
+        dato.each(colors, function (index, color) {
+            color = String(color);
+
+            if (typeis.Function(console.colors[color])) {
+                out = console.colors[color](out);
+            }
+        });
+
+        return out;
+    }
+};
+
+
+/**********************************************
  out
  **********************************************/
-
-
 var configs = {
     // 是否颜色输出
     // PM2 环境不建议输出颜色，否则日志文件内有很多颜色代码
@@ -96,60 +180,6 @@ exports.config = function () {
 
 
 /**
- * 格式错误对象
- * @param err
- * @returns {*}
- */
-var formatError = function (err) {
-    if (!err || !(err instanceof Error)) {
-        return err;
-    }
-
-    var defaultErrorKey = {
-        type: true,
-        message: true,
-        name: true,
-        stack: true
-    };
-
-    var msg = err.stack || err.message || String(err);
-    var name = err.name || 'Error';
-
-    dato.each(err, function (key, val) {
-        if (!defaultErrorKey[key]) {
-            msg += '\n' + name + ' ' + key + ': ' + pretty(val);
-        }
-    });
-
-    return msg;
-};
-
-
-/**
- * 美化对象输出
- * @param obj
- * @returns {*}
- */
-var pretty = function (obj) {
-    if (typeis.String(obj)) {
-        return obj;
-    }
-
-    if (obj && obj instanceof Error) {
-        return formatError(obj);
-    }
-
-    try {
-        return util.inspect(obj, {
-            depth: 3
-        });
-    } catch (err) {
-        return formatError(err);
-    }
-};
-
-
-/**
  * 打印日志
  * @param msg
  */
@@ -162,7 +192,7 @@ var printOut = function (msg) {
  * 普通日志
  */
 console.log = function () {
-    oldLog.apply(console, allocation.args(arguments).map(pretty));
+    oldLog.apply(console, allocation.args(arguments).map(format));
 };
 
 
@@ -170,7 +200,13 @@ console.log = function () {
  * 消息日志
  */
 console.info = function () {
-    printOut(makeColor(configs.color ? 'green' : null).apply(global, arguments));
+    var out = console.styles.format.apply(global, arguments);
+
+    if (configs.color) {
+        out = console.styles.pretty(out, ['green', 'bold']);
+    }
+
+    printOut(out);
 };
 
 
@@ -178,7 +214,13 @@ console.info = function () {
  * 警告日志
  */
 console.warn = function () {
-    printOut(makeColor(configs.color ? 'yellow' : null).apply(global, arguments));
+    var out = console.styles.format.apply(global, arguments);
+
+    if (configs.color) {
+        out = console.styles.pretty(out, ['yellow', 'bold']);
+    }
+
+    printOut(out);
 };
 
 
@@ -186,15 +228,28 @@ console.warn = function () {
  * 错误日志
  */
 console.error = function () {
-    printOut(makeColor(configs.color ? 'red' : null).apply(global, arguments));
+    var out = console.styles.format.apply(global, arguments);
+
+    if (configs.color) {
+        out = console.styles.pretty(out, ['red', 'bold']);
+    }
+
+    printOut(out);
 };
 
 
+/**
+ * 表格
+ * @param trs
+ * @param options
+ * @returns {string}
+ */
 console.table = function (trs, options) {
     options = dato.extend({
         padding: 1,
         thead: false,
-        tdBorder: false
+        tdBorder: false,
+        styles: []
     }, options);
     var maxTrLength = 0;
     var maxTdsLength = [];
@@ -203,7 +258,7 @@ console.table = function (trs, options) {
 
     dato.each(trs, function (i, tds) {
         dato.each(tds, function (j, td) {
-            tds[j] = td = pretty(td);
+            tds[j] = td = format(td);
             var tdLength = td.length + options.padding * 2;
             maxTdsLength[j] = maxTdsLength[j] || 0;
             maxTdsLength[j] = Math.max(maxTdsLength[j], tdLength);
@@ -253,7 +308,9 @@ console.table = function (trs, options) {
 
     ret.push('└' + trBottomCenters.join('') + '┘');
 
-    return ret.join('\n');
+    var out = ret.join('\n');
+
+    printOut(console.styles.pretty(out, options.colors));
 };
 
 
