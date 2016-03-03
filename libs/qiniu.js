@@ -14,6 +14,7 @@ var dato = require('./dato.js');
 var random = require('./random.js');
 var path = require('./path.js');
 var typeis = require('./typeis.js');
+var number = require('./number.js');
 
 var defaults = {
     accessKey: '',
@@ -25,8 +26,8 @@ var defaults = {
     expires: 10 * 60 * 1000,
     mimeLimit: 'image/*'
 };
-var REG_START = /^\//;
-var REG_END = /\/$/;
+var REG_START = /^\/+/;
+var REG_END = /\/+$/;
 var configs = {
     accessKey: '',
     secretKey: '',
@@ -81,10 +82,12 @@ exports.signature = function (options) {
 
     if (options.dirname && options.dirname.length > 1) {
         dirname = REG_END.test(options.dirname) ? options.dirname : options.dirname + '/';
+        dirname = dirname.replace(REG_END, '/');
     }
 
     var key = path.join(dirname, options.filename || random.guid());
     key = key.replace(REG_START, '');
+    options.expires = number.parseInt(number, configs.expires);
     var deadline = options.expires + Date.now();
     var encoded = urlsafeBase64Encode(JSON.stringify({
         scope: options.bucket + ':' + key,
