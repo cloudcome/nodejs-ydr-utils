@@ -87,7 +87,7 @@ exports.signature = function (options) {
 
     var key = path.join(dirname, options.filename || random.guid());
     key = key.replace(REG_START, '');
-    options.expires = number.parseInt(number, configs.expires);
+    options.expires = number.parseInt(options.expires, configs.expires);
     var deadline = options.expires + Date.now();
     var encoded = urlsafeBase64Encode(JSON.stringify({
         scope: options.bucket + ':' + key,
