@@ -28,8 +28,7 @@ describe('console', function () {
             ['2', 'dqwdqwdqwdqw', '919'],
             ['3', '中文中文中文中文中文', '91119'],
         ], {
-            color: 'red',
-            style: 'bold'
+            colors: ['red', 'bold', 'inverse']
         });
     });
 
