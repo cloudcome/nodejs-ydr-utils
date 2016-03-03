@@ -61,12 +61,14 @@ exports.config = function () {
 /**
  * 签名
  * @param options {String|Object}
- * @param [options.dirname] {String}
- * @param [options.bucket] {String}
- * @param [options.expires] {String}
- * @param [options.mimeLimit] {String}
- * @param [options.accessKey] {String}
- * @param [options.secretKey] {String}
+ * @param [options.filename] {String} 文件名
+ * @param [options.dirname] {String} 路径
+ * @param [options.extname] {String} 后缀
+ * @param [options.bucket] {String} 仓库
+ * @param [options.expires] {String} 有效期
+ * @param [options.mimeLimit] {String} MIME限制
+ * @param [options.accessKey] {String} ak
+ * @param [options.secretKey] {String} sk
  * @returns {{key: string, token: string, url: *}}
  */
 exports.signature = function (options) {
@@ -85,7 +87,13 @@ exports.signature = function (options) {
         dirname = dirname.replace(REG_END, '/');
     }
 
+    var hasFilename = !!options.filename;
     var key = path.join(dirname, options.filename || random.guid());
+
+    if (!hasFilename && options.extname) {
+        key += options.extname;
+    }
+
     key = key.replace(REG_START, '');
     options.expires = number.parseInt(options.expires, configs.expires);
     var deadline = options.expires + Date.now();
