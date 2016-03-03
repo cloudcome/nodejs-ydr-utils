@@ -13,6 +13,7 @@ var allocation = require('./allocation.js');
 var dato = require('./dato.js');
 var random = require('./random.js');
 var path = require('./path.js');
+var typeis = require('./typeis.js');
 
 var defaults = {
     accessKey: '',
@@ -34,7 +35,7 @@ var configs = {
     // 上传目录
     dirname: '/',
     // 有效期，10分钟，单位秒
-    deadline: 10 * 60 * 1000,
+    expires: 10 * 60 * 1000,
     mimeLimit: '*'
 };
 
@@ -57,30 +58,46 @@ exports.config = function () {
 
 /**
  * 签名
- * @param filename
+ * @param options {String|Object}
+ * @param [options.dirname] {String}
+ * @param [options.bucket] {String}
+ * @param [options.expires] {String}
+ * @param [options.mimeLimit] {String}
+ * @param [options.accessKey] {String}
+ * @param [options.secretKey] {String}
  * @returns {{key: string, token: string, url: *}}
  */
-exports.signature = function (filename) {
-    var dirname = '';
-
-    if (configs.dirname && configs.dirname.length > 1) {
-        dirname = REG_END.test(configs.dirname) ? configs.dirname : configs.dirname + '/';
+exports.signature = function (options) {
+    if (typeis.String(options)) {
+        options = {
+            filename: options
+        };
     }
 
-    var key = path.join(dirname, filename || random.guid());
+    options = dato.extend({}, configs, options);
 
+    var dirname = '';
+
+    if (options.dirname && options.dirname.length > 1) {
+        dirname = REG_END.test(options.dirname) ? options.dirname : options.dirname + '/';
+    }
+
+    var key = path.join(dirname, options.filename || random.guid());
+    var deadline = options.expires + Date.now();
     var encoded = urlsafeBase64Encode(JSON.stringify({
-        scope: configs.bucket + ':' + key,
+        scope: options.bucket + ':' + key,
         // 有效期
-        deadline: Math.floor((configs.deadline + Date.now()) / 1000),
-        mimeLimit: configs.mimeLimit
+        deadline: Math.floor(deadline / 1000),
+        mimeLimit: options.mimeLimit
     }));
-    var encoded_signed = base64ToUrlSafe(hmacSha1(encoded, configs.secretKey));
+    var encoded_signed = base64ToUrlSafe(hmacSha1(encoded, options.secretKey));
 
     return {
         key: key,
-        token: configs.accessKey + ':' + encoded_signed + ':' + encoded,
-        url: path.joinURI(configs.host, key)
+        token: options.accessKey + ':' + encoded_signed + ':' + encoded,
+        url: path.joinURI(options.host, key),
+        deadline: deadline,
+        formKeys: ['key', 'token', 'file']
     };
 };
 
