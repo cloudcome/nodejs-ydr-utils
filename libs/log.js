@@ -20,6 +20,7 @@ var dato = require('./dato.js');
 var string = require('./string.js');
 var typeis = require('./typeis.js');
 var system = require('./system.js');
+var console = require('./console.js');
 
 
 // ==========================================
@@ -42,7 +43,7 @@ exports.__expressStart = function (options) {
 
         var log = function (ip) {
             if (!options.exclude.test(req.url)) {
-                exports.info(exports.magenta(ip, req.method, req.$fullURL));
+                console.info(console.colors.magenta(ip, req.method, req.$fullURL));
             }
         };
 
@@ -104,7 +105,7 @@ exports.__expressEnd = function (options) {
                 }
             });
 
-            exports.error(err);
+            console.error(err);
         }
 
         next(err);
@@ -117,7 +118,7 @@ exports.__expressEnd = function (options) {
 // ==========================================
 exports.holdError = function (err) {
     if (err && err instanceof Error) {
-        exports.error(err);
+        console.error(err);
     }
 };
 
@@ -192,7 +193,7 @@ exports.manage = function (options) {
         var logs = path.join(options.dirname, 'node-*.log');
         glob(logs, function (err, files) {
             if (err) {
-                return exports.error(err);
+                return console.error(err);
             }
 
             if (files.length <= options.maxLength) {
