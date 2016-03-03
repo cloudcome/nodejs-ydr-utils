@@ -422,3 +422,6 @@ console.loadingEnd = function () {
     timer = 0;
     global.console.pointEnd();
 };
+
+
+module.exports = console;
