@@ -27,8 +27,8 @@ var random = require('./random.js');
 var allocation = require('./allocation.js');
 var controller = require('./controller.js');
 var mime = require('./mime.js');
-var console = require('./console.js');
 var debug = require('./debug.js');
+require('./console.js');
 
 
 var NO_BODY_REQUEST = {

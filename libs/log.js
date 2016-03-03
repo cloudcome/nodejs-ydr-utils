@@ -20,7 +20,7 @@ var dato = require('./dato.js');
 var string = require('./string.js');
 var typeis = require('./typeis.js');
 var system = require('./system.js');
-var console = require('./console.js');
+require('./console.js');
 
 
 // ==========================================

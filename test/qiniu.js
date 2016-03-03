@@ -24,7 +24,7 @@ describe('7niu', function () {
 
         var sign = qiniu.signature('abc.jpg');
 
-        assert.equal(sign.key, '/res/abc.jpg');
+        assert.equal(sign.key, 'res/abc.jpg');
         assert.equal(sign.url, 'https://dn-fed.qbox.me/@/res/abc.jpg');
     });
 });

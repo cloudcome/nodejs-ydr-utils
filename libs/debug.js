@@ -12,7 +12,7 @@ var util = require('util');
 var typeis = require('./typeis.js');
 var dato = require('./dato.js');
 var string = require('./string.js');
-var console = require('./console.js');
+require('./console.js');
 
 var REG_BREAK_LINE = /[\n\r]/g;
 var configs = {

@@ -423,5 +423,3 @@ console.loadingEnd = function () {
     global.console.pointEnd();
 };
 
-
-module.exports = console;

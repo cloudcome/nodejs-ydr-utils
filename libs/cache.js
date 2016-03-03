@@ -10,7 +10,7 @@
 var dato = require('./dato.js');
 var number = require('./number.js');
 var typeis = require('./typeis.js');
-var console = require('./console.js');
+require('./console.js');
 
 var cache = Object.create(null);
 var cacheLength = 0;
