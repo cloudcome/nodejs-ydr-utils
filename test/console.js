@@ -13,15 +13,15 @@ require('../libs/console.js');
 
 
 describe('console', function () {
-    it('base', function () {
-        //console.log('--------------------');
-        //console.log();
-        //console.log();
-        //console.log('--------------------');
-        //console.log('log 日志', {a: 1}, new Error('b'));
-        //console.info('info 日志', {a: 1}, new Error('b'));
-        //console.warn('warn 日志', {a: 1}, new Error('b'));
-        //console.error('error 日志', {a: 1}, new Error('b'));
+    it('out', function () {
+        console.log('--------------------');
+        console.log();
+        console.log();
+        console.log('--------------------');
+        console.log('log 日志', {a: 1}, new Error('b'));
+        console.info('info 日志', {a: 1}, new Error('b'));
+        console.warn('warn 日志', {a: 1}, new Error('b'));
+        console.error('error 日志', {a: 1}, new Error('b'));
     });
 
     //it('串行', function (done) {

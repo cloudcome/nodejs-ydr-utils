@@ -18,6 +18,60 @@ var string = require('./string.js');
 var console = global.console;
 var oldLog = console.log;
 
+
+/**********************************************
+ colors
+ **********************************************/
+
+/**
+ * 颜色包装器
+ * @param color
+ * @returns {Function}
+ */
+var makeColor = function (color) {
+    return function () {
+        var msgs = allocation.args(arguments).map(pretty);
+        var msg = msgs.join(' ');
+
+        if (!color) {
+            return msg;
+        }
+
+        var args = [];
+
+        args.push('\x1b[' + util.inspect.colors[color][0] + 'm%s\x1b[' + util.inspect.colors[color][1] + 'm');
+        args.push(msg);
+
+        return util.format.apply(util, args);
+    };
+};
+
+console.colors = {
+    red: makeColor('red'),
+    grey: makeColor('grey'),
+    cyan: makeColor('cyan'),
+    green: makeColor('green'),
+    yellow: makeColor('yellow'),
+    inverse: makeColor('inverse'),
+    magenta: makeColor('magenta')
+};
+
+
+/**********************************************
+ styles
+ **********************************************/
+console.styles = {
+    bold: makeColor('bold'),
+    italic: makeColor('italic'),
+    underline: makeColor('underline')
+};
+
+
+/**********************************************
+ out
+ **********************************************/
+
+
 var configs = {
     // 是否颜色输出
     // PM2 环境不建议输出颜色，否则日志文件内有很多颜色代码
@@ -92,30 +146,6 @@ var pretty = function (obj) {
     } catch (err) {
         return formatError(err);
     }
-};
-
-
-/**
- * 颜色包装器
- * @param color
- * @returns {Function}
- */
-var makeColor = function (color) {
-    return function () {
-        var msgs = allocation.args(arguments).map(pretty);
-        var msg = msgs.join(' ');
-
-        if (!color) {
-            return msg;
-        }
-
-        var args = [];
-
-        args.push('\x1b[' + util.inspect.colors[color][0] + 'm%s\x1b[' + util.inspect.colors[color][1] + 'm');
-        args.push(msg);
-
-        return util.format.apply(util, args);
-    };
 };
 
 
