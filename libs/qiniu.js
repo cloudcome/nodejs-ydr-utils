@@ -96,8 +96,7 @@ exports.signature = function (options) {
         key: key,
         token: options.accessKey + ':' + encoded_signed + ':' + encoded,
         url: path.joinURI(options.host, key),
-        deadline: deadline,
-        formKeys: ['key', 'token', 'file']
+        deadline: deadline
     };
 };
 
