@@ -183,7 +183,7 @@ var Request = klass.extends(stream.Stream).create({
             return the;
         }
 
-        console.log(console.colors.magenta('[' + the._options.method + ' ' + the._urlList[the._urlList.length - 1] + ']'));
+        console.log(console.styles.pretty(the._options.method + ' ' + the._urlList[the._urlList.length - 1], 'magenta'));
         debug.info(event, msg);
 
         return the;
