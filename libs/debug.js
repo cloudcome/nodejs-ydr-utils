@@ -39,9 +39,12 @@ exports.config = function () {
 };
 
 
-var debugBuilder = function (color) {
+var debugFormat = function (color) {
     return function (name, desc, options) {
         var nameLines = [];
+
+        name = console.styles.format(name);
+        desc = console.styles.format(desc);
         options = dato.extend({}, configs, options);
 
         if (name.length > options.nameLength) {
@@ -75,17 +78,34 @@ var debugBuilder = function (color) {
         });
 
         desc = descLines.join('\n');
-        console.log(console.styles.pretty(name, 'cyan'),
+        return console.styles.format(console.styles.pretty(name, 'cyan'),
             options.nameArrow,
-            console.styles.pretty(desc, [color, 'bold']));
+            console.styles.pretty(desc, [color, 'bold'], options.color));
     };
 };
 
 
-exports.primary = exports.success = debugBuilder('green');
-exports.warning = exports.warn = debugBuilder('yellow');
-exports.error = exports.danger = debugBuilder('red');
-exports.normal = debugBuilder();
-exports.ignore = debugBuilder('grey');
+/**
+ * 打印
+ * @param formatter
+ * @returns {Function}
+ */
+var debugPrint = function (formatter) {
+    return function () {
+        console.log(formatter.apply(global, arguments));
+    };
+};
+
+exports.primary = exports.success = debugPrint(debugFormat('green'));
+exports.warning = exports.warn = debugPrint(debugFormat('yellow'));
+exports.error = exports.danger = debugPrint(debugFormat('red'));
+exports.normal = debugPrint(debugFormat());
+exports.ignore = debugPrint(debugFormat('grey'));
 
 
+exports.progress = function (name, desc, options) {
+    console.point(debugFormat(options.color)(name, desc));
+};
+exports.progressEnd = function () {
+    console.pointEnd();
+};

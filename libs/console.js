@@ -130,16 +130,20 @@ console.styles = {
 
     /**
      * 美化
-     * @param out {String} 输出
-     * @param [colors] {Array} 颜色数组
      * @returns {String}
      */
-    pretty: function (out, colors) {
-        colors = colors || [];
+    pretty: function (/*arguments*/) {
+        var args = allocation.args(arguments);
+        var out = args.shift();
+        var colors = [];
 
-        if (!typeis.Array(colors)) {
-            colors = [colors];
-        }
+        dato.each(args, function (index, arg) {
+            if (!typeis.Array(arg)) {
+                arg = [arg];
+            }
+
+            colors = colors.concat(arg);
+        });
 
         dato.each(colors, function (index, color) {
             color = String(color);
