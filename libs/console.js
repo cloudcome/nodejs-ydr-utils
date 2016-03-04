@@ -18,6 +18,47 @@ var string = require('./string.js');
 var console = global.console;
 var oldLog = console.log;
 
+var colorCodes = {
+    bold: [1, 22],
+    dim: [2, 22],
+    italic: [3, 23],
+    underline: [4, 24],
+    inverse: [7, 27],
+    hidden: [8, 28],
+    strikethrough: [9, 29],
+
+    black: [30, 39],
+    red: [31, 39],
+    green: [32, 39],
+    yellow: [33, 39],
+    blue: [34, 39],
+    magenta: [35, 39],
+    cyan: [36, 39],
+    white: [37, 39],
+    gray: [90, 39],
+    grey: [90, 39],
+
+    bgBlack: [40, 49],
+    bgRed: [41, 49],
+    bgGreen: [42, 49],
+    bgYellow: [43, 49],
+    bgBlue: [44, 49],
+    bgMagenta: [45, 49],
+    bgCyan: [46, 49],
+    bgWhite: [47, 49],
+
+    // legacy styles for colors pre v1.0.0
+    blackBG: [40, 49],
+    redBG: [41, 49],
+    greenBG: [42, 49],
+    yellowBG: [43, 49],
+    blueBG: [44, 49],
+    magentaBG: [45, 49],
+    cyanBG: [46, 49],
+    whiteBG: [47, 49]
+
+};
+
 
 /**********************************************
  pretty
@@ -94,7 +135,7 @@ var makeColor = function (color) {
 
         var args = [];
 
-        args.push('\x1b[' + util.inspect.colors[color][0] + 'm%s\x1b[' + util.inspect.colors[color][1] + 'm');
+        args.push('\x1b[' + colorCodes[color][0] + 'm%s\x1b[' + colorCodes[color][1] + 'm');
         args.push(msg);
 
         return util.format.apply(util, args);
@@ -102,16 +143,41 @@ var makeColor = function (color) {
 };
 
 console.colors = {
+    // forcecolor
+    black: makeColor('black'),
     red: makeColor('red'),
     grey: makeColor('grey'),
     cyan: makeColor('cyan'),
     green: makeColor('green'),
+    blue: makeColor('blue'),
     yellow: makeColor('yellow'),
     inverse: makeColor('inverse'),
     magenta: makeColor('magenta'),
+
+    // backcolor
+    bgBlack: makeColor('bgBlack'),
+    blackBG: makeColor('blackBG'),
+    bgRed: makeColor('bgRed'),
+    redBG: makeColor('redBG'),
+    bgGreen: makeColor('bgGreen'),
+    greenBG: makeColor('greenBG'),
+    bgYellow: makeColor('bgYellow'),
+    yellowBG: makeColor('yellowBG'),
+    bgBlue: makeColor('bgBlue'),
+    blueBG: makeColor('blueBG'),
+    bgMagenta: makeColor('bgMagenta'),
+    magentaBG: makeColor('magentaBG'),
+    bgCyan: makeColor('bgCyan'),
+    cyanBG: makeColor('cyanBG'),
+    bgWhite: makeColor('bgWhite'),
+    whiteBG: makeColor('whiteBG'),
+
+    // stylecolor
     bold: makeColor('bold'),
+    dim: makeColor('dim'),
     italic: makeColor('italic'),
     underline: makeColor('underline'),
+    hidden: makeColor('hidden'),
     original: makeColor()
 };
 

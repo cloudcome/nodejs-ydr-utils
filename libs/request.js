@@ -529,7 +529,7 @@ var Request = klass.extends(stream.Stream).create({
         }
 
         if (the._pipeTo) {
-            the.emit('response', resContent);
+            the.emit('response', res);
             resContent.pipe(the._pipeTo);
             return;
         }
@@ -542,7 +542,7 @@ var Request = klass.extends(stream.Stream).create({
 
         the.resContent = resContent;
         resContent.setEncoding(options.encoding);
-        the.emit('response', resContent);
+        the.emit('response', res);
 
         var callbackResponse = controller.once(function () {
             if (the._finished) {

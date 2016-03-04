@@ -10,10 +10,18 @@
 var howdo = require('howdo');
 
 require('../libs/console.js');
+var dato = require('../libs/dato.js');
 
 
 describe('console', function () {
-    it('out', function () {
+    it('color', function () {
+        dato.each(console.colors, function (color) {
+            console.log(console.colors[color](color));
+        });
+    });
+
+
+    xit('out', function () {
         console.log('--------------------');
         console.log();
         console.log();
