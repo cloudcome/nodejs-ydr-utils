@@ -79,9 +79,9 @@ var debugFormat = function (color) {
         });
 
         desc = descLines.join('\n');
-        return console.styles.format(console.styles.pretty(name, 'cyan'),
-            options.nameArrow,
-            console.styles.pretty(desc, [color, 'bold'], options.colors));
+        return console.styles.format(console.styles.pretty(name, 'bgBlue'),
+            console.styles.pretty(options.nameArrow, 'grey'),
+            console.styles.pretty(desc, color, options.colors));
     };
 };
 
@@ -97,7 +97,8 @@ var debugPrint = function (formatter) {
     };
 };
 
-exports.primary = exports.success= exports.info = debugPrint(debugFormat('green'));
+exports.primary = debugPrint(debugFormat('magenta'));
+exports.success= exports.info = debugPrint(debugFormat('green'));
 exports.warning = exports.warn = debugPrint(debugFormat('yellow'));
 exports.error = exports.danger = debugPrint(debugFormat('red'));
 exports.normal = debugPrint(debugFormat());

@@ -31,7 +31,7 @@ var colorCodes = {
     red: [31, 39],
     green: [32, 39],
     yellow: [33, 39],
-    blue: [34, 39],
+    blue: [94, 39],
     magenta: [35, 39],
     cyan: [36, 39],
     white: [37, 39],
