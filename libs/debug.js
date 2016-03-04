@@ -79,7 +79,7 @@ var debugFormat = function (color) {
         });
 
         desc = descLines.join('\n');
-        return console.styles.format(console.styles.pretty(name, 'blue'),
+        return console.styles.format(console.styles.pretty(name, 'blue', 'bold'),
             console.styles.pretty(options.nameArrow, 'grey'),
             console.styles.pretty(desc, color, options.colors));
     };
