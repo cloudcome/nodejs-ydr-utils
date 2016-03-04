@@ -12,185 +12,80 @@ var util = require('util');
 var typeis = require('./typeis.js');
 var dato = require('./dato.js');
 var string = require('./string.js');
+var allocation = require('./allocation.js');
 require('./console.js');
 
 var REG_BREAK_LINE = /[\n\r]/g;
 var configs = {
-    eventLength: 20,
-    eventAlign: 'right',
-    eventArrow: ' >> '
+    nameLength: 20,
+    nameAlign: 'right',
+    nameArrow: ' >> '
 };
-
-
-/**
- * 对齐消息
- * @param alignLength
- * @param msg
- * @param colorWrapper
- * @returns {*}
- */
-var alignMsg = function (alignLength, msg, colorWrapper) {
-    var msg2 = '';
-    var space = '\n';
-
-    dato.repeat(alignLength + configs.eventArrow.length, function () {
-        space += ' ';
-    });
-
-    var messageList = String(msg).split(REG_BREAK_LINE);
-
-    messageList.forEach(function (msg, index) {
-        if (index) {
-            msg2 += space + colorWrapper(msg);
-        } else {
-            msg2 += colorWrapper(msg);
-        }
-    });
-
-    return msg2;
-};
-
-
-/**
- * 打印消息
- * @param type
- * @param event
- * @param msg
- * @param [options] {Object} 配置
- */
-var debug = function (type, event, msg, options) {
-    if (typeis.boolean(options)) {
-        options = {
-            alignInverse: true
-        };
-    }
-
-    msg = util.format(msg);
-    options = dato.extend({}, configs, options);
-
-    var eventArrow = console.colors.grey(options.eventArrow);
-    var eventAlign = options.eventAlign;
-
-    if (options.alignInverse) {
-        eventAlign = eventAlign === 'left' ? 'right' : 'left';
-    }
-
-    event = eventAlign === 'left' ?
-        string.padRight(event, options.eventLength, '') :
-        string.padLeft(event, options.eventLength, '');
-
-    var eventLength = event.length;
-
-    var event2 = console.colors.yellow(event);
-    switch (type) {
-        case 'error':
-            msg = alignMsg(eventLength, msg, console.colors.red);
-            break;
-
-        case 'primary':
-            msg = alignMsg(eventLength, msg, console.colors.cyan);
-            break;
-
-        case 'warn':
-            msg = alignMsg(eventLength, msg, console.colors.magenta);
-            break;
-
-        case 'success':
-            msg = alignMsg(eventLength, msg, console.colors.green);
-            break;
-
-        case 'normal':
-            msg = alignMsg(eventLength, msg, console.colors.original);
-            break;
-
-        default :
-            event2 = console.colors.grey(event);
-            msg = alignMsg(eventLength, msg, console.colors.grey);
-            break;
-    }
-
-    process.stdout.write(event2 + eventArrow + msg + '\n');
-};
-
-
-module.exports = debug;
 
 
 /**
  * 配置
- * @param _configs
+ * @returns {*}
  */
-module.exports.config = function (_configs) {
-    dato.extend(configs, _configs);
+exports.config = function () {
+    return allocation.getset({
+        get: function (key) {
+            return configs[key];
+        },
+        set: function (key, val) {
+            configs[key] = val;
+        }
+    }, arguments);
 };
 
 
-/**
- * 打印错误日志
- * @param event {String} 事件名称
- * @param message {String} 事件内容
- * @param [options] {Object} 配置
- */
-module.exports.error = module.exports.danger = function (event, message, options) {
-    debug('error', event, message, options);
+var debugBuilder = function (color) {
+    return function (name, desc, options) {
+        var nameLines = [];
+        options = dato.extend({}, configs, options);
+
+        if (name.length > options.nameLength) {
+            while (name.length > options.nameLength) {
+                var temp = name.slice(0, options.nameLength);
+                name = name.slice(options.nameLength);
+                nameLines.push(temp);
+            }
+
+            if (name.length) {
+                nameLines.push(name);
+            }
+        } else {
+            nameLines = [name];
+        }
+
+        var lastName = nameLines[nameLines.length - 1];
+
+        nameLines[nameLines.length - 1] = options.nameAlign === 'left' ?
+            string.padRight(lastName, options.nameLength) :
+            string.padLeft(lastName, options.nameLength);
+        name = nameLines.join('\n');
+
+        var descLines = desc.split('\n');
+        var space = new Array(options.nameLength + 1 + options.nameArrow.length + 2).join(' ');
+
+        dato.each(descLines, function (index, line) {
+            if (index > 0) {
+                descLines[index] = space + line;
+            }
+        });
+
+        desc = descLines.join('\n');
+        console.log(console.styles.pretty(name, 'cyan'),
+            options.nameArrow,
+            console.styles.pretty(desc, [color, 'bold']));
+    };
 };
 
 
-/**
- * 打印主要日志
- * @param event {String} 事件名称
- * @param message {String} 事件内容
- * @param [options] {Object} 配置
- */
-module.exports.primary = function (event, message, options) {
-    debug('primary', event, message, options);
-};
-
-
-/**
- * 打印成功日志
- * @param event {String} 事件名称
- * @param message {String} 事件内容
- * @param [options] {Object} 配置
- */
-module.exports.info = module.exports.success = function (event, message, options) {
-    debug('success', event, message, options);
-};
-
-
-/**
- * 打印警告日志
- * @param event {String} 事件名称
- * @param message {String} 事件内容
- * @param [options] {Object} 配置
- */
-module.exports.warn = module.exports.warning = function (event, message, options) {
-    debug('warn', event, message, options);
-};
-
-
-/**
- * 打印普通日志
- * @param event {String} 事件名称
- * @param message {String} 事件内容
- * @param [options] {Object} 配置
- */
-module.exports.normal = module.exports.secondary = function (event, message, options) {
-    debug('normal', event, message, options);
-};
-
-
-/**
- * 打印忽略日志
- * @param event {String} 事件名称
- * @param message {String} 事件内容
- * @param [options] {Object} 配置
- */
-module.exports.ignore = function (event, message, options) {
-    debug('ignore', event, message, options);
-};
-
-
-
+exports.primary = exports.success = debugBuilder('green');
+exports.warning = exports.warn = debugBuilder('yellow');
+exports.error = exports.danger = debugBuilder('red');
+exports.normal = debugBuilder();
+exports.ignore = debugBuilder('grey');
 
 
