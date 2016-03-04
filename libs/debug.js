@@ -97,7 +97,7 @@ var debugPrint = function (formatter) {
     };
 };
 
-exports.primary = exports.success = debugPrint(debugFormat('green'));
+exports.primary = exports.success= exports.info = debugPrint(debugFormat('green'));
 exports.warning = exports.warn = debugPrint(debugFormat('yellow'));
 exports.error = exports.danger = debugPrint(debugFormat('red'));
 exports.normal = debugPrint(debugFormat());
