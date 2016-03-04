@@ -19,7 +19,8 @@ var REG_BREAK_LINE = /[\n\r]/g;
 var configs = {
     nameLength: 20,
     nameAlign: 'right',
-    nameArrow: ' >> '
+    nameArrow: ' >> ',
+    colors: []
 };
 
 
@@ -80,7 +81,7 @@ var debugFormat = function (color) {
         desc = descLines.join('\n');
         return console.styles.format(console.styles.pretty(name, 'cyan'),
             options.nameArrow,
-            console.styles.pretty(desc, [color, 'bold'], options.color));
+            console.styles.pretty(desc, [color, 'bold'], options.colors));
     };
 };
 
@@ -103,9 +104,10 @@ exports.normal = debugPrint(debugFormat());
 exports.ignore = debugPrint(debugFormat('grey'));
 
 
-exports.progress = function (name, desc, options) {
-    console.point(debugFormat(options.color)(name, desc));
+exports.wait = function (name, desc, options) {
+    console.point(debugFormat()(name, desc, options));
 };
-exports.progressEnd = function () {
+exports.waitEnd = function (name, desc, options) {
     console.pointEnd();
+    console.log(debugFormat()(name, desc, options));
 };

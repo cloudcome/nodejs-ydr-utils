@@ -12,17 +12,19 @@ var debug = require('../libs/debug.js');
 
 describe('debug', function () {
     it('print', function () {
-        debug.error('error', '春风吹北风吹春风吹北风吹春风吹北风吹 hello world!\n' +
-            '春风吹北风吹春风吹北风吹春风吹北风吹 hello world!\n' +
-            '春风吹北风吹春风吹北风吹春风吹北风吹 hello world!');
-        debug.primary('primaryprimaryprimaryprimary', '春风吹北风吹春风吹北风吹春风吹北风吹 hello world!\n' +
-            '春风吹北风吹春风吹北风吹春风吹北风吹 hello world!\n' +
-            '春风吹北风吹春风吹北风吹春风吹北风吹 hello world!');
-        debug.warn('warn', '春风吹北风吹春风吹北风吹春风吹北风吹 hello world!');
-        debug.success('success', '春风吹北风吹春风吹北风吹春风吹北风吹 hello world!');
-        debug.success('successsuccesssuccesssuccesssuccesssuccesssuccess[]', '春风吹北风吹春风吹北\n风吹春风吹北风吹 hello world!');
-        debug.normal('normal', '春风吹北风吹春风吹北风吹春风吹北风吹 hello world!');
-        debug.ignore('ignore', '春风吹北风吹春风吹北风吹春风吹北风吹 hello world!');
+        //debug.error('error', '春风吹北风吹春风吹北风吹春风吹北风吹 hello world!\n' +
+        //    '春风吹北风吹春风吹北风吹春风吹北风吹 hello world!\n' +
+        //    '春风吹北风吹春风吹北风吹春风吹北风吹 hello world!', {
+        //    colors: ['italic']
+        //});
+        //debug.primary('primaryprimaryprimaryprimary', '春风吹北风吹春风吹北风吹春风吹北风吹 hello world!\n' +
+        //    '春风吹北风吹春风吹北风吹春风吹北风吹 hello world!\n' +
+        //    '春风吹北风吹春风吹北风吹春风吹北风吹 hello world!');
+        //debug.warn('warn', '春风吹北风吹春风吹北风吹春风吹北风吹 hello world!');
+        //debug.success('success', '春风吹北风吹春风吹北风吹春风吹北风吹 hello world!');
+        //debug.success('successsuccesssuccesssuccesssuccesssuccesssuccess[]', '春风吹北风吹春风吹北\n风吹春风吹北风吹 hello world!');
+        //debug.normal('normal', '春风吹北风吹春风吹北风吹春风吹北风吹 hello world!');
+        //debug.ignore('ignore', '春风吹北风吹春风吹北风吹春风吹北风吹 hello world!');
     });
 
     it('progress', function (done) {
@@ -30,13 +32,15 @@ describe('debug', function () {
         var j = 20;
         var next = function () {
             if (i > j) {
-                debug.progressEnd('find', '');
+                debug.waitEnd('find', i, {
+                    colors: ['red', 'bold']
+                });
                 done();
                 return;
             }
 
-            debug.progress('go', i, {
-                color: 'red'
+            debug.wait('go', i, {
+                colors: ['red', 'bold']
             });
             i++;
             setTimeout(next, 500);
