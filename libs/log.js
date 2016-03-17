@@ -42,6 +42,8 @@ exports.__expressStart = function (options) {
         req.$fullURL = req.protocol + '://' + req.headers.host + req.url;
 
         var log = function (ip) {
+            req.$ip = ip;
+
             if (!options.exclude.test(req.url)) {
                 console.info(console.colors.magenta(ip, req.method, req.$fullURL));
             }
