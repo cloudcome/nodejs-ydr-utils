@@ -62,12 +62,12 @@ exports.signature = function (method, filename, headers) {
 
     // signature(method, headers);
     if (args.length === 2 && typeis(args[1]) === 'object') {
-        filename = random.guid();
+        filename = random.guid() + random.string();
         headers = args[1];
     }
     // signature(method)
     else if (args.length === 1) {
-        filename = random.guid();
+        filename = random.guid() + random.string();
     }
 
     headers = headers || {};
