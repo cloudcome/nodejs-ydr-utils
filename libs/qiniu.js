@@ -94,7 +94,8 @@ exports.signature = function (options) {
     }
 
     var hasFilename = !!options.filename;
-    var key = path.join(dirname, options.filename || random.guid());
+    // 多实例下 guid 还是会有重复的
+    var key = path.join(dirname, options.filename || random.guid() + random.string());
 
     if (!hasFilename && options.extname) {
         key += options.extname;
