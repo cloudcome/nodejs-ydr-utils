@@ -20,9 +20,10 @@ var osReleaseMap = require('../data/os-release.json');
 var winReleaseMap = require('../data/win-release.json');
 
 var IP_138 = 'http://1111.ip138.com/ic.asp';
+var IP_T086 = 'http://ip.t086.com/getip.php';
 var IP_QQ = 'http://ip.qq.com/';
 var IP_LOOKUP = 'http://int.dpool.sina.com.cn/iplookup/iplookup.php';
-
+var REG_IP = /\d{1,3}(\.\d{1,3}){3}/;
 
 /**
  * 获取本机局域网 IP 地址
@@ -69,37 +70,36 @@ exports.remoteIP = function (req, callback) {
     }
 
     req.headers = req.headers || {};
-    var ip = req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || req.ip;
+    var ip = req.headers['x-real-ip'] || req.headers['x-forwarded-for'] ||  req.ip;
 
     if (ip && !typeis.localIP(ip)) {
         return callback(null, ip);
     }
 
     howdo
-    // 从 ip138.com 处获取
+    // 从 IP_T086 处获取
         .task(function (done) {
             this.req = request({
-                url: IP_138
+                url: IP_T086
             }, function (err, body) {
                 if (err) {
                     return done(err);
                 }
 
-                var REG_HTML = /<center>.*?\[([^>]*?)].*?<\/center>/i;
-                var matches = body.match(REG_HTML);
+                var matches = body.match(REG_IP);
 
                 if (!matches) {
                     return done(new Error('empty'));
                 }
 
-                done(null, matches[1].trim());
+                done(null, matches[0]);
             });
         })
         .abort(function () {
             this.req.abort();
         })
 
-        // 从 ip.qq.com 处获取
+        // 从 IP_QQ 处获取
         .task(function (done) {
             this.req = request({
                 url: IP_QQ
@@ -108,14 +108,13 @@ exports.remoteIP = function (req, callback) {
                     return done(err);
                 }
 
-                var REG_HTML = /<span class="red">([^<]*?)<\/span><\/p>/i;
-                var matches = body.match(REG_HTML);
+                var matches = body.match(REG_IP);
 
                 if (!matches) {
                     return done(new Error('empty'));
                 }
 
-                done(null, matches[1].trim());
+                done(null, matches[0]);
             });
         })
         .abort(function () {
