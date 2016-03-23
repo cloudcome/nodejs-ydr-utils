@@ -137,7 +137,7 @@ var STR_FORMAT = 'YYYY-MM-DD';
  * @param [options.outLog=out.log] {String} out 日志
  * @param [options.errLog=err.log] {String} error 日志
  * @param [options.schedules] {Object} 定时器
- * @param [options.maxLength=15] {Number} 保留天数
+ * @param [options.maxLength=7] {Number} 保留天数
  */
 exports.manage = function (options) {
     options = dato.extend({
@@ -150,8 +150,8 @@ exports.manage = function (options) {
             h: [0],
             m: [0]
         }],
-        // 只保留 15 天之内日志
-        maxLength: 15
+        // 只保留 7 天之内日志
+        maxLength: 7
     }, options);
 
     if (!options.dirname) {
