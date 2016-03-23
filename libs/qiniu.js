@@ -73,8 +73,10 @@ exports.config = function () {
  * @param [options.accessKey] {String} ak
  * @param [options.secretKey] {String} sk
  * @param [options.callbackUrl] {String} 回调地址
- * @param [options.callbackBody] {String} 回调内容
+ * @param [options.callbackBody] {String} 回调内容形式
  * @param [options.callbackBodyType] {String} 回调类型
+ * @param [options.returnUrl] {String} 跳转地址
+ * @param [options.returnBody] {String} 跳转地址内容形式
  * @returns {{key: string, token: string, url: *}}
  */
 exports.signature = function (options) {
@@ -111,7 +113,9 @@ exports.signature = function (options) {
         mimeLimit: options.mimeLimit,
         callbackUrl: options.callbackUrl,
         callbackBody: options.callbackBody,
-        callbackBodyType: options.callbackBodyType
+        callbackBodyType: options.callbackBodyType,
+        returnUrl: options.returnUrl,
+        returnBody: options.returnBody
     }));
     var encoded_signed = base64ToUrlSafe(hmacSha1(encoded, options.secretKey));
 
