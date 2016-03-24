@@ -230,7 +230,17 @@ console.styles = {
 var configs = {
     // 是否颜色输出
     // PM2 环境不建议输出颜色，否则日志文件内有很多颜色代码
-    color: true
+    color: true,
+    // 日志级别
+    // 生产环境建议只打印出 warn、error 日志
+    level: [
+        'log',
+        'info',
+        'warn',
+        'error'
+    ],
+    // 内容部变量
+    _levelMap: {}
 };
 
 
@@ -245,6 +255,10 @@ console.config = function () {
         },
         set: function (key, val) {
             configs[key] = val;
+            configs._levelMap = {};
+            dato.each(configs.level, function (index, type) {
+                configs._levelMap[type] = true;
+            });
         }
     }, arguments);
 };
@@ -263,6 +277,10 @@ var printOut = function (msg) {
  * 普通日志
  */
 console.log = function () {
+    if (!configs._levelMap.log) {
+        return;
+    }
+
     oldLog.apply(console, allocation.args(arguments).map(format));
 };
 
@@ -271,6 +289,10 @@ console.log = function () {
  * 消息日志
  */
 console.info = function () {
+    if (!configs._levelMap.info) {
+        return;
+    }
+
     var out = console.styles.format.apply(global, arguments);
 
     if (configs.color) {
@@ -285,6 +307,10 @@ console.info = function () {
  * 警告日志
  */
 console.warn = function () {
+    if (!configs._levelMap.warn) {
+        return;
+    }
+
     var out = console.styles.format.apply(global, arguments);
 
     if (configs.color) {
@@ -299,6 +325,10 @@ console.warn = function () {
  * 错误日志
  */
 console.error = function () {
+    if (!configs._levelMap.error) {
+        return;
+    }
+
     var out = console.styles.format.apply(global, arguments);
 
     if (configs.color) {
@@ -350,7 +380,6 @@ console.table = function (trs, options) {
     var maxTdsLength = [];
     var ret = [];
     var padding = new Array(options.padding + 1).join(' ');
-
 
     dato.each(trs, function (i, tds) {
         dato.each(tds, function (j, td) {
