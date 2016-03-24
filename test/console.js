@@ -21,7 +21,11 @@ describe('console', function () {
     });
 
 
-    xit('out', function () {
+    it('out', function () {
+        console.config({
+            //color: false,
+            //level: ['error']
+        });
         console.log('--------------------');
         console.log();
         console.log();
@@ -34,7 +38,7 @@ describe('console', function () {
             ['#', 'dqwd', 'dqw'],
             ['1', 'dqw', '99'],
             ['2', 'dqwdqwdqwdqw', '919'],
-            ['3', '中文中文中文中文中文', '91119'],
+            ['3', '中文中文中文中文中文', '91119']
         ], {
             colors: ['red', 'bold', 'inverse']
         });

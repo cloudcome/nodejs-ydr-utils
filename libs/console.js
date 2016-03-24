@@ -244,6 +244,15 @@ var configs = {
 };
 
 
+// 生成配置日志级别 map
+var buildConfigLevelMap = function () {
+    configs._levelMap = {};
+    dato.each(configs.level, function (index, type) {
+        configs._levelMap[type] = true;
+    });
+};
+
+
 /**
  * 配置
  * @returns {*}
@@ -255,13 +264,11 @@ console.config = function () {
         },
         set: function (key, val) {
             configs[key] = val;
-            configs._levelMap = {};
-            dato.each(configs.level, function (index, type) {
-                configs._levelMap[type] = true;
-            });
+            buildConfigLevelMap();
         }
     }, arguments);
 };
+buildConfigLevelMap();
 
 
 /**
