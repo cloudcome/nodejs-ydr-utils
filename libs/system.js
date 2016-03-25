@@ -70,10 +70,11 @@ exports.remoteIP = function (req, callback) {
     }
 
     req.headers = req.headers || {};
-    var ip = req.headers['x-real-ip'] || req.headers['x-forwarded-for'] ||  req.ip;
+    var header = req.headers['x-real-ip'] || req.headers['x-forwarded-for'] || req.ip || '';
+    var matches = header.match(REG_IP);
 
-    if (ip && !typeis.localIP(ip)) {
-        return callback(null, ip);
+    if (matches && !typeis.localIP(matches[0])) {
+        return callback(null, matches[0]);
     }
 
     howdo
