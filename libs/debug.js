@@ -98,11 +98,10 @@ var debugPrint = function (formatter) {
 };
 
 exports.primary = debugPrint(debugFormat('magenta'));
-exports.success= exports.info = debugPrint(debugFormat('green'));
+exports.success = exports.info = debugPrint(debugFormat('green'));
 exports.warning = exports.warn = debugPrint(debugFormat('yellow'));
 var showError = debugPrint(debugFormat('red'));
 exports.error = exports.danger = function () {
-    console.log();
     showError.apply(global, arguments);
 };
 exports.normal = debugPrint(debugFormat());
@@ -114,5 +113,7 @@ exports.wait = function (name, desc, options) {
 };
 exports.waitEnd = function (name, desc, options) {
     console.pointEnd();
-    console.log(debugFormat()(name, desc, options));
+    if (name) {
+        console.log(debugFormat()(name, desc, options));
+    }
 };
