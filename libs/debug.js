@@ -15,7 +15,6 @@ var string = require('./string.js');
 var allocation = require('./allocation.js');
 require('./console.js');
 
-var REG_BREAK_LINE = /[\n\r]/g;
 var configs = {
     nameLength: 20,
     nameAlign: 'right',
@@ -97,22 +96,68 @@ var debugPrint = function (formatter) {
     };
 };
 
+/**
+ * 输出主要类型消息
+ * @type {Function}
+ */
 exports.primary = debugPrint(debugFormat('magenta'));
+
+
+/**
+ * 输出成功类型消息
+ * @type {Function}
+ */
 exports.success = exports.info = debugPrint(debugFormat('green'));
+
+
+/**
+ * 输出警告类型消息
+ * @type {Function}
+ */
 exports.warning = exports.warn = debugPrint(debugFormat('yellow'));
-var showError = debugPrint(debugFormat('red'));
-exports.error = exports.danger = function () {
-    showError.apply(global, arguments);
-};
+
+
+/**
+ * 输出错误类型消息
+ * @type {Function}
+ */
+exports.error = exports.danger = debugPrint(debugFormat('red'));
+
+
+/**
+ * 输出普通类型消息
+ * @type {Function}
+ */
 exports.normal = debugPrint(debugFormat());
+
+
+/**
+ * 输出不紧要类型消息
+ * @type {Function}
+ */
 exports.ignore = debugPrint(debugFormat('grey'));
 
 
+/**
+ * 等待消息
+ * @param name
+ * @param desc
+ * @param options
+ */
 exports.wait = function (name, desc, options) {
     console.point(debugFormat()(name, desc, options));
 };
+
+
+/**
+ * 等待结束
+ * @param name
+ * @param desc
+ * @param options
+ */
 exports.waitEnd = function (name, desc, options) {
     console.pointEnd();
+
     if (name) {
         console.log(debugFormat()(name, desc, options));
     }
