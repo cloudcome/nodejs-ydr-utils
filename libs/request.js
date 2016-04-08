@@ -66,7 +66,8 @@ var defaults = {
         'cache-control': 'no-cache',
         host: true,
         origin: true,
-        referrer: true,
+        // 经典错误，应为 referrer
+        referer: true,
         cookie: true
     },
     // 是否调试模式
@@ -226,7 +227,7 @@ var Request = klass.extends(stream.Stream).create({
                             ret.headers[key] = the._url.host;
                             break;
 
-                        case 'referrer':
+                        case 'referer':
                             ret.headers[key] = ret.url;
                             break;
 
