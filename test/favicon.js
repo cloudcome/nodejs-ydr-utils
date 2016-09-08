@@ -23,7 +23,7 @@ describe('favicon', function () {
         var u = Favicon.joinURL('baidu.com', 'baidu.com');
         assert.equal(u, 'http://baidu.com');
 
-        var url = 'malaclc.tmall.com';
+        var url = 'https://itroy.cc/';
         var favicon = new Favicon(url);
 
         favicon.get(function () {

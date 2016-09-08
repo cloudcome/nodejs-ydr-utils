@@ -23,7 +23,7 @@ var mimeMap = require('./../data/mime.json');
  */
 exports.get = function (extname, defaultContentType) {
     extname = String(extname).toLowerCase();
-    defaultContentType = defaultContentType || 'application/octect-stream';
+    defaultContentType = defaultContentType || 'application/octet-stream';
 
     return mimeMap[extname] || defaultContentType;
 };

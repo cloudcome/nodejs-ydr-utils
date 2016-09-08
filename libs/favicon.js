@@ -354,7 +354,7 @@ var Favicon = klass.extends(Emitter).create({
             return next();
         }
 
-        request.down(the.faviconURL, function (err, stream, res) {
+        request.down(the.faviconURL, function (err, body, res) {
             if (err || res.statusCode !== 200) {
                 the.emit('eror', new Error('download error: ' + this.options.href));
                 return next();
@@ -382,18 +382,13 @@ var Favicon = klass.extends(Emitter).create({
                 next();
             };
 
-            stream
-                .pipe(fse.createWriteStream(filePath))
-                .on('data', function (bf) {
-                    //var bf = fse.readFileSync(filePath);
-                    console.log('buffer fileType', buffer.fileType(bf));
-                })
-                .on('error', function () {
-                    the.emit('erorr', err);
-                    next();
-                })
-                .on('close', onend)
-                .on('end', onend);
+            try {
+                fse.writeFileSync(filePath, body, 'binary');
+                onend();
+            } catch (err) {
+                the.emit('erorr', err);
+                next();
+            }
         });
     },
 

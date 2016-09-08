@@ -88,7 +88,7 @@ var Request = klass.extends(stream.Stream).create({
         }
 
         the.id = random.guid();
-        options = the._options = dato.extend(true, {}, defaults, options);
+        options = the.options = dato.extend(true, {}, defaults, options);
         options.method = options.method.trim().toUpperCase();
         options.url = the._buildURL();
         the._url = ur.parse(options.url);
@@ -96,7 +96,7 @@ var Request = klass.extends(stream.Stream).create({
         the._urlMap = {};
         the._urlMap[options.url] = 1;
         the._requestTimes = 0;
-        the._cookies = the._options.cookies || {};
+        the._cookies = the.options.cookies || {};
         the._pipeTo = null;
         the._pipeFrom = null;
         // 是否正在读数据流
@@ -155,7 +155,7 @@ var Request = klass.extends(stream.Stream).create({
      */
     _buildURL: function () {
         var the = this;
-        var options = the._options;
+        var options = the.options;
         var query = '';
 
         if (options.query) {
@@ -180,11 +180,11 @@ var Request = klass.extends(stream.Stream).create({
     debug: function (event, msg) {
         var the = this;
 
-        if (!the._options.debug) {
+        if (!the.options.debug) {
             return the;
         }
 
-        console.log(console.styles.pretty(the._options.method + ' ' + the._urlList[the._urlList.length - 1], 'magenta'));
+        console.log(console.styles.pretty(the.options.method + ' ' + the._urlList[the._urlList.length - 1], 'magenta'));
         debug.info(event, msg);
 
         return the;
@@ -198,7 +198,7 @@ var Request = klass.extends(stream.Stream).create({
      */
     _buildRequestOptions: function () {
         var the = this;
-        var options = the._options;
+        var options = the.options;
         var ret = {
             headers: {}
         };
@@ -289,7 +289,7 @@ var Request = klass.extends(stream.Stream).create({
      */
     _buildRequestHeaders: function (requestOptions) {
         var the = this;
-        var options = the._options;
+        var options = the.options;
 
         if (the._pipeFrom) {
             return;
@@ -329,7 +329,7 @@ var Request = klass.extends(stream.Stream).create({
      */
     _buildRequestSend: function () {
         var the = this;
-        var options = the._options;
+        var options = the.options;
 
         the.req.requestId = random.guid();
 
@@ -366,7 +366,7 @@ var Request = klass.extends(stream.Stream).create({
         }
 
         the._started = true;
-        var options = the._options;
+        var options = the.options;
         var client = the._url.protocol === 'https:' ? https : http;
         var requestOptions = the._buildRequestOptions();
 
@@ -388,7 +388,7 @@ var Request = klass.extends(stream.Stream).create({
             // 30x redirect
             if (res.statusCode >= 300 && res.statusCode < 400) {
                 var redirectURL = res.headers.location || the._url.href;
-                redirectURL = ur.resolve(the._url.href, redirectURL)
+                redirectURL = ur.resolve(the._url.href, redirectURL);
                 the._urlList.push(redirectURL);
                 the._urlMap[redirectURL] = the._urlMap[redirectURL] || 0;
                 the._urlMap[redirectURL]++;
@@ -507,7 +507,7 @@ var Request = klass.extends(stream.Stream).create({
      */
     _receiveResponse: function () {
         var the = this;
-        var options = the._options;
+        var options = the.options;
         var req = the.req;
         var res = the.res;
 
@@ -516,6 +516,12 @@ var Request = klass.extends(stream.Stream).create({
         if (options.method === 'HEAD') {
             the._ignoreError = true;
             the.emit('response', res);
+
+            if (the._callback) {
+                the._finished = true;
+                the._callback.call(the, null, res.headers, res);
+            }
+
             return;
         }
 
@@ -783,6 +789,26 @@ request.get = function (url, callback) {
     }
 
     options.method = 'GET';
+    return new Request(options, callback);
+};
+
+
+/**
+ * head 请求
+ * @param url
+ * @param callback
+ * @returns {Error|Domain|Suite}
+ */
+request.head = function (url, callback) {
+    var options = url;
+
+    if (typeis.String(options)) {
+        options = {
+            url: url
+        };
+    }
+
+    options.method = 'HEAD';
     return new Request(options, callback);
 };
 
