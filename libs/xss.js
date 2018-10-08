@@ -536,7 +536,7 @@ function _buildLink(href, title, text, isBlank, isNoFavicon) {
         (isBlank ? ' target="_blank" rel="nofollow"' : '') +
         (title ? ' ' + title : '') +
         '>' +
-        (isNoFavicon ? '' : '<img src="http://f.ydr.me/' + href + '" class="favicon" width="16" height="16" alt="f">') +
+        (isNoFavicon ? '' : '<img src="https://f.ydr.me/' + href + '" class="favicon" width="16" height="16" alt="f">') +
         (text || href) + '</a>';
 }
 
