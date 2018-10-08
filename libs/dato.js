@@ -355,7 +355,7 @@ exports.gravatar = function (email, options) {
     email = email.toLowerCase();
 
     if (!options.origin) {
-        options.origin = 'http://cn.gravatar.com/avatar/';
+        options.origin = 'https://cn.gravatar.com/avatar/';
     }
 
     options.origin += encryption.md5(email) + '?';
